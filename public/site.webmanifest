@@ -1,0 +1,14 @@
+{
+  "name": "Dersly",
+  "short_name": "Dersly",
+  "description": "Your English lessons, all in one place",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FDFDFA",
+  "theme_color": "#00746E",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
