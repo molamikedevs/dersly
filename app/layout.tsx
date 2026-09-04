@@ -1,20 +1,8 @@
 import { ThemeProvider } from '@/components/theme/theme-provider';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { geistMono, geistSans } from '@/config/font';
 import './globals.css';
-
 export { metadata, viewport } from '@/config/site';
-
-const geistSans = Geist({
-  variable: '--font-sans',
-  subsets: ['latin'],
-  display: 'swap',
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-mono',
-  subsets: ['latin'],
-  display: 'swap',
-});
 
 export default function RootLayout({
   children,
@@ -34,7 +22,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <TooltipProvider>{children}</TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -1,4 +1,4 @@
-export function SkipLink() {
+export default function SkipLink() {
   return (
     <a
       href="#main"

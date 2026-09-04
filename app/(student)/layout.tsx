@@ -1,4 +1,6 @@
-import { SkipLink } from '@/components/ui/layout/skip-link';
+import StudentTabBar from '@/components/ui/layout/navigation/student-tab-bar';
+import StudentTopBar from '@/components/ui/layout/navigation/student-top-bar';
+import SkipLink from '@/components/ui/layout/skip-link';
 
 export default function StudentLayout({
   children,
@@ -8,10 +10,14 @@ export default function StudentLayout({
   return (
     <>
       <SkipLink />
-
-      <main id="main" className="flex-1">
+      <StudentTopBar />
+      <main
+        id="main"
+        className="container-app flex-1 pt-4 pb-24 md:pt-6 md:pb-10"
+      >
         {children}
       </main>
+      <StudentTabBar />
     </>
   );
 }
