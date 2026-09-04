@@ -39,7 +39,7 @@ export async function signUp(values: unknown): Promise<ActionResult> {
   const { data: classRow } = await supabase
     .from('classes')
     .select('id')
-    .eq('invite_code', code)
+    .ilike('invite_code', code)
     .eq('is_active', true)
     .maybeSingle();
 
@@ -73,7 +73,13 @@ export async function signUp(values: unknown): Promise<ActionResult> {
         'Account created, but joining the class failed. Tell your teacher.',
     };
 
-  redirect('/');
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', data.user.id)
+    .single();
+
+  redirect(profile?.role === 'teacher' ? '/dashboard' : '/');
 }
 
 export async function signOut() {

@@ -20,6 +20,8 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { toast } from '@/components/ui/toast';
+import { signIn } from '@/features/auth/actions';
 import { LogInSchema, type LogInValues } from '@/lib/validation/auth.schema';
 
 export function LoginForm() {
@@ -31,7 +33,9 @@ export function LoginForm() {
   const { isSubmitting } = form.formState;
 
   async function onSubmit(data: LogInValues) {
-    console.log(data);
+    const result = await signIn(data);
+    if (result?.error)
+      toast.add({ title: 'Registration error', description: result.error });
   }
 
   return (

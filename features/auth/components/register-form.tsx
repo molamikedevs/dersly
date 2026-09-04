@@ -21,6 +21,8 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { toast } from '@/components/ui/toast';
+import { signUp } from '@/features/auth/actions';
 import {
   RegisterSchema,
   type RegisterValues,
@@ -35,7 +37,9 @@ export function RegisterForm() {
   const { isSubmitting } = form.formState;
 
   async function onSubmit(data: RegisterValues) {
-    console.log(data);
+    const result = await signUp(data);
+    if (result?.error)
+      toast.add({ title: 'Registration error', description: result.error });
   }
 
   return (
