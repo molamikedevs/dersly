@@ -23,6 +23,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/toast';
 import { signUp } from '@/features/auth/actions';
+import PasswordInput from '@/features/auth/components/password-input';
 import {
   RegisterSchema,
   type RegisterValues,
@@ -39,19 +40,24 @@ export function RegisterForm() {
   async function onSubmit(data: RegisterValues) {
     const result = await signUp(data);
     if (result?.error)
-      toast.add({ title: 'Registration error', description: result.error });
+      toast.add({
+        title: 'Could not create account',
+        description: result.error,
+      });
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-2xl">Create your account</CardTitle>
+    <Card className="border-0 bg-transparent shadow-none sm:border sm:bg-card sm:shadow-sm">
+      <CardHeader className="px-4 sm:px-6">
+        <CardTitle className="text-xl sm:text-2xl">
+          Create your account
+        </CardTitle>
         <CardDescription>
           Use the class code your teacher gave you.
         </CardDescription>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="px-4 sm:px-6">
         <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
           <FieldGroup>
             <Controller
@@ -66,7 +72,6 @@ export function RegisterForm() {
                     autoComplete="name"
                     placeholder="Aysel Mammadova"
                     aria-invalid={fieldState.invalid}
-                    className="h-11"
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -89,7 +94,6 @@ export function RegisterForm() {
                     autoComplete="email"
                     placeholder="you@example.com"
                     aria-invalid={fieldState.invalid}
-                    className="h-11"
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -104,16 +108,15 @@ export function RegisterForm() {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="register-password">Password</FieldLabel>
-                  <Input
+                  <PasswordInput
                     {...field}
                     id="register-password"
-                    type="password"
                     autoComplete="new-password"
                     placeholder="••••••••"
                     aria-invalid={fieldState.invalid}
-                    className="h-11"
+                    aria-describedby="register-password-hint"
                   />
-                  <FieldDescription>
+                  <FieldDescription id="register-password-hint">
                     At least 8 characters, with a letter and a number.
                   </FieldDescription>
                   {fieldState.invalid && (
@@ -131,12 +134,22 @@ export function RegisterForm() {
                   <FieldLabel htmlFor="register-code">Class code</FieldLabel>
                   <Input
                     {...field}
+                    // Normalise on the way in so the value matches what is
+                    // displayed. `uppercase` is presentation only and was
+                    // submitting whatever case the student typed.
+                    onChange={(e) =>
+                      field.onChange(e.target.value.toUpperCase())
+                    }
                     id="register-code"
                     autoComplete="off"
                     autoCapitalize="characters"
+                    autoCorrect="off"
+                    spellCheck={false}
                     placeholder="ABC123"
                     aria-invalid={fieldState.invalid}
-                    className="h-11 font-mono tracking-widest uppercase"
+                    // invite-code utility: mono, uppercase, wide tracking,
+                    // tabular figures and slashed zero from the theme.
+                    className="invite-code"
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -145,11 +158,7 @@ export function RegisterForm() {
               )}
             />
 
-            <Button
-              type="submit"
-              className="h-11 w-full"
-              disabled={isSubmitting}
-            >
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting && (
                 <Loader2 className="size-4 animate-spin" aria-hidden />
               )}

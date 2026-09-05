@@ -1,23 +1,24 @@
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { cache } from 'react';
 
-async function getProfile() {
+const getProfile = cache(async () => {
   const supabase = createClient(await cookies());
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
+
+  const { data } = await supabase.auth.getClaims();
+  const userId = data?.claims.sub;
+  if (!userId) redirect('/login');
 
   const { data: profile } = await supabase
     .from('profiles')
     .select('id, full_name, email, role, level')
-    .eq('id', user.id)
+    .eq('id', userId)
     .single();
 
   if (!profile) redirect('/login');
   return profile;
-}
+});
 
 export async function requireTeacher() {
   const profile = await getProfile();

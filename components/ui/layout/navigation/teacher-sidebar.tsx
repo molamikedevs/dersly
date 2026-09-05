@@ -7,6 +7,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import { TEACHER_NAV } from '@/constants/nav';
 import SignOutButton from '@/features/auth/components/signout-button';
@@ -24,6 +25,8 @@ export function TeacherSidebar({
   email = 'teacher@dersly.app',
 }: TeacherSidebarProps) {
   const pathname = usePathname();
+  const { isMobile, setOpenMobile } = useSidebar();
+
   const initials = name
     .split(' ')
     .map((part) => part[0])
@@ -45,19 +48,27 @@ export function TeacherSidebar({
               return (
                 <li key={href}>
                   <Link
+                    onClick={() => {
+                      if (isMobile) setOpenMobile(false);
+                    }}
                     href={href}
                     title={label}
                     aria-current={active ? 'page' : undefined}
                     className={cn(
-                      'relative flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors',
+                      'tap-row relative flex items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors',
                       'group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0',
-                      'before:absolute before:left-0 before:top-1/2 before:h-5 before:w-1 before:-translate-y-1/2 before:rounded-r-full before:bg-primary before:transition-opacity',
+                      'before:absolute before:left-0 before:top-1/2 before:h-5 before:w-0.5 before:-translate-y-1/2',
+                      'before:rounded-r-full before:bg-primary before:transition-opacity',
                       active
                         ? 'bg-accent text-accent-foreground before:opacity-100'
                         : 'text-muted-foreground before:opacity-0 hover:bg-muted hover:text-foreground',
                     )}
                   >
-                    <Icon className="size-4 shrink-0" aria-hidden />
+                    <Icon
+                      className="size-4 shrink-0"
+                      aria-hidden
+                      strokeWidth={active ? 2.25 : 1.75}
+                    />
                     <span className="truncate group-data-[collapsible=icon]:hidden">
                       {label}
                     </span>
@@ -81,18 +92,22 @@ export function TeacherSidebar({
             <p className="truncate text-sm font-medium text-foreground">
               {name}
             </p>
-            <p className="truncate text-xs text-muted-foreground">{email}</p>
-          </div>
-          <div className="group-data-[collapsible=icon]:hidden">
-            <ThemeSwitch />
+            {/* Break on the @ rather than clipping "gmail...." mid-word. */}
+            <p className="truncate text-xs text-muted-foreground" title={email}>
+              {email}
+            </p>
           </div>
         </div>
 
-        <SignOutButton className="group-data-[collapsible=icon]:hidden" />
-        <SignOutButton
-          collapsed
-          className="hidden group-data-[collapsible=icon]:block"
-        />
+        <div className="flex items-center gap-2 group-data-[collapsible=icon]:hidden">
+          <SignOutButton className="min-w-0 flex-1" />
+          <ThemeSwitch />
+        </div>
+
+        <div className="hidden flex-col gap-2 group-data-[collapsible=icon]:flex">
+          <SignOutButton collapsed />
+          <ThemeSwitch />
+        </div>
       </SidebarFooter>
     </Sidebar>
   );

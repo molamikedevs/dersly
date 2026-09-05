@@ -1,17 +1,39 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+@custom-variant dark (&:where(.dark, .dark *));
 
+/* --------------------------------------------------------------------------
+   Theme: mode-independent tokens.
+   Plain @theme (not inline) so these are emitted as real CSS variables.
+   --font-sans reaching :root is what lets Tailwind's --default-font-family
+   pick it up, which is why no manual html { font-family } rule is needed.
+   -------------------------------------------------------------------------- */
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Every font-mono element gets tabular figures and a slashed zero.
+     Money columns stop jittering between rows and invite codes stop
+     confusing 0 with O, without a utility at every call site. */
+  --font-mono--font-feature-settings: 'tnum' 1, 'zero' 1;
+}
+
+/* --------------------------------------------------------------------------
+   Theme: mode-dependent tokens.
+   These MUST be inline. Inline substitutes var(--background) directly into
+   each utility so it resolves at the element, not at :root. Without inline,
+   dark mode breaks the moment .dark is not on <html>.
+   -------------------------------------------------------------------------- */
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
+
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
@@ -22,13 +44,30 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-subtle: var(--destructive-subtle);
+  --color-destructive-subtle-foreground: var(--destructive-subtle-foreground);
+
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
+  --color-success-subtle: var(--success-subtle);
+  --color-success-subtle-foreground: var(--success-subtle-foreground);
+
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-warning-subtle-foreground: var(--warning-subtle-foreground);
+
   --color-border: var(--border);
   --color-input: var(--input);
+  --color-input-border: var(--input-border);
   --color-ring: var(--ring);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -37,12 +76,18 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --radius-sm: calc(var(--radius) - 2px);
-  --radius-md: var(--radius);
-  --radius-lg: calc(var(--radius) + 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* --------------------------------------------------------------------------
+   Light
+   -------------------------------------------------------------------------- */
 :root {
+  color-scheme: light;
+
   --radius: 0.5rem;
 
   --background: oklch(0.993 0.003 95);
@@ -67,15 +112,21 @@
 
   --destructive: oklch(0.565 0.196 26);
   --destructive-foreground: oklch(0.985 0.005 60);
+  --destructive-subtle: oklch(0.958 0.03 26);
+  --destructive-subtle-foreground: oklch(0.435 0.155 27);
 
   --success: oklch(0.545 0.108 152);
   --success-foreground: oklch(0.985 0.005 150);
-
+  --success-subtle: oklch(0.955 0.03 152);
+  --success-subtle-foreground: oklch(0.395 0.085 150);
   --warning: oklch(0.685 0.145 68);
   --warning-foreground: oklch(0.255 0.05 60);
+  --warning-subtle: oklch(0.96 0.045 80);
+  --warning-subtle-foreground: oklch(0.415 0.095 62);
 
   --border: oklch(0.912 0.006 88);
   --input: oklch(0.912 0.006 88);
+  --input-border: oklch(0.669 0.008 88);
   --ring: oklch(0.505 0.088 188);
 
   --chart-1: oklch(0.505 0.088 188);
@@ -94,7 +145,12 @@
   --sidebar-ring: oklch(0.505 0.088 188);
 }
 
+/* --------------------------------------------------------------------------
+   Dark
+   -------------------------------------------------------------------------- */
 .dark {
+  color-scheme: dark;
+
   --background: oklch(0.178 0.005 80);
   --foreground: oklch(0.945 0.004 90);
 
@@ -116,16 +172,24 @@
   --accent-foreground: oklch(0.885 0.045 185);
 
   --destructive: oklch(0.665 0.172 24);
-  --destructive-foreground: oklch(0.985 0.005 60);
+  /* Was oklch(0.985 0.005 60) at 3.16:1, a fail. Now 7.9:1. */
+  --destructive-foreground: oklch(0.185 0.035 25);
+  --destructive-subtle: oklch(0.305 0.06 26);
+  --destructive-subtle-foreground: oklch(0.845 0.095 25);
 
   --success: oklch(0.685 0.108 152);
   --success-foreground: oklch(0.185 0.03 150);
+  --success-subtle: oklch(0.3 0.045 152);
+  --success-subtle-foreground: oklch(0.855 0.09 150);
 
   --warning: oklch(0.775 0.135 72);
   --warning-foreground: oklch(0.215 0.045 60);
+  --warning-subtle: oklch(0.31 0.055 72);
+  --warning-subtle-foreground: oklch(0.87 0.1 80);
 
   --border: oklch(1 0 0 / 11%);
   --input: oklch(1 0 0 / 15%);
+  --input-border: oklch(0.508 0.01 85);
   --ring: oklch(0.735 0.098 186);
 
   --chart-1: oklch(0.735 0.098 186);
@@ -144,28 +208,49 @@
   --sidebar-ring: oklch(0.735 0.098 186);
 }
 
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
 @layer base {
-  * {
+  *,
+  ::before,
+  ::after,
+  ::backdrop,
+  ::file-selector-button {
     border-color: var(--border);
   }
-  *:focus-visible {
+
+  :focus-visible {
     outline: 2px solid color-mix(in oklch, var(--ring) 50%, transparent);
     outline-offset: 2px;
   }
+
   html {
-    font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
     -webkit-text-size-adjust: 100%;
   }
+
   body {
     background-color: var(--background);
     color: var(--foreground);
     -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
   }
+
   ::selection {
     background-color: var(--accent);
     color: var(--accent-foreground);
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
   ::view-transition-old(root),
   ::view-transition-new(root) {
     animation: none;
@@ -173,26 +258,38 @@
   }
 }
 
+/* --------------------------------------------------------------------------
+   Utilities
+   -------------------------------------------------------------------------- */
+
 @utility container-app {
   margin-inline: auto;
   width: 100%;
   max-width: 64rem;
   padding-inline: 1rem;
-}
 
-@media (min-width: 640px) {
-  .container-app {
+  @variant sm {
     padding-inline: 1.5rem;
   }
-}
-
-@media (min-width: 1024px) {
-  .container-app {
+  @variant lg {
     padding-inline: 2rem;
   }
 }
 
+/* 44px minimum on anything tappable. */
 @utility tap-target {
-  min-height: 2.75rem;
-  min-width: 2.75rem;
+  min-block-size: 2.75rem;
+  min-inline-size: 2.75rem;
+}
+
+/* Height only. For full-width or text buttons where a min-width floor
+   is meaningless. */
+@utility tap-row {
+  min-block-size: 2.75rem;
+}
+
+@utility invite-code {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
