@@ -6,16 +6,18 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
+import { requireTeacher } from '@/features/auth/guard';
 
-export default function TeacherLayout({
+export default async function TeacherLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const profile = await requireTeacher();
   return (
     <SidebarProvider>
       <SkipLink />
-      <TeacherSidebar />
+      <TeacherSidebar name={profile.full_name} email={profile.email} />
       <SidebarInset>
         <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 border-b bg-background/80 px-4 backdrop-blur-sm">
           <SidebarTrigger className="-ml-1" />
