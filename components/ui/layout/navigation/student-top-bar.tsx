@@ -2,6 +2,7 @@
 
 import ThemeSwitch from '@/components/theme/theme-switch';
 import { STUDENT_TOP_NAV } from '@/constants/nav';
+import SignOutButton from '@/features/auth/components/signout-button';
 import { cn, isActive } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -36,7 +37,11 @@ export default function StudentTopBar() {
           })}
         </nav>
 
-        <ThemeSwitch />
+        <div className="flex items-center gap-4 md:gap-2">
+          <ThemeSwitch />
+          <SignOutButton collapsed className="md:hidden" />
+          <SignOutButton className="hidden w-auto md:block" />
+        </div>
       </div>
     </header>
   );

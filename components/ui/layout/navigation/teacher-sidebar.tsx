@@ -9,6 +9,7 @@ import {
   SidebarHeader,
 } from '@/components/ui/sidebar';
 import { TEACHER_NAV } from '@/constants/nav';
+import SignOutButton from '@/features/auth/components/signout-button';
 import { cn, isActive } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -68,7 +69,7 @@ export function TeacherSidebar({
         </nav>
       </SidebarContent>
 
-      <SidebarFooter className="border-t p-3">
+      <SidebarFooter className="gap-2 border-t p-3">
         <div className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
           <span
             aria-hidden
@@ -86,6 +87,12 @@ export function TeacherSidebar({
             <ThemeSwitch />
           </div>
         </div>
+
+        <SignOutButton className="group-data-[collapsible=icon]:hidden" />
+        <SignOutButton
+          collapsed
+          className="hidden group-data-[collapsible=icon]:block"
+        />
       </SidebarFooter>
     </Sidebar>
   );
