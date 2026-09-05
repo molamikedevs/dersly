@@ -14,30 +14,35 @@ export default function StudentTabBar() {
       className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 backdrop-blur-md md:hidden"
       style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 0.5rem)' }}
     >
-      <ul className="grid grid-cols-4 gap-1 px-2 pt-2">
+      <ul className="grid grid-cols-4">
         {STUDENT_TAB_NAV.map(({ label, href, icon: Icon }) => {
           const active = isActive(pathname, href, href === '/');
+
           return (
             <li key={href}>
               <Link
                 href={href}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'flex min-h-16 w-full flex-col items-center justify-center gap-1.5 rounded-xl px-1 py-2 transition-colors',
-                  active
-                    ? 'bg-accent text-primary'
-                    : 'text-muted-foreground active:bg-muted',
+                  'relative flex h-16 flex-col items-center justify-center gap-1 px-1',
+                  'transition-colors active:bg-muted',
+                  active ? 'text-primary' : 'text-muted-foreground',
                 )}
               >
-                <Icon
+                <span
+                  aria-hidden
                   className={cn(
-                    'size-6 shrink-0 transition-transform duration-200',
-                    active && 'scale-110',
+                    'absolute inset-x-4 top-0 h-0.5 rounded-b-full bg-primary transition-opacity',
+                    active ? 'opacity-100' : 'opacity-0',
                   )}
+                />
+
+                <Icon
+                  className="size-6 shrink-0"
                   aria-hidden
                   strokeWidth={active ? 2.25 : 1.75}
                 />
-                <span className="w-full truncate text-center text-xs font-medium leading-none">
+                <span className="max-w-full truncate text-xs font-medium leading-tight">
                   {label}
                 </span>
               </Link>
