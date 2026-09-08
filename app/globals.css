@@ -1,21 +1,30 @@
+/* ==========================================================================
+   Dersly design system
+   Tailwind CSS v4 (CSS-first) + shadcn/ui
+   Teal primary. Warm neutrals in light, teal-tinted near-black in dark.
+   Radius 0.5rem. Geist Sans / Geist Mono.
+   ========================================================================== */
+
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+
+/* Drive dark mode from the .dark class instead of prefers-color-scheme.
+   :where() keeps specificity at zero and matches the .dark element itself. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* --------------------------------------------------------------------------
    Theme: mode-independent tokens.
    Plain @theme (not inline) so these are emitted as real CSS variables.
    --font-sans reaching :root is what lets Tailwind's --default-font-family
-   pick it up, which is why no manual html { font-family } rule is needed.
+   pick it up, which is why there is no manual html { font-family } rule.
    -------------------------------------------------------------------------- */
 @theme {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  /* Every font-mono element gets tabular figures and a slashed zero.
-     Money columns stop jittering between rows and invite codes stop
-     confusing 0 with O, without a utility at every call site. */
+  /* Tabular figures and a slashed zero on every font-mono element.
+     Money columns stop jittering, invite codes stop confusing 0 with O. */
   --font-mono--font-feature-settings: 'tnum' 1, 'zero' 1;
 }
 
@@ -42,6 +51,9 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+
+  /* Status. Solid pair = filled badge or button. Subtle pair = tinted row
+     or inline badge. See the note on --warning in :root. */
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-destructive-subtle: var(--destructive-subtle);
@@ -76,6 +88,9 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* shadcn's own mapping. Card uses rounded-xl, most controls rounded-md.
+     Deviating puts components at radii their authors did not design for. */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -92,6 +107,7 @@
 
   --background: oklch(0.993 0.003 95);
   --foreground: oklch(0.205 0.008 75);
+  --background-gradient: none;
 
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.205 0.008 75);
@@ -119,6 +135,10 @@
   --success-foreground: oklch(0.985 0.005 150);
   --success-subtle: oklch(0.955 0.03 152);
   --success-subtle-foreground: oklch(0.395 0.085 150);
+
+  /* --warning is a FILL colour only in light mode. As text on background,
+     card or muted it measures 2.86, 2.92 and 2.64 to 1, failing both 4.5
+     and 3.0. For "due soon" text use --warning-subtle-foreground. */
   --warning: oklch(0.685 0.145 68);
   --warning-foreground: oklch(0.255 0.05 60);
   --warning-subtle: oklch(0.96 0.045 80);
@@ -126,6 +146,8 @@
 
   --border: oklch(0.912 0.006 88);
   --input: oklch(0.912 0.006 88);
+  /* Separate from --input because shadcn uses --input as a translucent
+     surface too. This one carries the 3:1 control boundary of WCAG 1.4.11. */
   --input-border: oklch(0.669 0.008 88);
   --ring: oklch(0.505 0.088 188);
 
@@ -147,49 +169,65 @@
 
 /* --------------------------------------------------------------------------
    Dark
+
+   Surfaces are a single teal-tinted near-black family, stepping up in
+   lightness rather than switching hue: sidebar 0.152, background 0.162,
+   card 0.202, popover 0.212, muted 0.238. Depth comes from that step plus
+   a border, not from transparency. All opaque, so nothing has to be
+   reasoned about in terms of what is behind it.
    -------------------------------------------------------------------------- */
 .dark {
   color-scheme: dark;
 
-  --background: oklch(0.178 0.005 80);
+  --background: oklch(0.162 0.016 168);
   --foreground: oklch(0.945 0.004 90);
 
-  --card: oklch(0.218 0.006 82);
+  /* One soft glow top left. The base colour does the work; this only
+     keeps the top of the page from reading as flat. */
+  --background-gradient: radial-gradient(
+    100% 60% at 15% 0%,
+    oklch(0.212 0.028 172) 0%,
+    transparent 75%
+  );
+
+  --card: oklch(0.202 0.015 170);
   --card-foreground: oklch(0.945 0.004 90);
-  --popover: oklch(0.218 0.006 82);
+  --popover: oklch(0.212 0.015 170);
   --popover-foreground: oklch(0.945 0.004 90);
 
   --primary: oklch(0.735 0.098 186);
   --primary-foreground: oklch(0.195 0.03 190);
 
-  --secondary: oklch(0.268 0.007 82);
+  --secondary: oklch(0.238 0.013 170);
   --secondary-foreground: oklch(0.945 0.004 90);
 
-  --muted: oklch(0.268 0.007 82);
+  --muted: oklch(0.238 0.013 170);
   --muted-foreground: oklch(0.705 0.011 88);
 
-  --accent: oklch(0.298 0.028 188);
+  --accent: oklch(0.272 0.028 188);
   --accent-foreground: oklch(0.885 0.045 185);
 
   --destructive: oklch(0.665 0.172 24);
   /* Was oklch(0.985 0.005 60) at 3.16:1, a fail. Now 7.9:1. */
   --destructive-foreground: oklch(0.185 0.035 25);
-  --destructive-subtle: oklch(0.305 0.06 26);
+  --destructive-subtle: oklch(0.28 0.06 26);
   --destructive-subtle-foreground: oklch(0.845 0.095 25);
 
   --success: oklch(0.685 0.108 152);
   --success-foreground: oklch(0.185 0.03 150);
-  --success-subtle: oklch(0.3 0.045 152);
+  --success-subtle: oklch(0.275 0.045 152);
   --success-subtle-foreground: oklch(0.855 0.09 150);
 
   --warning: oklch(0.775 0.135 72);
   --warning-foreground: oklch(0.215 0.045 60);
-  --warning-subtle: oklch(0.31 0.055 72);
+  --warning-subtle: oklch(0.285 0.055 72);
   --warning-subtle-foreground: oklch(0.87 0.1 80);
 
-  --border: oklch(1 0 0 / 11%);
-  --input: oklch(1 0 0 / 15%);
-  --input-border: oklch(0.508 0.01 85);
+  /* Tinted rather than white-alpha, so edges read green on a green
+     surface instead of grey. */
+  --border: oklch(0.3 0.012 170);
+  --input: oklch(0.3 0.012 170);
+  --input-border: oklch(0.508 0.012 170);
   --ring: oklch(0.735 0.098 186);
 
   --chart-1: oklch(0.735 0.098 186);
@@ -198,13 +236,13 @@
   --chart-4: oklch(0.775 0.135 72);
   --chart-5: oklch(0.685 0.108 152);
 
-  --sidebar: oklch(0.208 0.006 82);
+  --sidebar: oklch(0.152 0.015 168);
   --sidebar-foreground: oklch(0.945 0.004 90);
   --sidebar-primary: oklch(0.735 0.098 186);
   --sidebar-primary-foreground: oklch(0.195 0.03 190);
-  --sidebar-accent: oklch(0.298 0.028 188);
+  --sidebar-accent: oklch(0.272 0.028 188);
   --sidebar-accent-foreground: oklch(0.885 0.045 185);
-  --sidebar-border: oklch(1 0 0 / 11%);
+  --sidebar-border: oklch(0.3 0.012 170);
   --sidebar-ring: oklch(0.735 0.098 186);
 }
 
@@ -212,6 +250,8 @@
    Base
    -------------------------------------------------------------------------- */
 @layer base {
+  /* v4 preflight sets border-color to currentColor. Pseudo-elements need
+     naming explicitly or they fall back to the text colour. */
   *,
   ::before,
   ::after,
@@ -220,17 +260,27 @@
     border-color: var(--border);
   }
 
+  /* shadcn components carry outline-none plus their own focus-visible ring,
+     so this does not double up on them. It covers everything else. */
   :focus-visible {
     outline: 2px solid color-mix(in oklch, var(--ring) 50%, transparent);
     outline-offset: 2px;
   }
 
+  /* Background lives on html, not body. A background on body paints only
+     body's box, and body's own colour sits on top of html's. On html it
+     propagates to the canvas and always covers the viewport. */
   html {
     -webkit-text-size-adjust: 100%;
+    background-color: var(--background);
+    background-image: var(--background-gradient);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
   }
 
   body {
-    background-color: var(--background);
+    background-color: transparent;
+    min-height: 100svh;
     color: var(--foreground);
     -webkit-font-smoothing: antialiased;
   }
@@ -240,6 +290,8 @@
     color: var(--accent-foreground);
   }
 
+  /* Animation is hover, focus, enter and skeletons only. Anyone who asked
+     the OS to stop it gets that honoured globally. */
   @media (prefers-reduced-motion: reduce) {
     *,
     ::before,
@@ -262,6 +314,9 @@
    Utilities
    -------------------------------------------------------------------------- */
 
+/* Breakpoints live inside the utility via @variant so the whole thing stays
+   in the utilities layer. Bare @media blocks outside it sit unlayered and
+   silently beat any px-* utility applied alongside. */
 @utility container-app {
   margin-inline: auto;
   width: 100%;
@@ -288,6 +343,8 @@
   min-block-size: 2.75rem;
 }
 
+/* classes.invite_code. Mono already supplies tabular figures and a slashed
+   zero via --font-mono--font-feature-settings. */
 @utility invite-code {
   font-family: var(--font-mono);
   text-transform: uppercase;

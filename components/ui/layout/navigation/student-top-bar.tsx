@@ -12,7 +12,7 @@ export default function StudentTopBar() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 border-b bg-transparent backdrop-blur-sm">
       <div className="container-app flex h-16 items-center justify-between gap-4">
         <Logo />
 

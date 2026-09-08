@@ -38,7 +38,7 @@ export function TeacherSidebar({
   );
 
   function handleEnter() {
-    if (isMobile || open) return;
+    if (isMobile || open || hoverOpened.current) return;
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches)
       return;
     if (timer.current) clearTimeout(timer.current);
