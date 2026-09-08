@@ -1,5 +1,6 @@
 'use client';
 
+import InitialsAvatar from '@/components/common/initials-avatar';
 import ThemeSwitch from '@/components/theme/theme-switch';
 import Logo from '@/components/ui/layout/logo';
 import {
@@ -53,13 +54,6 @@ export function TeacherSidebar({
       setOpen(false);
     }, 200);
   }
-
-  const initials = name
-    .split(' ')
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
 
   return (
     <Sidebar
@@ -119,12 +113,7 @@ export function TeacherSidebar({
 
       <SidebarFooter className="gap-2 border-t p-3">
         <div className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
-          <span
-            aria-hidden
-            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground"
-          >
-            {initials}
-          </span>
+          <InitialsAvatar name={name} />
           <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
             <p className="truncate text-sm font-medium text-foreground">
               {name}
