@@ -14,6 +14,7 @@ import SignOutButton from '@/features/auth/components/signout-button';
 import { cn, isActive } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 
 type TeacherSidebarProps = {
   name?: string;
@@ -25,7 +26,33 @@ export function TeacherSidebar({
   email = 'teacher@dersly.app',
 }: TeacherSidebarProps) {
   const pathname = usePathname();
-  const { isMobile, setOpenMobile } = useSidebar();
+  const { open, setOpen, isMobile, setOpenMobile } = useSidebar();
+  const hoverOpened = useRef(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
+
+  function handleEnter() {
+    if (isMobile || open) return;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches)
+      return;
+    if (timer.current) clearTimeout(timer.current);
+    hoverOpened.current = true;
+    setOpen(true);
+  }
+
+  function handleLeave() {
+    if (isMobile || !hoverOpened.current) return;
+    timer.current = setTimeout(() => {
+      hoverOpened.current = false;
+      setOpen(false);
+    }, 200);
+  }
 
   const initials = name
     .split(' ')
@@ -35,7 +62,12 @@ export function TeacherSidebar({
     .toUpperCase();
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar
+      collapsible="icon"
+      variant="floating"
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+    >
       <SidebarHeader className="h-16 justify-center border-b px-4 group-data-[collapsible=icon]:px-2">
         <Logo href="/dashboard" />
       </SidebarHeader>
@@ -49,7 +81,12 @@ export function TeacherSidebar({
                 <li key={href}>
                   <Link
                     onClick={() => {
-                      if (isMobile) setOpenMobile(false);
+                      if (isMobile) {
+                        setOpenMobile(false);
+                      } else {
+                        hoverOpened.current = false;
+                        setOpen(false);
+                      }
                     }}
                     href={href}
                     title={label}
