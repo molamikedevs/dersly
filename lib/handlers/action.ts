@@ -1,6 +1,7 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
 import { Session } from '@supabase/supabase-js';
-import { ZodError, type ZodSchema } from 'zod';
+import { cookies } from 'next/headers';
+import { type ZodSchema } from 'zod';
 import {
   RequestError,
   UnauthorizedError,
@@ -24,19 +25,16 @@ export default async function action<T>({
   schema,
   authorize = false,
 }: ActionOptions<T>): Promise<ActionResult<T>> {
-  const supabase = createClient();
+  const supabase = createClient(await cookies());
   // 1. Validation
-  if (schema && params)
-    try {
-      schema.parse(params);
-    } catch (error) {
-      if (error instanceof ZodError) {
-        return new ValidationError(
-          error.flatten().fieldErrors as Record<string, string[]>,
-        );
-      }
-      return new RequestError(400, 'Schema validation faild');
+  if (schema && params) {
+    const parsed = schema.safeParse(params);
+    if (!parsed.success) {
+      return new ValidationError(
+        parsed.error.flatten().fieldErrors as Record<string, string[]>,
+      );
     }
+  }
 
   // 2. Authorization (Supabase)
   let session: Session | null = null;
