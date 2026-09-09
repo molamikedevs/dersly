@@ -1,9 +1,7 @@
-import { BookOpen, Plus } from 'lucide-react';
-import Link from 'next/link';
+import { BookOpen } from 'lucide-react';
 
 import DataRenderer from '@/components/common/data-renderer';
-import { Button } from '@/components/ui/button';
-
+import AddClass from '@/features/classes/components/add-class';
 import ClassSection from '@/features/classes/components/class-section';
 import { mockClasses } from '@/features/classes/mock';
 
@@ -29,15 +27,7 @@ export default function Page() {
           </p>
         </div>
 
-        <Button className="h-11">
-          <Link
-            href="/dashboard/classes/new"
-            className="flex ga-1 items-center"
-          >
-            <Plus className="size-4" aria-hidden />
-            New class
-          </Link>
-        </Button>
+        <AddClass />
       </div>
 
       <DataRenderer
