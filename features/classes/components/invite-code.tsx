@@ -8,13 +8,14 @@ export default function InviteCode({ code }: { code: string }) {
 
   useEffect(() => {
     if (!copied) return;
-    const timer = setTimeout(() => setCopied(false), 200);
-    return clearTimeout(timer);
+    const timer = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(timer);
   }, [copied]);
 
-  function handleCopy() {
+  async function handleCopy() {
     try {
-      navigator.clipboard.writeText(code);
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
     } catch {
       setCopied(false);
     }
