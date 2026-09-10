@@ -10,3 +10,20 @@ export const LEVELS = [
   { value: 'intermediate', label: 'Intermediate' },
   { value: 'advanced', label: 'Advanced' },
 ] as const;
+
+export const mockStudents = [
+  {
+    id: 's1',
+    fullName: 'Aysel Mammadova',
+    level: 'A2',
+    joinedAt: '2026-09-01',
+  },
+  { id: 's2', fullName: 'Rashad Aliyev', level: 'A1', joinedAt: '2026-09-03' },
+  {
+    id: 's3',
+    fullName: 'Nigar Huseynova',
+    level: 'A2',
+    joinedAt: '2026-09-05',
+  },
+  { id: 's4', fullName: 'Elvin Gasimov', level: 'A1', joinedAt: '2026-09-08' },
+];

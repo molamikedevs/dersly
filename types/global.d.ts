@@ -13,3 +13,11 @@ type ActionResponse<T = null> = {
 type SuccessResponse<T = null> = ActionResponse<T> & { success: true };
 type ErrorResponse = ActionResponse<undefined> & { success: false };
 type ApiErrrorResponse = NextResponse<ErrorResponse>;
+
+export interface RouteParams<
+  P = Record<string, string>,
+  S = Record<string, string | string[] | undefined>,
+> {
+  params: Promise<P>;
+  searchParams: Promise<S>;
+}

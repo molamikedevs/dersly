@@ -4,7 +4,7 @@ export const mockClasses = [
     name: 'English Group',
     type: 'course',
     level: 'A1 → A2',
-    schedule: 'Tue & Fri, 19:00',
+    schedule: 'Tue & Fri, 18:30',
     meetingUrl: null,
     inviteCode: 'TRA1QX',
     enrollmentOpen: true,
