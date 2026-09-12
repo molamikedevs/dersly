@@ -18,10 +18,11 @@ interface Props<T> {
   };
   data: T[] | null | undefined;
   empty: {
+    icon?: LucideIcon;
     title: string;
     message: string;
-    icon?: LucideIcon;
     button?: StateAction;
+    action?: ReactNode;
   };
   render: (data: T[]) => ReactNode;
 }
@@ -32,6 +33,7 @@ interface StateSkeletonProps {
   message: string;
   tone?: 'muted' | 'destructive';
   button?: StateAction;
+  action?: ReactNode;
 }
 
 const StateSkeleton = ({
@@ -40,6 +42,7 @@ const StateSkeleton = ({
   message,
   tone = 'muted',
   button,
+  action,
 }: StateSkeletonProps) => (
   <div className="flex w-full flex-col items-center justify-center rounded-lg border border-dashed px-6 py-16 text-center">
     <span
@@ -53,8 +56,8 @@ const StateSkeleton = ({
 
     <h2 className="mt-5 text-lg font-semibold text-foreground">{title}</h2>
     <p className="mt-2 max-w-sm text-sm text-muted-foreground">{message}</p>
-
-    {button && (
+    {action}
+    {button && !action && (
       <Button className="mt-6 h-11">
         <Link href={button.href}>{button.text}</Link>
       </Button>
@@ -87,7 +90,8 @@ export default function DataRenderer<T>({
         icon={empty.icon ?? Inbox}
         title={empty.title}
         message={empty.message}
-        button={empty.button}
+        button={empty.action ? undefined : empty.button}
+        action={empty.action}
       />
     );
   }
