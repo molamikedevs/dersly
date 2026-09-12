@@ -5,6 +5,8 @@ import ClassHeader from '@/features/classes/components/class-header';
 import StudentsSection from '@/features/classes/components/student-section';
 import { mockStudents } from '@/features/classes/constants/index';
 import { mockClasses } from '@/features/classes/mock';
+import HomeWorkSection from '@/features/home-work/components/home-work-section';
+import { mockhomeWorks } from '@/features/home-work/mock';
 import { RouteParams } from '@/types/global';
 
 export default async function Page({
@@ -23,6 +25,7 @@ export default async function Page({
         className="mb-4"
       />
       <ClassHeader data={data} />
+      <HomeWorkSection homeWork={mockhomeWorks} classType={data.type} />
       {data.type === 'course' && (
         <StudentsSection students={mockStudents} inviteCode={data.inviteCode} />
       )}

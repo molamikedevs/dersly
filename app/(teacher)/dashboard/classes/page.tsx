@@ -1,7 +1,8 @@
 import { BookOpen } from 'lucide-react';
 
 import DataRenderer from '@/components/common/data-renderer';
-import AddClass from '@/features/classes/components/add-class';
+import FormDialog from '@/components/common/form-dialog';
+import AddClassForm from '@/features/classes/components/add-class-form';
 import ClassSection from '@/features/classes/components/class-section';
 import { mockClasses } from '@/features/classes/mock';
 
@@ -17,17 +18,12 @@ export default function Page() {
   return (
     <div>
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-            Classes
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {result.data.length} classes · {groups.length} groups,{' '}
-            {private_.length} one to one
-          </p>
-        </div>
-
-        <AddClass />
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+          Classes
+        </h1>
+        <FormDialog triggerLabel="Add Class" title="New class">
+          <AddClassForm />
+        </FormDialog>
       </div>
 
       <DataRenderer
@@ -38,7 +34,13 @@ export default function Page() {
           title: 'No classes yet',
           message:
             'Create your first class and share the invite code with your students.',
-          button: { text: 'New class', href: '/dashboard/classes/new' },
+          action: (
+            <div className="mt-6">
+              <FormDialog triggerLabel="New class" title="New class">
+                <AddClassForm />
+              </FormDialog>
+            </div>
+          ),
         }}
         render={(classes) => (
           <>

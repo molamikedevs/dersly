@@ -1,7 +1,6 @@
-import { Pencil, Plus, Video } from 'lucide-react';
+import { Video } from 'lucide-react';
 import { Fragment } from 'react';
 
-import { Button } from '@/components/ui/button';
 import InviteCodeDialog from '@/features/classes/components/invite-code-dialog';
 
 export default function ClassHeader({ data }: { data: ClassRecordParams }) {
@@ -47,16 +46,6 @@ export default function ClassHeader({ data }: { data: ClassRecordParams }) {
               {level}
             </span>
           )}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" aria-label="Edit class">
-            <Pencil className="size-4" aria-hidden />
-          </Button>
-          <Button className="h-11">
-            <Plus className="size-4" aria-hidden />
-            New assignment
-          </Button>
         </div>
       </div>
 
