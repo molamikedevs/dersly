@@ -1,0 +1,23 @@
+import * as z from 'zod';
+
+export const MaterialSchema = z
+  .object({
+    kind: z.enum(['file', 'link']),
+    title: z.string().trim().min(2, { message: 'Give this a title.' }),
+    description: z.string().trim().optional(),
+    level: z
+      .enum(['beginner', 'elementary', 'intermediate', 'advanced'])
+      .optional(),
+    url: z.string().trim().optional(),
+    file: z.instanceof(File).optional(),
+  })
+  .refine((data) => data.kind !== 'link' || !!data.url, {
+    message: 'Enter a link.',
+    path: ['url'],
+  })
+  .refine((data) => data.kind !== 'file' || !!data.file, {
+    message: 'Choose a file.',
+    path: ['file'],
+  });
+
+export type MaterialValues = z.infer<typeof MaterialSchema>;

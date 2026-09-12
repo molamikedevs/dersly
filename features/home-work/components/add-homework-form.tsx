@@ -44,7 +44,6 @@ export default function AddHomeworkForm({
     console.log(data);
     toast.add({ title: 'Homework posted' });
     form.reset();
-    if (inputRef.current) inputRef.current.value = '';
     onSuccess?.();
   }
 
