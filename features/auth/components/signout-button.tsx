@@ -1,6 +1,5 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { signOut } from '@/features/auth/actions';
 import { cn } from '@/lib/utils';
 import { Loader2, LogOut } from 'lucide-react';
@@ -9,27 +8,33 @@ import { useFormStatus } from 'react-dom';
 function SubmitButton({ collapsed }: { collapsed?: boolean }) {
   const { pending } = useFormStatus();
 
+  const Icon = pending ? Loader2 : LogOut;
+
   return (
-    <Button
+    <button
       type="submit"
-      variant="ghost"
       disabled={pending}
       aria-label={collapsed ? 'Sign out' : undefined}
       className={cn(
-        'tap-row w-full gap-2 px-3 text-sm font-medium',
-        'text-muted-foreground hover:text-foreground',
-        collapsed ? 'justify-center px-0' : 'justify-start',
+        'group inline-flex shrink-0 select-none items-center rounded-md',
+        'bg-transparent text-sm font-normal text-muted-foreground',
+        'transition-colors hover:text-foreground',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        'disabled:pointer-events-none disabled:opacity-60',
+        collapsed ? 'size-11 justify-center' : 'h-11 gap-2 px-2',
       )}
     >
-      {pending ? (
-        <Loader2 className="size-4 shrink-0 animate-spin" aria-hidden />
-      ) : (
-        <LogOut className="size-4 shrink-0" aria-hidden />
-      )}
+      <Icon
+        className={cn(
+          'size-4 shrink-0 transition-transform',
+          pending ? 'animate-spin' : 'group-hover:translate-x-0.5',
+        )}
+        aria-hidden
+      />
       <span className={cn('truncate', collapsed && 'sr-only')}>
         {pending ? 'Signing out' : 'Sign out'}
       </span>
-    </Button>
+    </button>
   );
 }
 

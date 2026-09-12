@@ -1,5 +1,6 @@
-import InitialsAvatar from '@/components/common/initials-avatar';
 import Link from 'next/link';
+
+import InitialsAvatar from '@/components/common/initials-avatar';
 
 export default function StudentRow({ data }: { data: StudentRecord }) {
   const { fullName, email, level, classes } = data;
@@ -8,40 +9,37 @@ export default function StudentRow({ data }: { data: StudentRecord }) {
   const isPrivate = classes.some((item) => item.type === 'one_to_one');
 
   return (
-    <article className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-center">
-      <InitialsAvatar name={fullName} className="size-10" />
+    <li className="flex flex-wrap items-center gap-x-4 gap-y-1 py-3 sm:flex-nowrap sm:py-2.5">
+      <InitialsAvatar name={fullName} className="size-9 shrink-0" />
 
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="truncate font-semibold text-foreground">{fullName}</p>
-          {isPrivate && (
-            <span className="rounded-md border px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-              Private
-            </span>
-          )}
-        </div>
+        <p className="truncate font-medium text-foreground">{fullName}</p>
         <p className="truncate text-sm text-muted-foreground">{email}</p>
       </div>
 
-      {groups.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
-          {groups.map((item) => (
-            <Link
-              key={item.id}
-              href={`/dashboard/classes/${item.id}`}
-              className="rounded-md border px-2 py-0.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              {item.name}
-            </Link>
-          ))}
-        </div>
-      )}
-
       {level && (
-        <span className="text-sm capitalize text-muted-foreground sm:w-24 sm:text-right">
+        <span className="shrink-0 text-sm capitalize text-muted-foreground sm:order-last sm:w-28 sm:text-right">
           {level}
         </span>
       )}
-    </article>
+
+      <div className="order-last flex w-full basis-full flex-wrap items-center gap-2 pl-13 sm:order-none sm:w-auto sm:basis-auto sm:justify-end sm:pl-0">
+        {groups.length > 0
+          ? groups.map((item) => (
+              <Link
+                key={item.id}
+                href={`/dashboard/classes/${item.id}`}
+                className="inline-flex h-11 items-center rounded-md bg-muted px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-7"
+              >
+                {item.name}
+              </Link>
+            ))
+          : isPrivate && (
+              <span className="text-sm text-muted-foreground">
+                Private lessons
+              </span>
+            )}
+      </div>
+    </li>
   );
 }

@@ -1,66 +1,57 @@
 import { Video } from 'lucide-react';
-import { Fragment } from 'react';
 
 import InviteCodeDialog from '@/features/classes/components/invite-code-dialog';
 
-export default function ClassHeader({ data }: { data: ClassRecordParams }) {
+export default function ClassHeader({ data }: { data: ClassWithCount }) {
   const { name, level, schedule, meetingUrl, inviteCode, enrollmentOpen } =
     data;
 
-  const meta = [
-    schedule && <span key="schedule">{schedule}</span>,
-    meetingUrl && (
-      <a
-        key="meeting"
-        href={meetingUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 text-primary hover:underline"
-      >
-        <Video className="size-3.5" aria-hidden />
-        Join lesson
-      </a>
-    ),
-    <InviteCodeDialog
-      key="code"
-      code={inviteCode}
-      enrollmentOpen={enrollmentOpen}
-    />,
-    <span
-      key="enrolment"
-      className={enrollmentOpen ? undefined : 'text-destructive'}
-    >
-      {enrollmentOpen ? 'Enrolment open' : 'Enrolment closed'}
-    </span>,
-  ].filter(Boolean);
-
   return (
-    <header className="border-b pb-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-            {name}
-          </h1>
-          {level && (
-            <span className="rounded-md border px-2 py-0.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {level}
+    <header>
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+        {name}
+      </h1>
+
+      <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+        {level && <span className="capitalize">{level}</span>}
+        {level && schedule && (
+          <span aria-hidden className="text-border">
+            ·
+          </span>
+        )}
+        {schedule && <span>{schedule}</span>}
+        {!enrollmentOpen && (
+          <>
+            <span aria-hidden className="text-border">
+              ·
             </span>
+            <span>Enrolment closed</span>
+          </>
+        )}
+      </div>
+
+      {(meetingUrl || enrollmentOpen) && (
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          {meetingUrl && (
+            <a
+              href={meetingUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-11 items-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <Video className="size-4" aria-hidden />
+              Join lesson
+            </a>
+          )}
+
+          {enrollmentOpen && (
+            <InviteCodeDialog
+              code={inviteCode}
+              enrollmentOpen={enrollmentOpen}
+            />
           )}
         </div>
-      </div>
-
-      <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-        {meta.map((item, index) => (
-          <Fragment key={index}>
-            {index > 0 && (
-              <span aria-hidden className="text-border">
-                ·
-              </span>
-            )}
-            {item}
-          </Fragment>
-        ))}
-      </div>
+      )}
     </header>
   );
 }

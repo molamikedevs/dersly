@@ -62,13 +62,13 @@ export function TeacherSidebar({
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
-      <SidebarHeader className="h-16 justify-center border-b px-4 group-data-[collapsible=icon]:px-2">
+      <SidebarHeader className="h-14 justify-center px-3 group-data-[collapsible=icon]:px-2">
         <Logo href="/dashboard" />
       </SidebarHeader>
 
-      <SidebarContent className="px-3 py-4 group-data-[collapsible=icon]:px-2">
+      <SidebarContent className="px-3 py-2 group-data-[collapsible=icon]:px-2">
         <nav aria-label="Dashboard">
-          <ul className="flex flex-col gap-1">
+          <ul className="flex flex-col gap-0.5">
             {TEACHER_NAV.map(({ label, href, icon: Icon }) => {
               const active = isActive(pathname, href, href === '/dashboard');
               return (
@@ -86,17 +86,19 @@ export function TeacherSidebar({
                     title={label}
                     aria-current={active ? 'page' : undefined}
                     className={cn(
-                      'tap-row relative flex items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors',
+                      'tap-row relative flex items-center gap-3 rounded-md px-3 text-sm transition-colors',
                       'group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0',
-                      'before:absolute before:left-0 before:top-1/2 before:h-5 before:w-0.5 before:-translate-y-1/2',
-                      'before:rounded-r-full before:bg-primary before:transition-opacity',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                       active
-                        ? 'bg-accent text-accent-foreground before:opacity-100'
-                        : 'text-muted-foreground before:opacity-0 hover:bg-muted hover:text-foreground',
+                        ? 'bg-accent font-medium text-accent-foreground'
+                        : 'font-normal text-muted-foreground hover:bg-muted hover:text-foreground',
                     )}
                   >
                     <Icon
-                      className="size-4 shrink-0"
+                      className={cn(
+                        'size-4 shrink-0',
+                        active ? 'text-primary' : 'text-current',
+                      )}
                       aria-hidden
                       strokeWidth={active ? 2.25 : 1.75}
                     />
@@ -111,9 +113,9 @@ export function TeacherSidebar({
         </nav>
       </SidebarContent>
 
-      <SidebarFooter className="gap-2 border-t p-3">
-        <div className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
-          <InitialsAvatar name={name} />
+      <SidebarFooter className="gap-1 border-t border-border p-3 group-data-[collapsible=icon]:px-2">
+        <div className="flex items-center gap-3 px-1 py-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
+          <InitialsAvatar name={name} className="size-8 shrink-0" />
           <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
             <p className="truncate text-sm font-medium text-foreground">
               {name}
@@ -125,13 +127,16 @@ export function TeacherSidebar({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 group-data-[collapsible=icon]:hidden">
+        <div className="flex items-center gap-1 group-data-[collapsible=icon]:hidden">
           <SignOutButton className="min-w-0 flex-1" />
           <ThemeSwitch />
         </div>
 
-        <div className="hidden flex-col gap-2 group-data-[collapsible=icon]:flex">
-          <SignOutButton collapsed />
+        <div className="hidden flex-col gap-1 group-data-[collapsible=icon]:flex">
+          <SignOutButton
+            collapsed
+            className="min-w-0 flex-1 [&>button]:w-full [&>button]:justify-start [&>button]:px-3"
+          />
           <ThemeSwitch />
         </div>
       </SidebarFooter>

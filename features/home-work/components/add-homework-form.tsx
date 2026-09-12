@@ -59,6 +59,7 @@ export default function AddHomeworkForm({
               <Input
                 {...field}
                 id="homework-title"
+                className="h-11"
                 autoComplete="off"
                 placeholder="Past simple worksheet"
                 aria-invalid={fieldState.invalid}
@@ -85,13 +86,15 @@ export default function AddHomeworkForm({
               />
 
               {value instanceof File ? (
-                <div className="flex items-center gap-3 rounded-md border bg-muted/40 px-3 py-2.5">
-                  <FileText
-                    className="size-4 shrink-0 text-muted-foreground"
+                <div className="flex items-center gap-3 rounded-md bg-muted p-3">
+                  <span
                     aria-hidden
-                  />
+                    className="flex size-9 shrink-0 items-center justify-center rounded-md bg-background"
+                  >
+                    <FileText className="size-4 text-muted-foreground" />
+                  </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm text-foreground">
+                    <p className="truncate text-sm font-medium text-foreground">
                       {value.name}
                     </p>
                     <p className="text-xs text-muted-foreground">
@@ -101,7 +104,7 @@ export default function AddHomeworkForm({
                   <button
                     type="button"
                     aria-label="Remove file"
-                    className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    className="-mr-1 flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     onClick={() => {
                       onChange(undefined);
                       if (inputRef.current) inputRef.current.value = '';
@@ -111,15 +114,19 @@ export default function AddHomeworkForm({
                   </button>
                 </div>
               ) : (
-                <Button
+                <button
                   type="button"
-                  variant="outline"
-                  className="h-11 w-full justify-start font-normal text-muted-foreground"
                   onClick={() => inputRef.current?.click()}
+                  className="flex w-full flex-col items-center justify-center rounded-md bg-muted px-4 py-7 text-center transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <Upload className="size-4" aria-hidden />
-                  Choose a file
-                </Button>
+                  <Upload
+                    className="size-5 text-muted-foreground"
+                    aria-hidden
+                  />
+                  <span className="mt-2 text-sm font-medium text-foreground">
+                    Choose a file
+                  </span>
+                </button>
               )}
 
               <FieldDescription>
@@ -130,7 +137,7 @@ export default function AddHomeworkForm({
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
+        <Button type="submit" className="h-11 w-full" disabled={isSubmitting}>
           {isSubmitting && (
             <Loader2 className="size-4 animate-spin" aria-hidden />
           )}

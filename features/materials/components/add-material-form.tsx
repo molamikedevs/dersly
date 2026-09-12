@@ -1,7 +1,8 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2 } from 'lucide-react';
+import { FileText, Link2, Loader2, Upload, X } from 'lucide-react';
+import { useRef } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
@@ -22,16 +23,24 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/toast';
+import { cn, formatSize } from '@/lib/utils';
 import {
   MaterialSchema,
   type MaterialValues,
 } from '@/lib/validation/materials.schema';
+
+const KINDS = [
+  { value: 'file' as const, label: 'Document', icon: FileText },
+  { value: 'link' as const, label: 'Link', icon: Link2 },
+];
 
 export default function AddMaterialForm({
   onSuccess,
 }: {
   onSuccess?: () => void;
 }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const form = useForm<MaterialValues>({
     resolver: zodResolver(MaterialSchema),
     defaultValues: { kind: 'file', title: '', description: '', url: '' },
@@ -49,23 +58,39 @@ export default function AddMaterialForm({
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
-      <FieldGroup>
+      <FieldGroup className="gap-4">
         <Controller
           name="kind"
           control={form.control}
           render={({ field }) => (
-            <Field>
-              <FieldLabel htmlFor="material-kind">Type</FieldLabel>
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger id="material-kind">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="file">Document</SelectItem>
-                  <SelectItem value="link">Link</SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
+            <div
+              role="radiogroup"
+              aria-label="Type"
+              className="grid grid-cols-2 gap-1 rounded-md bg-muted p-1"
+            >
+              {KINDS.map(({ value, label, icon: Icon }) => {
+                const selected = field.value === value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    onClick={() => field.onChange(value)}
+                    className={cn(
+                      'flex h-9 items-center justify-center gap-2 rounded-sm text-sm transition-colors',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                      selected
+                        ? 'bg-background font-medium text-foreground shadow-sm'
+                        : 'font-normal text-muted-foreground hover:text-foreground',
+                    )}
+                  >
+                    <Icon className="size-4" aria-hidden />
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
           )}
         />
 
@@ -78,6 +103,7 @@ export default function AddMaterialForm({
               <Input
                 {...field}
                 id="material-title"
+                className="h-11"
                 autoComplete="off"
                 placeholder="Irregular verbs reference sheet"
                 aria-invalid={fieldState.invalid}
@@ -98,10 +124,16 @@ export default function AddMaterialForm({
                   {...field}
                   id="material-url"
                   type="url"
+                  inputMode="url"
+                  className="h-11"
                   autoComplete="off"
-                  placeholder="https://youtube.com/..."
+                  placeholder="https://youtube.com/watch?v=..."
                   aria-invalid={fieldState.invalid}
+                  aria-describedby="material-url-hint"
                 />
+                <FieldDescription id="material-url-hint">
+                  YouTube links play inline for students.
+                </FieldDescription>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -112,17 +144,64 @@ export default function AddMaterialForm({
           <Controller
             name="file"
             control={form.control}
-            render={({ field: { onChange }, fieldState }) => (
+            render={({ field: { onChange, value }, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="material-file">Document</FieldLabel>
-                <Input
+
+                <input
+                  ref={inputRef}
                   id="material-file"
                   type="file"
+                  className="sr-only"
                   accept=".pdf,.doc,.docx,.mp3,.jpg,.jpeg,.png"
                   onChange={(event) => onChange(event.target.files?.[0])}
-                  aria-invalid={fieldState.invalid}
                 />
-                <FieldDescription>Up to 20MB.</FieldDescription>
+
+                {value instanceof File ? (
+                  <div className="flex items-center gap-3 rounded-md bg-muted p-2">
+                    <span
+                      aria-hidden
+                      className="flex size-9 shrink-0 items-center justify-center rounded-md bg-background"
+                    >
+                      <FileText className="size-4 text-muted-foreground" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-foreground">
+                        {value.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatSize(value.size)}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      aria-label="Remove file"
+                      className="flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      onClick={() => {
+                        onChange(undefined);
+                        if (inputRef.current) inputRef.current.value = '';
+                      }}
+                    >
+                      <X className="size-4" aria-hidden />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => inputRef.current?.click()}
+                    className="flex h-14 w-full items-center justify-center gap-2.5 rounded-md bg-muted text-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <Upload
+                      className="size-4 text-muted-foreground"
+                      aria-hidden
+                    />
+                    <span className="font-medium text-foreground">
+                      Choose a file
+                    </span>
+                    <span className="text-muted-foreground">up to 20MB</span>
+                  </button>
+                )}
+
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -132,31 +211,18 @@ export default function AddMaterialForm({
         )}
 
         <Controller
-          name="description"
-          control={form.control}
-          render={({ field }) => (
-            <Field>
-              <FieldLabel htmlFor="material-description">
-                Description
-              </FieldLabel>
-              <Textarea
-                {...field}
-                id="material-description"
-                rows={3}
-                placeholder="What is this for?"
-              />
-            </Field>
-          )}
-        />
-
-        <Controller
           name="level"
           control={form.control}
           render={({ field }) => (
             <Field>
-              <FieldLabel htmlFor="material-level">Level</FieldLabel>
+              <FieldLabel htmlFor="material-level">
+                Level{' '}
+                <span className="font-normal text-muted-foreground">
+                  optional
+                </span>
+              </FieldLabel>
               <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger id="material-level">
+                <SelectTrigger id="material-level" className="h-11 w-full">
                   <SelectValue placeholder="All levels" />
                 </SelectTrigger>
                 <SelectContent>
@@ -170,7 +236,28 @@ export default function AddMaterialForm({
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
+        <Controller
+          name="description"
+          control={form.control}
+          render={({ field }) => (
+            <Field>
+              <FieldLabel htmlFor="material-description">
+                Description{' '}
+                <span className="font-normal text-muted-foreground">
+                  optional
+                </span>
+              </FieldLabel>
+              <Textarea
+                {...field}
+                id="material-description"
+                rows={2}
+                placeholder="What is this for?"
+              />
+            </Field>
+          )}
+        />
+
+        <Button type="submit" className="h-11 w-full" disabled={isSubmitting}>
           {isSubmitting && (
             <Loader2 className="size-4 animate-spin" aria-hidden />
           )}

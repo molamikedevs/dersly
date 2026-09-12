@@ -18,17 +18,17 @@ export default async function Page({
   if (!data) notFound();
 
   return (
-    <>
+    <div className="pb-16">
       <BackLink
         href="/dashboard/classes"
         label="Back to classes"
-        className="mb-4"
+        className="mb-6"
       />
       <ClassHeader data={data} />
       <HomeWorkSection homeWork={mockhomeWorks} classType={data.type} />
       {data.type === 'course' && (
         <StudentsSection students={mockStudents} inviteCode={data.inviteCode} />
       )}
-    </>
+    </div>
   );
 }

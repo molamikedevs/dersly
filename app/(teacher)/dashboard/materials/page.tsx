@@ -2,6 +2,7 @@ import { FolderOpen } from 'lucide-react';
 
 import DataRenderer from '@/components/common/data-renderer';
 import FormDialog from '@/components/common/form-dialog';
+import PageHeader from '@/components/common/page-header';
 import AddMaterialForm from '@/features/materials/components/add-material-form';
 import MaterialCard from '@/features/materials/components/material-card';
 import { mockMaterials } from '@/features/materials/mock';
@@ -14,16 +15,12 @@ export default function Materials() {
   );
 
   return (
-    <div>
+    <div className="pb-16">
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-            Materials
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Reading, listening and reference material for all students.
-          </p>
-        </div>
+        <PageHeader
+          title="Materials"
+          subText="Reading, listening and reference material for all students."
+        />
 
         <FormDialog triggerLabel="Add material" title="New material">
           <AddMaterialForm />
@@ -48,7 +45,7 @@ export default function Materials() {
             ),
           }}
           render={(materials) => (
-            <div className="flex flex-col gap-3">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {materials.map((item) => (
                 <MaterialCard key={item.id} data={item} />
               ))}

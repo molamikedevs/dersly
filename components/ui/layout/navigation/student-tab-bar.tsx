@@ -11,10 +11,15 @@ export default function StudentTabBar() {
   return (
     <nav
       aria-label="Main"
-      className="fixed inset-x-0 bottom-0 z-40 border-t bg-transparent backdrop-blur-md md:hidden"
-      style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 0.5rem)' }}
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/90 backdrop-blur-md md:hidden"
+      style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 0.25rem)' }}
     >
-      <ul className="grid grid-cols-4">
+      <ul
+        className="grid"
+        style={{
+          gridTemplateColumns: `repeat(${STUDENT_TAB_NAV.length}, minmax(0, 1fr))`,
+        }}
+      >
         {STUDENT_TAB_NAV.map(({ label, href, icon: Icon }) => {
           const active = isActive(pathname, href, href === '/');
 
@@ -24,25 +29,23 @@ export default function StudentTabBar() {
                 href={href}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'relative flex h-16 flex-col items-center justify-center gap-1 px-1',
+                  'flex h-14 flex-col items-center justify-center gap-1 px-1',
                   'transition-colors active:bg-muted',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
                   active ? 'text-primary' : 'text-muted-foreground',
                 )}
               >
-                <span
-                  aria-hidden
-                  className={cn(
-                    'absolute inset-x-4 top-0 h-0.5 rounded-b-full bg-primary transition-opacity',
-                    active ? 'opacity-100' : 'opacity-0',
-                  )}
-                />
-
                 <Icon
-                  className="size-6 shrink-0"
+                  className="size-5 shrink-0"
                   aria-hidden
                   strokeWidth={active ? 2.25 : 1.75}
                 />
-                <span className="max-w-full truncate text-xs font-medium leading-tight">
+                <span
+                  className={cn(
+                    'max-w-full truncate text-[11px] leading-tight',
+                    active ? 'font-medium' : 'font-normal',
+                  )}
+                >
                   {label}
                 </span>
               </Link>
