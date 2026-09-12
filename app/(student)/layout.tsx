@@ -13,7 +13,7 @@ export default function StudentLayout({
       <StudentTopBar />
       <main
         id="main"
-        className="container-app flex-1 pt-4 pb-24 md:pt-6 md:pb-10"
+        className="container-app flex-1 pb-28 pt-6 md:pb-12 md:pt-8"
       >
         {children}
       </main>

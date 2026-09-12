@@ -13,13 +13,21 @@ export default async function TeacherLayout({
   children: React.ReactNode;
 }) {
   const profile = await requireTeacher();
+
   return (
     <SidebarProvider>
       <SkipLink />
       <TeacherSidebar name={profile.full_name} email={profile.email} />
+
       <SidebarInset className="bg-transparent">
-        <SidebarTrigger className="tap-target -ml-1 md:hidden" />
-        <main id="main" className="flex-1 p-4 sm:p-6">
+        <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-border bg-background px-2 md:hidden">
+          <SidebarTrigger className="tap-target" />
+          <span className="text-sm font-semibold tracking-tight text-foreground">
+            Dersly
+          </span>
+        </header>
+
+        <main id="main" className="flex-1 px-4 py-6 sm:px-6 sm:py-8">
           <div className="mx-auto w-full max-w-6xl">{children}</div>
         </main>
       </SidebarInset>

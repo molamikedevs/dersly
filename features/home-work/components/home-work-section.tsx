@@ -1,12 +1,13 @@
-import { ClipboardList, Pencil } from 'lucide-react';
+import { ChevronRight, ClipboardList, Pencil } from 'lucide-react';
 
 import FormDialog from '@/components/common/form-dialog';
 import { Button } from '@/components/ui/button';
 import HomeWorkCard from '@/features/home-work/components/home-work-card';
+import { formatDueDate } from '@/lib/utils';
 import AddHomeWorkForm from './add-homework-form';
 
 type Props = {
-  homeWork: HomeWorkRecord[];
+  homeWork: HomeWorkWithSubmission[];
   classType: ClassType;
 };
 
@@ -14,9 +15,9 @@ export default function HomeWorkSection({ homeWork, classType }: Props) {
   const [current, ...past] = homeWork;
 
   return (
-    <section className="mt-8">
+    <section className="mt-10 sm:mt-12">
       <div className="flex items-center justify-between gap-4">
-        <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <h2 className="text-lg font-semibold tracking-tight text-foreground">
           Homework
         </h2>
 
@@ -32,14 +33,14 @@ export default function HomeWorkSection({ homeWork, classType }: Props) {
       </div>
 
       {!current ? (
-        <div className="mt-4 flex flex-col items-center justify-center rounded-lg border border-dashed px-6 py-12 text-center">
+        <div className="mt-4 flex flex-col items-center justify-center rounded-lg bg-muted px-6 py-12 text-center">
           <ClipboardList
-            className="size-10 text-muted-foreground"
+            className="size-9 text-muted-foreground"
             strokeWidth={1.5}
             aria-hidden
           />
-          <p className="mt-4 font-medium text-foreground">No homeworks yet</p>
-          <p className="mt-1 max-w-sm text-sm text-muted-foreground mb-7">
+          <p className="mt-4 font-medium text-foreground">No homework yet</p>
+          <p className="mt-1 mb-6 max-w-sm text-sm text-muted-foreground">
             Post homework for this class and students will see it here.
           </p>
           <FormDialog triggerLabel="New homework" title="New homework">
@@ -51,20 +52,37 @@ export default function HomeWorkSection({ homeWork, classType }: Props) {
           <HomeWorkCard data={current} classType={classType} />
 
           {past.length > 0 && (
-            <details className="group mt-4">
-              <summary className="cursor-pointer list-none text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
-                Previous HomeWorks ({past.length})
+            <details className="group mt-8">
+              <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <ChevronRight
+                  className="size-3.5 transition-transform group-open:rotate-90"
+                  aria-hidden
+                />
+                Earlier homework ({past.length})
               </summary>
 
-              <div className="mt-3 flex flex-col gap-3">
+              <ul className="mt-1 divide-y divide-border">
                 {past.map((item) => (
-                  <HomeWorkCard
+                  <li
                     key={item.id}
-                    data={item}
-                    classType={classType}
-                  />
+                    className="flex min-h-11 items-center gap-4 py-2.5"
+                  >
+                    <span className="min-w-0 flex-1 truncate text-sm text-foreground">
+                      {item.title}
+                    </span>
+
+                    {item.submission && !item.submission.reviewedAt ? (
+                      <span className="shrink-0 text-sm font-medium text-warning">
+                        Needs review
+                      </span>
+                    ) : (
+                      <span className="shrink-0 text-sm text-muted-foreground">
+                        {formatDueDate(item.dueDate)}
+                      </span>
+                    )}
+                  </li>
                 ))}
-              </div>
+              </ul>
             </details>
           )}
         </div>

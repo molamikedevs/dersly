@@ -22,16 +22,15 @@ export default function AuthLayout({
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-background/70" />
+        <div className="absolute inset-0 bg-background/80 sm:bg-background/70" />
       </div>
 
-      <div className="relative z-10 flex min-h-svh flex-col items-center px-4 py-8">
-        <div className="my-auto flex w-full max-w-md flex-col items-center gap-8">
-          <Logo />
-          <main id="main" className="w-full">
-            {children}
-          </main>
-        </div>
+      <div className="relative z-10 flex min-h-svh flex-col items-center justify-center gap-5 px-4 pb-12 pt-6 sm:gap-6 sm:py-8">
+        <Logo />
+
+        <main id="main" className="w-full max-w-md">
+          {children}
+        </main>
       </div>
     </>
   );

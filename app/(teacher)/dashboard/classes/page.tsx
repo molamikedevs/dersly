@@ -2,25 +2,25 @@ import { BookOpen } from 'lucide-react';
 
 import DataRenderer from '@/components/common/data-renderer';
 import FormDialog from '@/components/common/form-dialog';
+import PageHeader from '@/components/common/page-header';
 import AddClassForm from '@/features/classes/components/add-class-form';
 import ClassSection from '@/features/classes/components/class-section';
 import { mockClasses } from '@/features/classes/mock';
 
 export default function Page() {
-  const result: { success: true; data: ClassRecordParams[] } = {
+  const result: { success: true; data: ClassWithCount[] } = {
     success: true,
-    data: mockClasses as ClassRecordParams[],
+    data: mockClasses as ClassWithCount[],
   };
 
   const groups = result.data.filter((item) => item.type !== 'one_to_one');
   const private_ = result.data.filter((item) => item.type === 'one_to_one');
 
   return (
-    <div>
-      <div className="flex items-start justify-between gap-4">
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-          Classes
-        </h1>
+    <div className="pb-16">
+      <div className="flex items-center justify-between gap-4">
+        <PageHeader title="Classes" subText="class categories" />
+
         <FormDialog triggerLabel="Add Class" title="New class">
           <AddClassForm />
         </FormDialog>

@@ -17,17 +17,22 @@ type Props = {
 
 export default function StudentsSection({ students, inviteCode }: Props) {
   return (
-    <section className="mt-8">
+    <section className="mt-14 sm:mt-16">
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Students
         </h2>
+        {students.length > 0 && (
+          <span className="text-xs text-muted-foreground">
+            {students.length}
+          </span>
+        )}
       </div>
 
       {students.length === 0 ? (
-        <div className="mt-4 flex flex-col items-center justify-center rounded-lg border border-dashed px-6 py-10 text-center">
+        <div className="mt-4 flex flex-col items-center justify-center rounded-lg bg-muted px-6 py-10 text-center">
           <Users
-            className="size-10 text-muted-foreground"
+            className="size-9 text-muted-foreground"
             strokeWidth={1.5}
             aria-hidden
           />
@@ -40,17 +45,19 @@ export default function StudentsSection({ students, inviteCode }: Props) {
           </div>
         </div>
       ) : (
-        <ul className="mt-4 divide-y rounded-lg border bg-card">
+        <ul className="mt-2 divide-y divide-border">
           {students.map(({ id, fullName, level, joinedAt }) => (
-            <li key={id} className="flex items-center gap-3 px-4 py-3">
-              <InitialsAvatar name={fullName} className="size-8" />
+            <li key={id} className="flex min-h-11 items-center gap-3 py-2.5">
+              <InitialsAvatar name={fullName} className="size-7 shrink-0" />
               <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
                 {fullName}
               </span>
               {level && (
-                <span className="text-sm text-muted-foreground">{level}</span>
+                <span className="shrink-0 text-sm text-muted-foreground">
+                  {level}
+                </span>
               )}
-              <span className="hidden text-sm text-muted-foreground sm:block">
+              <span className="hidden shrink-0 text-sm text-muted-foreground sm:block">
                 Joined{' '}
                 {new Date(joinedAt).toLocaleDateString('en-GB', {
                   day: 'numeric',
