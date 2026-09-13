@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FileText, Link2, Loader2, Upload, X } from 'lucide-react';
 import { useRef } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
+import { createMaterialAction, updateMaterialAction } from '../actions';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -28,6 +29,7 @@ import {
   MaterialSchema,
   type MaterialValues,
 } from '@/lib/validation/materials.schema';
+import { MaterialRecord } from '@/types/materials';
 
 const KINDS = [
   { value: 'file' as const, label: 'Document', icon: FileText },
@@ -36,22 +38,42 @@ const KINDS = [
 
 export default function AddMaterialForm({
   onSuccess,
+  material,
 }: {
   onSuccess?: () => void;
+  material?: MaterialRecord;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
-
+  const isEdit = Boolean(material);
   const form = useForm<MaterialValues>({
     resolver: zodResolver(MaterialSchema),
-    defaultValues: { kind: 'file', title: '', description: '', url: '' },
+    defaultValues: {
+      kind: material?.kind ?? 'file',
+      title: material?.title ?? '',
+      description: material?.description ?? '',
+      url: material?.url ?? '',
+      level: material?.level ?? undefined,
+      existingPath: material?.filePath ?? undefined,
+    },
   });
 
   const kind = useWatch({ control: form.control, name: 'kind' });
   const { isSubmitting } = form.formState;
 
   async function onSubmit(data: MaterialValues) {
-    console.log(data);
-    toast.add({ title: 'Material added' });
+    const result = isEdit
+      ? await updateMaterialAction(material!.id, data)
+      : await createMaterialAction(data);
+
+    if (!result.success) {
+      toast.add({
+        title: 'Could not add material',
+        description: result.error?.message,
+      });
+      return;
+    }
+
+    toast.add({ title: 'Material added successfully' });
     form.reset();
     onSuccess?.();
   }
@@ -185,6 +207,25 @@ export default function AddMaterialForm({
                       <X className="size-4" aria-hidden />
                     </button>
                   </div>
+                ) : material?.filePath ? (
+                  <div className="flex items-center gap-3 rounded-md bg-muted p-2">
+                    <span
+                      aria-hidden
+                      className="flex size-9 shrink-0 items-center justify-center rounded-md bg-background"
+                    >
+                      <FileText className="size-4 text-muted-foreground" />
+                    </span>
+                    <p className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
+                      Current file attached
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => inputRef.current?.click()}
+                      className="shrink-0 rounded-md px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      Replace
+                    </button>
+                  </div>
                 ) : (
                   <button
                     type="button"
@@ -261,7 +302,13 @@ export default function AddMaterialForm({
           {isSubmitting && (
             <Loader2 className="size-4 animate-spin" aria-hidden />
           )}
-          {isSubmitting ? 'Adding' : 'Add material'}
+          {isSubmitting
+            ? isEdit
+              ? 'Saving'
+              : 'Adding'
+            : isEdit
+              ? 'Save changes'
+              : 'Add material'}
         </Button>
       </FieldGroup>
     </form>
