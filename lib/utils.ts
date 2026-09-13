@@ -40,3 +40,45 @@ export function formatSize(bytes: number) {
   if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
+
+export function youTubeId(url: string) {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname === 'youtu.be') return parsed.pathname.slice(1) || null;
+    if (parsed.hostname.endsWith('youtube.com')) {
+      if (parsed.pathname === '/watch') return parsed.searchParams.get('v');
+      if (parsed.pathname.startsWith('/embed/'))
+        return parsed.pathname.split('/')[2] ?? null;
+      if (parsed.pathname.startsWith('/shorts/'))
+        return parsed.pathname.split('/')[2] ?? null;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export function hostname(url: string) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return null;
+  }
+}
+
+export function toCamel<T>(input: unknown): T {
+  if (Array.isArray(input)) {
+    return input.map((item) => toCamel(item)) as T;
+  }
+
+  if (input !== null && typeof input === 'object') {
+    return Object.fromEntries(
+      Object.entries(input).map(([key, value]) => [
+        key.replace(/_([a-z])/g, (_, char: string) => char.toUpperCase()),
+        toCamel(value),
+      ]),
+    ) as T;
+  }
+
+  return input as T;
+}

@@ -21,3 +21,11 @@ export interface RouteParams<
   params: Promise<P>;
   searchParams: Promise<S>;
 }
+
+type PaginatedSearchParams = {
+  page?: number;
+  pageSize?: number;
+  query?: string;
+  sort?: string;
+  filter?: string;
+};

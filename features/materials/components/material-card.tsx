@@ -1,31 +1,7 @@
+import { hostname, youTubeId } from '@/lib/utils';
+import { MaterialRecord } from '@/types/materials';
 import { Download, ExternalLink, FileText, Link2 } from 'lucide-react';
-
 const IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'avif'];
-
-function youTubeId(url: string) {
-  try {
-    const parsed = new URL(url);
-    if (parsed.hostname === 'youtu.be') return parsed.pathname.slice(1) || null;
-    if (parsed.hostname.endsWith('youtube.com')) {
-      if (parsed.pathname === '/watch') return parsed.searchParams.get('v');
-      if (parsed.pathname.startsWith('/embed/'))
-        return parsed.pathname.split('/')[2] ?? null;
-      if (parsed.pathname.startsWith('/shorts/'))
-        return parsed.pathname.split('/')[2] ?? null;
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-function hostname(url: string) {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return null;
-  }
-}
 
 export default function MaterialCard({ data }: { data: MaterialRecord }) {
   const { title, description, kind, filePath, url, level } = data;

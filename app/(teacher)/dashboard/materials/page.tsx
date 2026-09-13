@@ -5,14 +5,20 @@ import FormDialog from '@/components/common/form-dialog';
 import PageHeader from '@/components/common/page-header';
 import AddMaterialForm from '@/features/materials/components/add-material-form';
 import MaterialCard from '@/features/materials/components/material-card';
-import { mockMaterials } from '@/features/materials/mock';
+import MaterialSkeleton from '@/features/materials/components/material-skeleton';
+import { getMaterials } from '@/features/materials/queries';
+import type { RouteParams } from '@/types/global';
+import { Suspense } from 'react';
 
-export default function Materials() {
-  const result = { success: true, data: mockMaterials };
+export default async function Materials({ searchParams }: RouteParams) {
+  const { page, pageSize } = await searchParams;
 
-  const sorted = [...result.data].sort(
-    (a, b) => Date.parse(b.uploadedAt) - Date.parse(a.uploadedAt),
-  );
+  const { data, success, error } = await getMaterials({
+    page: Number(page) || 1,
+    pageSize: Number(pageSize) || 10,
+  });
+
+  const { materials } = data || {};
 
   return (
     <div className="pb-16">
@@ -29,8 +35,9 @@ export default function Materials() {
 
       <div className="mt-8">
         <DataRenderer
-          success={result.success}
-          data={sorted}
+          success={success}
+          error={error}
+          data={materials}
           empty={{
             icon: FolderOpen,
             title: 'No materials yet',
@@ -47,7 +54,9 @@ export default function Materials() {
           render={(materials) => (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {materials.map((item) => (
-                <MaterialCard key={item.id} data={item} />
+                <Suspense key={item.id} fallback={<MaterialSkeleton />}>
+                  <MaterialCard key={item.id} data={item} />
+                </Suspense>
               ))}
             </div>
           )}
