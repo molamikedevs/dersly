@@ -5,6 +5,7 @@ export const MaterialSchema = z
     kind: z.enum(['file', 'link']),
     title: z.string().trim().min(2, { message: 'Give this a title.' }),
     description: z.string().trim().optional(),
+    existingPath: z.string().optional(),
     level: z
       .enum(['beginner', 'elementary', 'intermediate', 'advanced'])
       .optional(),
@@ -15,9 +16,12 @@ export const MaterialSchema = z
     message: 'Enter a link.',
     path: ['url'],
   })
-  .refine((data) => data.kind !== 'file' || !!data.file, {
-    message: 'Choose a file.',
-    path: ['file'],
-  });
+  .refine(
+    (data) => data.kind !== 'file' || !!data.file || !!data.existingPath,
+    {
+      message: 'Choose a file.',
+      path: ['file'],
+    },
+  );
 
 export type MaterialValues = z.infer<typeof MaterialSchema>;

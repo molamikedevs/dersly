@@ -5,17 +5,15 @@ import FormDialog from '@/components/common/form-dialog';
 import PageHeader from '@/components/common/page-header';
 import AddMaterialForm from '@/features/materials/components/add-material-form';
 import MaterialCard from '@/features/materials/components/material-card';
-import MaterialSkeleton from '@/features/materials/components/material-skeleton';
 import { getMaterials } from '@/features/materials/queries';
 import type { RouteParams } from '@/types/global';
-import { Suspense } from 'react';
 
 export default async function Materials({ searchParams }: RouteParams) {
   const { page, pageSize } = await searchParams;
 
   const { data, success, error } = await getMaterials({
     page: Number(page) || 1,
-    pageSize: Number(pageSize) || 10,
+    pageSize: Number(pageSize) || 12,
   });
 
   const { materials } = data || {};
@@ -33,7 +31,7 @@ export default async function Materials({ searchParams }: RouteParams) {
         </FormDialog>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-6">
         <DataRenderer
           success={success}
           error={error}
@@ -54,9 +52,7 @@ export default async function Materials({ searchParams }: RouteParams) {
           render={(materials) => (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {materials.map((item) => (
-                <Suspense key={item.id} fallback={<MaterialSkeleton />}>
-                  <MaterialCard key={item.id} data={item} />
-                </Suspense>
+                <MaterialCard key={item.id} data={item} />
               ))}
             </div>
           )}

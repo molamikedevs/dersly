@@ -2,7 +2,7 @@
 
 import action from '@/lib/handlers/action';
 import handleError from '@/lib/handlers/errors';
-import { throwPostgresError } from '@/lib/http-errors';
+import { NotFoundError, throwPostgresError } from '@/lib/http-errors';
 import { createClient } from '@/lib/supabase/server';
 import { toCamel } from '@/lib/utils';
 import {
@@ -31,10 +31,10 @@ export async function createMaterialAction(
   const { kind, title, description, level, url, file } = params!;
 
   try {
+    const supabase = createClient(await cookies());
+
     const filePath =
       kind === 'file' && file ? await uploadMaterialFile(file) : null;
-
-    const supabase = createClient(await cookies());
 
     const { data, error } = await supabase.from('materials').insert({
       title,
@@ -51,6 +51,106 @@ export async function createMaterialAction(
     revalidatePath('/dashboard/materials');
 
     return { success: true, data: toCamel<MaterialRecord>(data) };
+  } catch (error) {
+    return handleError(error) as ErrorResponse;
+  }
+}
+
+export async function updateMaterialAction(
+  id: string,
+  params: MaterialValues,
+): Promise<ActionResponse<MaterialRecord>> {
+  const validationResult = await action({
+    params,
+    schema: MaterialSchema,
+    authorize: true,
+  });
+
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
+
+  const { kind, title, description, level, url, file } =
+    validationResult.params!;
+
+  try {
+    const supabase = createClient(await cookies());
+
+    const { data: existing, error: readError } = await supabase
+      .from('materials')
+      .select('file_path')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (readError) throwPostgresError(readError, 'Material');
+    if (!existing) throw new NotFoundError('Material');
+
+    const newPath =
+      kind === 'file' && file ? await uploadMaterialFile(file) : null;
+
+    const filePath = kind === 'link' ? null : (newPath ?? existing.file_path);
+
+    const { data, error } = await supabase
+      .from('materials')
+      .update({
+        title,
+        kind,
+        description: description || null,
+        level: level ?? null,
+        url: kind === 'link' ? url : null,
+        file_path: filePath,
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throwPostgresError(error, 'Material');
+
+    const orphan = existing.file_path;
+    if (orphan && orphan !== filePath) {
+      const [bucket, ...rest] = orphan.split('/');
+      await supabase.storage.from(bucket).remove([rest.join('/')]);
+    }
+
+    revalidatePath('/dashboard/materials');
+
+    return { success: true, data: toCamel<MaterialRecord>(data) };
+  } catch (error) {
+    return handleError(error) as ErrorResponse;
+  }
+}
+
+export async function deleteMaterialAction(
+  id: string,
+): Promise<ActionResponse<null>> {
+  const validationResult = await action({ authorize: true });
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
+
+  try {
+    const supabase = createClient(await cookies());
+
+    const { data: material, error: readError } = await supabase
+      .from('materials')
+      .select('file_path')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (readError) throwPostgresError(readError, 'Material');
+    if (!material) throw new NotFoundError('Material');
+
+    const { error } = await supabase.from('materials').delete().eq('id', id);
+    if (error) throwPostgresError(error, 'Material');
+
+    if (material.file_path) {
+      const [bucket, ...rest] = material.file_path.split('/');
+      await supabase.storage.from(bucket).remove([rest.join('/')]);
+    }
+
+    revalidatePath('/dashboard/materials');
+
+    return { success: true, data: null };
   } catch (error) {
     return handleError(error) as ErrorResponse;
   }
