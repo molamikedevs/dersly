@@ -8,6 +8,8 @@ export interface MaterialRecord {
   kind: MaterialKind;
   filePath: string | null;
   url: string | null;
+  signedUrl?: string | null;
+  downloadUrl?: string | null;
   level: ClassLevel | null;
   uploadedAt: string;
 }

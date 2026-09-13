@@ -67,3 +67,17 @@ export class ConflictError extends RequestError {
     this.name = 'ConflictError';
   }
 }
+
+export function throwPostgresError(
+  error: { code?: string; message: string },
+  resource: string,
+): never {
+  if (error.code === '23505')
+    throw new ConflictError(`${resource} already exists.`);
+  if (error.code === '42501')
+    throw new ForbiddenError(
+      `You cannot modify this ${resource.toLowerCase()}.`,
+    );
+  if (error.code === '23503') throw new NotFoundError(resource);
+  throw new RequestError(500, `Could not save the ${resource.toLowerCase()}.`);
+}

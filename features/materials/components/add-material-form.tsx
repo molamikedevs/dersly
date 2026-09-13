@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FileText, Link2, Loader2, Upload, X } from 'lucide-react';
 import { useRef } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
+import { createMaterialAction } from '../actions';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -50,8 +51,17 @@ export default function AddMaterialForm({
   const { isSubmitting } = form.formState;
 
   async function onSubmit(data: MaterialValues) {
-    console.log(data);
-    toast.add({ title: 'Material added' });
+    const result = await createMaterialAction(data);
+
+    if (!result.success) {
+      toast.add({
+        title: 'Could not add material',
+        description: result.error?.message,
+      });
+      return;
+    }
+
+    toast.add({ title: 'Material added successfully' });
     form.reset();
     onSuccess?.();
   }

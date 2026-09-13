@@ -1,13 +1,24 @@
-import { hostname, youTubeId } from '@/lib/utils';
 import { MaterialRecord } from '@/types/materials';
+
+import { hostname, youTubeId } from '@/lib/utils';
 import { Download, ExternalLink, FileText, Link2 } from 'lucide-react';
+
 const IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'avif'];
 
 export default function MaterialCard({ data }: { data: MaterialRecord }) {
-  const { title, description, kind, filePath, url, level } = data;
+  const {
+    title,
+    description,
+    kind,
+    filePath,
+    url,
+    level,
+    signedUrl,
+    downloadUrl,
+  } = data;
 
-  const href = kind === 'link' ? url : filePath;
   const isLink = kind === 'link';
+  const href = isLink ? url : downloadUrl;
 
   const videoId = isLink && url ? youTubeId(url) : null;
   const fileName = filePath?.split('/').pop() ?? '';
@@ -35,12 +46,12 @@ export default function MaterialCard({ data }: { data: MaterialRecord }) {
         </div>
       )}
 
-      {isPdf && filePath && (
+      {isPdf && signedUrl && (
         <div className="mb-4 overflow-hidden rounded-md bg-muted">
           <object
-            data={`${filePath}#toolbar=0&navpanes=0&view=FitH`}
+            data={`${signedUrl}#toolbar=0&navpanes=0&view=FitH`}
             type="application/pdf"
-            aria-label={fileName}
+            aria-label={title}
             className="h-44 w-full"
           >
             <div className="flex h-44 items-center justify-center">
@@ -50,11 +61,11 @@ export default function MaterialCard({ data }: { data: MaterialRecord }) {
         </div>
       )}
 
-      {isImage && filePath && (
+      {isImage && signedUrl && (
         <div className="mb-4 overflow-hidden rounded-md bg-muted">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={filePath}
+            src={signedUrl}
             alt={title}
             loading="lazy"
             className="h-44 w-full object-cover"
@@ -81,27 +92,23 @@ export default function MaterialCard({ data }: { data: MaterialRecord }) {
 
           <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
             {level && <span className="capitalize">{level}</span>}
-            {level && (site || fileName) && (
+            {level && site && (
               <span aria-hidden className="text-border">
                 ·
               </span>
             )}
-            {site ? (
-              <span className="truncate">{site}</span>
-            ) : (
-              fileName && <span className="truncate">{fileName}</span>
-            )}
+            {site && <span className="truncate">{site}</span>}
           </div>
 
           {description && (
             <p className="mt-2 text-sm text-muted-foreground">{description}</p>
           )}
 
-          {isAudio && filePath && (
+          {isAudio && signedUrl && (
             <audio
               controls
               preload="none"
-              src={filePath}
+              src={signedUrl}
               className="mt-3 w-full"
             >
               Your browser does not support audio playback.
@@ -114,9 +121,9 @@ export default function MaterialCard({ data }: { data: MaterialRecord }) {
         <div className="mt-3 flex">
           <a
             href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            {...(!isLink ? { download: true } : {})}
+            {...(isLink
+              ? { target: '_blank', rel: 'noopener noreferrer' }
+              : { download: fileName })}
             className="-ml-2 inline-flex h-11 items-center gap-2 rounded-md px-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {isLink ? (

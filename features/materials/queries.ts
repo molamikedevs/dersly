@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 
 import action from '@/lib/handlers/action';
 import handleError from '@/lib/handlers/errors';
+import { throwPostgresError } from '@/lib/http-errors';
 import { createClient } from '@/lib/supabase/server';
 import { toCamel } from '@/lib/utils';
 import { PaginatedSearchParamsSchema } from '@/lib/validation/global.schema';
@@ -57,12 +58,34 @@ export async function getMaterials(
       .order(column, { ascending: false })
       .range(from, to);
 
-    if (error) throw new Error(error.message);
+    if (error) throwPostgresError(error, 'Material');
+
+    const materials = toCamel<MaterialRecord[]>(data ?? []);
+
+    await Promise.all(
+      materials.map(async (item) => {
+        if (!item.filePath) return;
+
+        const [bucket, ...rest] = item.filePath.split('/');
+        const path = rest.join('/');
+        const extension = path.split('.').pop() ?? 'pdf';
+
+        const [view, download] = await Promise.all([
+          supabase.storage.from(bucket).createSignedUrl(path, 60 * 15),
+          supabase.storage.from(bucket).createSignedUrl(path, 60 * 15, {
+            download: `${item.title}.${extension}`,
+          }),
+        ]);
+
+        item.signedUrl = view.data?.signedUrl ?? null;
+        item.downloadUrl = download.data?.signedUrl ?? null;
+      }),
+    );
 
     return {
       success: true,
       data: {
-        materials: toCamel<MaterialRecord[]>(data ?? []),
+        materials,
         isNext: (count ?? 0) > to + 1,
       },
     };
