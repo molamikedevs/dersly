@@ -3,33 +3,19 @@ import Link from 'next/link';
 
 import DataRenderer from '@/components/common/data-renderer';
 import PageHeader from '@/components/common/page-header';
-import { getAllHomework } from '@/features/homework/queries';
+import { getGroupedHomework } from '@/features/homework/queries';
 import { formatDueDate } from '@/lib/utils';
 import { RouteParams } from '@/types/global';
 
 export default async function HomeWork({ searchParams }: RouteParams) {
   const { page, pageSize } = await searchParams;
 
-  const { data, success, error } = await getAllHomework({
+  const { data, success, error } = await getGroupedHomework({
     page: Number(page) || 1,
-    pageSize: Number(pageSize) || 10,
+    pageSize: Number(pageSize) || 20,
   });
 
-  const { homework } = data || {};
-
-  const byClass = Object.values(
-    (homework ?? []).reduce<
-      Record<string, { id: string; name: string; items: HomeWorkRecord[] }>
-    >((groups, work: HomeWorkRecord) => {
-      const owner = work.classes;
-      if (!owner) return groups;
-
-      groups[owner.id] ??= { id: owner.id, name: owner.name, items: [] };
-      groups[owner.id].items.push(work);
-
-      return groups;
-    }, {}),
-  );
+  const { groups } = data || {};
 
   return (
     <div className="pb-16">
@@ -42,7 +28,7 @@ export default async function HomeWork({ searchParams }: RouteParams) {
         <DataRenderer
           success={success}
           error={error}
-          data={homework}
+          data={groups}
           empty={{
             icon: ClipboardList,
             title: 'No homework yet',
@@ -50,8 +36,8 @@ export default async function HomeWork({ searchParams }: RouteParams) {
               'Open a class and post homework. Everything you post will appear here.',
             button: { text: 'Go to classes', href: '/dashboard/classes' },
           }}
-          render={() =>
-            byClass.map(({ id, name, items }) => (
+          render={(groups) =>
+            groups.map(({ id, name, items }) => (
               <section key={id} className="mt-10 first:mt-0">
                 <div className="flex items-baseline gap-2.5">
                   <Link

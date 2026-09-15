@@ -5,16 +5,18 @@ import FormDialog from '@/components/common/form-dialog';
 import PageHeader from '@/components/common/page-header';
 import AddClassForm from '@/features/classes/components/add-class-form';
 import ClassSection from '@/features/classes/components/class-section';
-import { mockClasses } from '@/features/classes/mock';
+import { getGroupedClasses } from '@/features/classes/queries';
+import { RouteParams } from '@/types/global';
 
-export default function Page() {
-  const result: { success: true; data: ClassWithCount[] } = {
-    success: true,
-    data: mockClasses as ClassWithCount[],
-  };
+export default async function Page({ searchParams }: RouteParams) {
+  const { page, pageSize } = await searchParams;
 
-  const groups = result.data.filter((item) => item.type !== 'one_to_one');
-  const private_ = result.data.filter((item) => item.type === 'one_to_one');
+  const { data, success, error } = await getGroupedClasses({
+    page: Number(page) || 1,
+    pageSize: Number(pageSize) || 20,
+  });
+
+  const { groups = [], private: privateClasses = [] } = data || {};
 
   return (
     <div className="pb-16">
@@ -27,8 +29,9 @@ export default function Page() {
       </div>
 
       <DataRenderer
-        success={result.success}
-        data={result.data}
+        success={success}
+        error={error}
+        data={[...groups, ...privateClasses]}
         empty={{
           icon: BookOpen,
           title: 'No classes yet',
@@ -42,18 +45,22 @@ export default function Page() {
             </div>
           ),
         }}
-        render={(classes) => (
+        render={() => (
           <>
-            <ClassSection
-              title="Groups & clubs"
-              meta={`${groups.length} classes`}
-              classes={classes.filter((item) => item.type !== 'one_to_one')}
-            />
-            <ClassSection
-              title="One to one"
-              meta={`${private_.length} students`}
-              classes={classes.filter((item) => item.type === 'one_to_one')}
-            />
+            {groups.length > 0 && (
+              <ClassSection
+                title="Groups & clubs"
+                meta={`${groups.length} classes`}
+                classes={groups}
+              />
+            )}
+            {privateClasses.length > 0 && (
+              <ClassSection
+                title="One to one"
+                meta={`${privateClasses.length} students`}
+                classes={privateClasses}
+              />
+            )}
           </>
         )}
       />

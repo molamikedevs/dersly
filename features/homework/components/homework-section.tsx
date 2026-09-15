@@ -2,15 +2,14 @@ import { ChevronRight, ClipboardList, Pencil } from 'lucide-react';
 
 import FormDialog from '@/components/common/form-dialog';
 import { Button } from '@/components/ui/button';
-import HomeWorkCard from '@/features/home-work/components/home-work-card';
+import HomeWorkCard from '@/features/homework/components/homework-card';
 import AddHomeWorkForm from './addhomework-form';
 
 type Props = {
   homeWork: HomeWorkRecord[];
-  classType: ClassType;
 };
 
-export default function HomeWorkSection({ homeWork, classType }: Props) {
+export default function HomeWorkSection({ homeWork }: Props) {
   const [current, ...past] = homeWork;
 
   return (
@@ -48,7 +47,7 @@ export default function HomeWorkSection({ homeWork, classType }: Props) {
         </div>
       ) : (
         <div className="mt-4">
-          <HomeWorkCard data={current} classType={classType} />
+          <HomeWorkCard data={current} />
 
           {past.length > 0 && (
             <details className="group mt-8">
