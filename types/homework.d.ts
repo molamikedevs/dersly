@@ -7,11 +7,11 @@ type HomeWorkRecord = {
   dueDate: string | null;
   isPublished: boolean;
   createdAt: string;
-};
-
-type HomeWorkWithSubmission = HomeWorkRecord & {
-  submission: {
-    submittedAt: string;
-    reviewedAt: string | null;
+  signedUrl?: string | null;
+  downloadUrl?: string | null;
+  classes?: {
+    id: string;
+    name: string;
+    type: ClassType;
   } | null;
 };

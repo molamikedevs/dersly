@@ -4,6 +4,7 @@ import action from '@/lib/handlers/action';
 import handleError from '@/lib/handlers/errors';
 import { throwPostgresError } from '@/lib/http-errors';
 import { createClient } from '@/lib/supabase/server';
+import { signStoragePath } from '@/lib/supabase/sign';
 import { toCamel } from '@/lib/utils';
 import { PaginatedSearchParamsSchema } from '@/lib/validation/global.schema';
 import type {
@@ -65,20 +66,8 @@ export async function getMaterials(
     await Promise.all(
       materials.map(async (item) => {
         if (!item.filePath) return;
-
-        const [bucket, ...rest] = item.filePath.split('/');
-        const path = rest.join('/');
-        const extension = path.split('.').pop() ?? 'pdf';
-
-        const [view, download] = await Promise.all([
-          supabase.storage.from(bucket).createSignedUrl(path, 60 * 15),
-          supabase.storage.from(bucket).createSignedUrl(path, 60 * 15, {
-            download: `${item.title}.${extension}`,
-          }),
-        ]);
-
-        item.signedUrl = view.data?.signedUrl ?? null;
-        item.downloadUrl = download.data?.signedUrl ?? null;
+        const urls = await signStoragePath(supabase, item.filePath, item.title);
+        Object.assign(item, urls);
       }),
     );
 
