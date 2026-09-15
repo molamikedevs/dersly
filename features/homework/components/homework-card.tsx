@@ -1,5 +1,6 @@
-import { formatDueDate } from '@/lib/utils';
 import { Download, FileText } from 'lucide-react';
+
+import HomeworkMenu from './homework-menu';
 
 type Props = {
   data: HomeWorkRecord;
@@ -9,7 +10,7 @@ type Props = {
 const IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'avif'];
 
 export default function HomeWorkCard({ data, action }: Props) {
-  const { title, attachmentPath, dueDate, isPublished } = data;
+  const { title, attachmentPath, isPublished, signedUrl, downloadUrl } = data;
 
   const fileName = attachmentPath?.split('/').pop() ?? '';
   const extension = fileName.split('.').pop()?.toLowerCase() ?? '';
@@ -30,21 +31,17 @@ export default function HomeWorkCard({ data, action }: Props) {
               </span>
             )}
           </div>
-
-          <p className="mt-1 text-sm text-muted-foreground">
-            {formatDueDate(dueDate)}
-          </p>
         </div>
 
-        {action}
+        {action ?? <HomeworkMenu data={data} />}
       </div>
 
       {attachmentPath && (
         <div className="mt-5">
           <div className="overflow-hidden rounded-lg bg-muted">
-            {isPdf ? (
+            {isPdf && signedUrl ? (
               <object
-                data={`${attachmentPath}#toolbar=0&navpanes=0&view=FitH`}
+                data={`${signedUrl}#toolbar=0&navpanes=0&view=FitH`}
                 type="application/pdf"
                 aria-label={fileName}
                 className="h-60 w-full sm:h-80"
@@ -59,10 +56,10 @@ export default function HomeWorkCard({ data, action }: Props) {
                   </p>
                 </div>
               </object>
-            ) : isImage ? (
+            ) : isImage && signedUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={attachmentPath}
+                src={signedUrl}
                 alt={fileName}
                 className="h-60 w-full object-cover sm:h-80"
               />
@@ -84,16 +81,16 @@ export default function HomeWorkCard({ data, action }: Props) {
               {fileName}
             </span>
 
-            <a
-              href={attachmentPath}
-              download
-              target="_blank"
-              rel="noopener noreferrer"
-              className="-mr-3 inline-flex h-11 shrink-0 items-center gap-2 rounded-md px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <Download className="size-4" aria-hidden />
-              Download
-            </a>
+            {downloadUrl && (
+              <a
+                href={downloadUrl}
+                download={fileName}
+                className="-mr-3 inline-flex h-11 shrink-0 items-center gap-2 rounded-md px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <Download className="size-4" aria-hidden />
+                Download
+              </a>
+            )}
           </div>
         </div>
       )}

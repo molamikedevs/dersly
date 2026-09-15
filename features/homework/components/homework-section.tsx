@@ -1,15 +1,16 @@
-import { ChevronRight, ClipboardList, Pencil } from 'lucide-react';
+import { ChevronRight, ClipboardList } from 'lucide-react';
 
 import FormDialog from '@/components/common/form-dialog';
-import { Button } from '@/components/ui/button';
 import HomeWorkCard from '@/features/homework/components/homework-card';
-import AddHomeWorkForm from './addhomework-form';
+import AddHomeWorkForm from './add-homework-form';
+import HomeworkMenu from './homework-menu';
 
 type Props = {
+  classId: string;
   homeWork: HomeWorkRecord[];
 };
 
-export default function HomeWorkSection({ homeWork }: Props) {
+export default function HomeWorkSection({ classId, homeWork }: Props) {
   const [current, ...past] = homeWork;
 
   return (
@@ -19,15 +20,9 @@ export default function HomeWorkSection({ homeWork }: Props) {
           Homework
         </h2>
 
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" aria-label="Edit class">
-            <Pencil className="size-4" aria-hidden />
-          </Button>
-
-          <FormDialog triggerLabel="New homework" title="New homework">
-            <AddHomeWorkForm />
-          </FormDialog>
-        </div>
+        <FormDialog triggerLabel="New homework" title="New homework">
+          <AddHomeWorkForm classId={classId} />
+        </FormDialog>
       </div>
 
       {!current ? (
@@ -42,7 +37,7 @@ export default function HomeWorkSection({ homeWork }: Props) {
             Post homework for this class and students will see it here.
           </p>
           <FormDialog triggerLabel="New homework" title="New homework">
-            <AddHomeWorkForm />
+            <AddHomeWorkForm classId={classId} />
           </FormDialog>
         </div>
       ) : (
@@ -68,6 +63,7 @@ export default function HomeWorkSection({ homeWork }: Props) {
                     <span className="min-w-0 flex-1 truncate text-sm text-foreground">
                       {item.title}
                     </span>
+                    <HomeworkMenu data={item} />
                   </li>
                 ))}
               </ul>

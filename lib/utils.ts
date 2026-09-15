@@ -1,6 +1,8 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
+const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -81,4 +83,11 @@ export function toCamel<T>(input: unknown): T {
   }
 
   return input as T;
+}
+
+export function generateInviteCode(length = 6) {
+  return Array.from(
+    { length },
+    () => ALPHABET[Math.floor(Math.random() * ALPHABET.length)],
+  ).join('');
 }

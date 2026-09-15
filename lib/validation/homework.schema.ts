@@ -10,22 +10,38 @@ const ACCEPTED_TYPES = [
   'image/png',
 ];
 
-export const HomeworkSchema = z.object({
-  title: z
-    .string()
-    .trim()
-    .min(2, { message: 'Give the homework a title.' })
-    .max(80, { message: 'Title cannot exceed 80 characters.' }),
+export const HomeworkSchema = z
+  .object({
+    classId: z.uuid({ message: 'Choose a class.' }),
 
-  file: z
-    .instanceof(File, { message: 'Choose a file to upload.' })
-    .refine((file) => file.size > 0, { message: 'Choose a file to upload.' })
-    .refine((file) => file.size <= MAX_SIZE, {
-      message: 'File must be under 10MB.',
-    })
-    .refine((file) => ACCEPTED_TYPES.includes(file.type), {
-      message: 'Upload a PDF, Word document or image.',
-    }),
-});
+    title: z
+      .string()
+      .trim()
+      .min(2, { message: 'Give the homework a title.' })
+      .max(80, { message: 'Title cannot exceed 80 characters.' }),
+
+    instructions: z
+      .string()
+      .trim()
+      .max(500, { message: 'Keep the instructions short.' })
+      .optional(),
+
+    existingPath: z.string().optional(),
+
+    file: z
+      .instanceof(File)
+      .refine((file) => file.size > 0, { message: 'Choose a file to upload.' })
+      .refine((file) => file.size <= MAX_SIZE, {
+        message: 'File must be under 10MB.',
+      })
+      .refine((file) => ACCEPTED_TYPES.includes(file.type), {
+        message: 'Upload a PDF, Word document or image.',
+      })
+      .optional(),
+  })
+  .refine((data) => !!data.file || !!data.existingPath || !!data.instructions, {
+    message: 'Add a file or write instructions.',
+    path: ['file'],
+  });
 
 export type HomeworkValues = z.infer<typeof HomeworkSchema>;

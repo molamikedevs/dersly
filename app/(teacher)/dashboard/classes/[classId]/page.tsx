@@ -38,7 +38,7 @@ export default async function Page({
         className="mb-6"
       />
       <ClassHeader data={data} />
-      <HomeWorkSection homeWork={homework} />
+      <HomeWorkSection homeWork={homework} classId={classId} />
       {data.type === 'course' && (
         <StudentsSection students={mockStudents} inviteCode={data.inviteCode} />
       )}
