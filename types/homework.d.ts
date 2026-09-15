@@ -15,3 +15,9 @@ type HomeWorkRecord = {
     type: ClassType;
   } | null;
 };
+
+type HomeWorkGroup = {
+  id: string;
+  name: string;
+  items: HomeWorkRecord[];
+};

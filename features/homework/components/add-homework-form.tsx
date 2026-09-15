@@ -14,42 +14,60 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/toast';
+import { createHomework, updateHomework } from '@/features/homework/actions';
+import { formatSize } from '@/lib/utils';
 import {
   HomeworkSchema,
   type HomeworkValues,
 } from '@/lib/validation/homework.schema';
 
-function formatSize(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
 export default function AddHomeworkForm({
+  classId,
+  homework,
   onSuccess,
 }: {
+  classId: string;
+  homework?: HomeWorkRecord;
   onSuccess?: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const isEdit = Boolean(homework);
 
   const form = useForm<HomeworkValues>({
     resolver: zodResolver(HomeworkSchema),
-    defaultValues: { title: '' },
+    defaultValues: {
+      classId,
+      title: homework?.title ?? '',
+      instructions: homework?.instructions ?? '',
+      existingPath: homework?.attachmentPath ?? undefined,
+    },
   });
 
   const { isSubmitting } = form.formState;
 
   async function onSubmit(data: HomeworkValues) {
-    console.log(data);
-    toast.add({ title: 'Homework posted' });
+    const result = isEdit
+      ? await updateHomework(homework!.id, data)
+      : await createHomework(data);
+
+    if (!result.success) {
+      toast.add({
+        title: isEdit ? 'Could not update homework' : 'Could not post homework',
+        description: result.error?.message,
+      });
+      return;
+    }
+
+    toast.add({ title: isEdit ? 'Homework updated' : 'Homework posted' });
     form.reset();
     onSuccess?.();
   }
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
-      <FieldGroup>
+      <FieldGroup className="gap-4">
         <Controller
           name="title"
           control={form.control}
@@ -113,6 +131,25 @@ export default function AddHomeworkForm({
                     <X className="size-4" aria-hidden />
                   </button>
                 </div>
+              ) : homework?.attachmentPath ? (
+                <div className="flex items-center gap-3 rounded-md bg-muted p-3">
+                  <span
+                    aria-hidden
+                    className="flex size-9 shrink-0 items-center justify-center rounded-md bg-background"
+                  >
+                    <FileText className="size-4 text-muted-foreground" />
+                  </span>
+                  <p className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
+                    Current file attached
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => inputRef.current?.click()}
+                    className="shrink-0 rounded-md px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    Replace
+                  </button>
+                </div>
               ) : (
                 <button
                   type="button"
@@ -137,11 +174,40 @@ export default function AddHomeworkForm({
           )}
         />
 
+        <Controller
+          name="instructions"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="homework-instructions">
+                Instructions{' '}
+                <span className="font-normal text-muted-foreground">
+                  optional
+                </span>
+              </FieldLabel>
+              <Textarea
+                {...field}
+                id="homework-instructions"
+                rows={3}
+                placeholder="What should students do before the next lesson?"
+                aria-invalid={fieldState.invalid}
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
         <Button type="submit" className="h-11 w-full" disabled={isSubmitting}>
           {isSubmitting && (
             <Loader2 className="size-4 animate-spin" aria-hidden />
           )}
-          {isSubmitting ? 'Posting homework' : 'Post homework'}
+          {isSubmitting
+            ? isEdit
+              ? 'Saving'
+              : 'Posting'
+            : isEdit
+              ? 'Save changes'
+              : 'Post homework'}
         </Button>
       </FieldGroup>
     </form>

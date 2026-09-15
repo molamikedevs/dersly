@@ -21,14 +21,18 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from '@/components/ui/toast';
+import { createClass, updateClass } from '@/features/classes/actions';
 import { ClassSchema, ClassValues } from '@/lib/validation/class.schema';
 import { LEVELS, TYPES } from '../constants/index';
 
 export default function AddClassForm({
   onSuccess,
+  classRecord,
 }: {
   onSuccess?: () => void;
+  classRecord?: ClassRecord;
 }) {
+  const isEdit = Boolean(classRecord);
   const form = useForm<ClassValues>({
     resolver: zodResolver(ClassSchema),
     defaultValues: {
@@ -43,12 +47,22 @@ export default function AddClassForm({
   const { isSubmitting } = form.formState;
 
   async function onSubmit(data: ClassValues) {
-    console.log(data);
-    toast.add({ title: 'Class created' });
+    const result = isEdit
+      ? await updateClass(classRecord!.id, data)
+      : await createClass(data);
+
+    if (!result.success) {
+      toast.add({
+        title: isEdit ? 'Could not update class' : 'Could not create class',
+        description: result.error?.message,
+      });
+      return;
+    }
+
+    toast.add({ title: isEdit ? 'Class updated' : 'Class created' });
     form.reset();
     onSuccess?.();
   }
-
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
       <FieldGroup>

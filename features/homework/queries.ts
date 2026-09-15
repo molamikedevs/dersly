@@ -77,3 +77,27 @@ export function getClassHomework(
 ) {
   return fetchHomework(params, classId);
 }
+
+export async function getGroupedHomework(
+  params: PaginatedSearchParams,
+): Promise<ActionResponse<{ groups: HomeWorkGroup[]; isNext: boolean }>> {
+  const result = await fetchHomework(params);
+
+  if (!result.success || !result.data) return result as ErrorResponse;
+
+  const { homework, isNext } = result.data;
+
+  const groups = Object.values(
+    homework.reduce<Record<string, HomeWorkGroup>>((acc, work) => {
+      const owner = work.classes;
+      if (!owner) return acc;
+
+      acc[owner.id] ??= { id: owner.id, name: owner.name, items: [] };
+      acc[owner.id].items.push(work);
+
+      return acc;
+    }, {}),
+  );
+
+  return { success: true, data: { groups, isNext } };
+}
