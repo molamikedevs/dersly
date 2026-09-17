@@ -3,22 +3,36 @@ import { Users } from 'lucide-react';
 import DataRenderer from '@/components/common/data-renderer';
 import PageHeader from '@/components/common/page-header';
 import StudentRow from '@/features/students/components/student-row';
-import { mockStudents } from '@/features/students/mock';
+import { getStudents } from '@/features/students/queries';
+import { RouteParams } from '@/types/global';
 
-export default function Students() {
-  const result = { success: true, data: mockStudents };
+export default async function Students({ searchParams }: RouteParams) {
+  const { page, pageSize } = await searchParams;
+
+  const { data, success, error } = await getStudents({
+    page: Number(page) || 1,
+    pageSize: Number(pageSize) || 50,
+  });
+
+  const students = data?.students ?? [];
+  console.log(data);
 
   return (
     <div className="pb-16">
       <PageHeader
         title="Students"
-        subText={`${result.data.length} students across your classes`}
+        subText={
+          students.length === 1
+            ? '1 student across your classes'
+            : `${students.length} students across your classes`
+        }
       />
 
       <div className="mt-8">
         <DataRenderer
-          success={result.success}
-          data={result.data}
+          success={success}
+          error={error}
+          data={students}
           empty={{
             icon: Users,
             title: 'No students yet',
