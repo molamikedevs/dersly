@@ -3,7 +3,7 @@ type StudentRecord = {
   fullName: string;
   email: string;
   level: ClassLevel | null;
-  joinedAt: string;
+  createdAt: string;
   classes: {
     id: string;
     name: string;

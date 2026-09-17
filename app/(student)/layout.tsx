@@ -1,12 +1,14 @@
 import StudentTabBar from '@/components/ui/layout/navigation/student-tab-bar';
 import StudentTopBar from '@/components/ui/layout/navigation/student-top-bar';
 import SkipLink from '@/components/ui/layout/skip-link';
+import { requireStudent } from '@/features/auth/guard';
 
-export default function StudentLayout({
+export default async function StudentLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  await requireStudent();
   return (
     <>
       <SkipLink />

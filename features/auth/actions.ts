@@ -41,6 +41,7 @@ export async function signUp(values: unknown): Promise<ActionResult> {
     .select('id')
     .ilike('invite_code', code)
     .eq('is_active', true)
+    .eq('enrollment_open', true)
     .maybeSingle();
 
   if (!classRow) return { error: 'That class code is not valid.' };
@@ -48,7 +49,7 @@ export async function signUp(values: unknown): Promise<ActionResult> {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name: fullname } },
+    options: { data: { full_name: fullname, invite_code: code } },
   });
 
   if (error) {
@@ -62,24 +63,7 @@ export async function signUp(values: unknown): Promise<ActionResult> {
 
   if (!data.user) return { error: 'Could not create your account.' };
 
-  const { error: enrollError } = await supabase.from('enrollments').insert({
-    class_id: classRow.id,
-    student_id: data.user.id,
-  });
-
-  if (enrollError)
-    return {
-      error:
-        'Account created, but joining the class failed. Tell your teacher.',
-    };
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', data.user.id)
-    .single();
-
-  redirect(profile?.role === 'teacher' ? '/dashboard' : '/');
+  redirect('/');
 }
 
 export async function signOut() {
