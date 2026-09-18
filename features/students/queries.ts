@@ -31,17 +31,16 @@ export async function getStudents(
 
   try {
     const supabase = createClient(await cookies());
-
     const { data, count, error } = await supabase
-      .from('profiles')
+      .from('enrollments')
       .select(
-        'id, full_name, email, level, created_at, classes(id, name, type)',
-        {
-          count: 'exact',
-        },
+        `joined_at,
+     student:profiles!enrollments_student_id_fkey(id, full_name, email, level),
+     class:classes!enrollments_class_id_fkey(id, name, type, schedule)`,
+        { count: 'exact' },
       )
-      .eq('role', 'student')
-      .order('created_at', { ascending: false })
+      .eq('status', 'active')
+      .order('joined_at', { ascending: false })
       .range(from, to);
 
     if (error) throwPostgresError(error, 'Student');

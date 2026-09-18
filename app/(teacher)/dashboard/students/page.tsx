@@ -2,6 +2,13 @@ import { Users } from 'lucide-react';
 
 import DataRenderer from '@/components/common/data-renderer';
 import PageHeader from '@/components/common/page-header';
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import StudentRow from '@/features/students/components/student-row';
 import { getStudents } from '@/features/students/queries';
 import { RouteParams } from '@/types/global';
@@ -15,7 +22,6 @@ export default async function Students({ searchParams }: RouteParams) {
   });
 
   const students = data?.students ?? [];
-  console.log(data);
 
   return (
     <div className="pb-16">
@@ -23,8 +29,8 @@ export default async function Students({ searchParams }: RouteParams) {
         title="Students"
         subText={
           students.length === 1
-            ? '1 student across your classes'
-            : `${students.length} students across your classes`
+            ? '1 enrolment across your classes'
+            : `${students.length} enrolments across your classes`
         }
       />
 
@@ -41,11 +47,38 @@ export default async function Students({ searchParams }: RouteParams) {
             button: { text: 'Go to classes', href: '/dashboard/classes' },
           }}
           render={(students) => (
-            <ul className="divide-y divide-border">
-              {students.map((item) => (
-                <StudentRow key={item.id} data={item} />
-              ))}
-            </ul>
+            <div className="overflow-x-auto rounded-lg bg-card shadow-sm">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-border hover:bg-transparent">
+                    <TableHead className="h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                      Student
+                    </TableHead>
+                    <TableHead className="hidden h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground sm:table-cell">
+                      Email
+                    </TableHead>
+                    <TableHead className="h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                      Class
+                    </TableHead>
+                    <TableHead className="h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                      Level
+                    </TableHead>
+                    <TableHead className="hidden h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground md:table-cell">
+                      Schedule
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+
+                <TableBody className="[&_td]:px-4">
+                  {students.map((item) => (
+                    <StudentRow
+                      key={`${item.student.id}-${item.class.id}`}
+                      data={item}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         />
       </div>
