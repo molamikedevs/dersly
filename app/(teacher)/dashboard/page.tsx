@@ -1,4 +1,4 @@
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 
 import PageHeader from '@/components/common/page-header';
@@ -22,42 +22,64 @@ export default async function Dashboard() {
   const missing = latestByClass.filter(({ current }) => !current).length;
 
   return (
-    <div className="pb-16">
+    <div className="max-w-5xl pb-16">
       <PageHeader title="Overview" subText="What needs your attention today." />
 
       <section className="mt-10 sm:mt-12">
-        <div className="flex items-baseline gap-2.5">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
           <h2 className="text-lg font-semibold tracking-tight text-foreground">
             Homework posted
           </h2>
-          {missing > 0 && (
-            <span className="text-sm font-medium text-warning">
-              {missing} missing
+
+          {missing > 0 ? (
+            <span className="flex items-center gap-1.5 text-sm font-medium text-warning">
+              <AlertCircle className="size-4" aria-hidden />
+              {missing === 1
+                ? '1 class needs homework'
+                : `${missing} classes need homework`}
+            </span>
+          ) : (
+            <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <CheckCircle2 className="size-4 text-success" aria-hidden />
+              Every class has homework
             </span>
           )}
         </div>
 
-        <ul className="mt-4 divide-y divide-border">
+        <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {latestByClass.map(({ class: item, current }) => (
             <li key={item.id}>
               <Link
                 href={`/dashboard/classes/${item.id}`}
-                className="-mx-2 flex min-h-11 items-center gap-4 rounded-md px-2 py-3 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex h-full min-h-11 flex-col rounded-lg bg-card p-4 shadow-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
+                <p className="truncate font-medium text-foreground">
                   {item.name}
-                </span>
+                </p>
 
-                {current ? (
-                  <span className="min-w-0 max-w-[55%] truncate text-sm text-muted-foreground">
-                    {current.title}
-                  </span>
-                ) : (
-                  <span className="flex shrink-0 items-center gap-1.5 text-sm text-warning">
-                    <AlertCircle className="size-4" aria-hidden />
-                    Nothing posted
-                  </span>
+                {item.schedule && (
+                  <p className="mt-0.5 truncate text-sm text-muted-foreground">
+                    {item.schedule}
+                  </p>
                 )}
+
+                <div className="mt-4 border-t border-border pt-3">
+                  {current ? (
+                    <>
+                      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        Latest
+                      </p>
+                      <p className="mt-1 line-clamp-2 text-sm text-foreground">
+                        {current.title}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="flex items-center gap-1.5 text-sm font-medium text-warning">
+                      <AlertCircle className="size-4 shrink-0" aria-hidden />
+                      Nothing posted
+                    </p>
+                  )}
+                </div>
               </Link>
             </li>
           ))}

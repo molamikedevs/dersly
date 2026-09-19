@@ -3,15 +3,8 @@ import { Users } from 'lucide-react';
 import InitialsAvatar from '@/components/common/initials-avatar';
 import InviteCode from '@/features/classes/components/invite-code';
 
-type Student = {
-  id: string;
-  fullName: string;
-  level: string | null;
-  joinedAt: string;
-};
-
 type Props = {
-  students: Student[];
+  students: StudentRecord[];
   inviteCode: string;
 };
 
@@ -46,15 +39,21 @@ export default function StudentsSection({ students, inviteCode }: Props) {
         </div>
       ) : (
         <ul className="mt-2 divide-y divide-border">
-          {students.map(({ id, fullName, level, joinedAt }) => (
-            <li key={id} className="flex min-h-11 items-center gap-3 py-2.5">
-              <InitialsAvatar name={fullName} className="size-7 shrink-0" />
+          {students.map(({ student, joinedAt }) => (
+            <li
+              key={student.id}
+              className="flex min-h-11 items-center gap-3 py-2.5"
+            >
+              <InitialsAvatar
+                name={student.fullName}
+                className="size-7 shrink-0"
+              />
               <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
-                {fullName}
+                {student.fullName}
               </span>
-              {level && (
-                <span className="shrink-0 text-sm text-muted-foreground">
-                  {level}
+              {student.level && (
+                <span className="shrink-0 text-sm capitalize text-muted-foreground">
+                  {student.level}
                 </span>
               )}
               <span className="hidden shrink-0 text-sm text-muted-foreground sm:block">

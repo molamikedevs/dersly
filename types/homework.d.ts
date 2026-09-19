@@ -4,6 +4,7 @@ type HomeWorkRecord = {
   title: string;
   instructions: string | null;
   attachmentPath: string | null;
+  attachmentName: string | null;
   dueDate: string | null;
   isPublished: boolean;
   createdAt: string;

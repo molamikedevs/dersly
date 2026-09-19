@@ -1,4 +1,4 @@
-import { Download, FileText } from 'lucide-react';
+import { Download, ExternalLink, FileText } from 'lucide-react';
 
 import HomeworkMenu from './homework-menu';
 
@@ -7,90 +7,90 @@ type Props = {
   action?: React.ReactNode;
 };
 
-const IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'avif'];
-
 export default function HomeWorkCard({ data, action }: Props) {
-  const { title, attachmentPath, isPublished, signedUrl, downloadUrl } = data;
-
-  const fileName = attachmentPath?.split('/').pop() ?? '';
-  const extension = fileName.split('.').pop()?.toLowerCase() ?? '';
-  const isPdf = extension === 'pdf';
-  const isImage = IMAGE_EXTENSIONS.includes(extension);
+  const {
+    title,
+    instructions,
+    attachmentPath,
+    attachmentName,
+    isPublished,
+    signedUrl,
+    downloadUrl,
+  } = data;
 
   return (
-    <article className="rounded-lg bg-card p-5 shadow-sm sm:p-6">
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-base font-semibold tracking-tight text-foreground sm:text-lg">
-              {title}
-            </h3>
-            {!isPublished && (
-              <span className="rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                Draft
-              </span>
+    <article className="rounded-xl border bg-card">
+      <div className="p-5 sm:p-6">
+        <header className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="min-w-0 text-base font-semibold tracking-tight text-foreground sm:text-lg">
+                {title}
+              </h3>
+
+              {!isPublished && (
+                <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                  Draft
+                </span>
+              )}
+            </div>
+
+            {instructions && (
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+                {instructions}
+              </p>
             )}
           </div>
-        </div>
 
-        {action ?? <HomeworkMenu data={data} />}
+          <div className="shrink-0">
+            {action ?? <HomeworkMenu data={data} />}
+          </div>
+        </header>
       </div>
 
       {attachmentPath && (
-        <div className="mt-5">
-          <div className="overflow-hidden rounded-lg bg-muted">
-            {isPdf && signedUrl ? (
-              <object
-                data={`${signedUrl}#toolbar=0&navpanes=0&view=FitH`}
-                type="application/pdf"
-                aria-label={fileName}
-                className="h-60 w-full sm:h-80"
-              >
-                <div className="flex h-60 flex-col items-center justify-center gap-2 sm:h-80">
-                  <FileText
-                    className="size-6 text-muted-foreground"
-                    aria-hidden
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Preview not available in this browser.
-                  </p>
-                </div>
-              </object>
-            ) : isImage && signedUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={signedUrl}
-                alt={fileName}
-                className="h-60 w-full object-cover sm:h-80"
-              />
-            ) : (
-              <div className="flex h-24 items-center gap-3 px-4">
-                <FileText
-                  className="size-5 shrink-0 text-muted-foreground"
-                  aria-hidden
-                />
-                <span className="min-w-0 flex-1 truncate text-sm text-foreground">
-                  {fileName}
-                </span>
-              </div>
-            )}
-          </div>
+        <div className="border-t px-5 py-4 sm:px-6">
+          <div className="flex items-center gap-3">
+            <div
+              aria-hidden
+              className="flex size-10 shrink-0 items-center justify-center rounded-lg border bg-muted/50"
+            >
+              <FileText className="size-4 text-muted-foreground" />
+            </div>
 
-          <div className="mt-2 flex items-center gap-3">
-            <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
-              {fileName}
-            </span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-foreground">
+                {attachmentName ?? 'Attachment'}
+              </p>
 
-            {downloadUrl && (
-              <a
-                href={downloadUrl}
-                download={fileName}
-                className="-mr-3 inline-flex h-11 shrink-0 items-center gap-2 rounded-md px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <Download className="size-4" aria-hidden />
-                Download
-              </a>
-            )}
+              <p className="text-xs text-muted-foreground">
+                Homework attachment
+              </p>
+            </div>
+
+            <div className="flex shrink-0 items-center gap-1">
+              {signedUrl && (
+                <a
+                  href={signedUrl}
+                  rel="noopener noreferrer"
+                  className="inline-flex h-9 items-center gap-1.5 rounded-md px-3 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  Open
+                  <ExternalLink className="size-3.5" aria-hidden />
+                </a>
+              )}
+
+              {downloadUrl && (
+                <a
+                  href={downloadUrl}
+                  download={attachmentName ?? undefined}
+                  aria-label={`Download ${attachmentName ?? 'attachment'}`}
+                  className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <Download className="size-4" aria-hidden />
+                </a>
+              )}
+            </div>
           </div>
         </div>
       )}

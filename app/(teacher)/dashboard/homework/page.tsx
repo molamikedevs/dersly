@@ -53,8 +53,6 @@ export default async function HomeWork({ searchParams }: RouteParams) {
 
                 <ul className="mt-3 divide-y divide-border">
                   {items.map((work) => {
-                    const fileName = work.attachmentPath?.split('/').pop();
-
                     return (
                       <li key={work.id}>
                         <Link
@@ -89,17 +87,16 @@ export default async function HomeWork({ searchParams }: RouteParams) {
 
                             <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
                               <span>{formatDueDate(work.dueDate)}</span>
-                              {fileName && (
+                              {work.attachmentPath && (
                                 <>
-                                  <span aria-hidden className="text-border">
-                                    ·
-                                  </span>
                                   <span className="inline-flex min-w-0 items-center gap-1.5">
                                     <Paperclip
                                       className="size-3.5 shrink-0"
                                       aria-hidden
                                     />
-                                    <span className="truncate">{fileName}</span>
+                                    <span className="truncate">
+                                      {work.attachmentName ?? 'Attachment'}
+                                    </span>
                                   </span>
                                 </>
                               )}
