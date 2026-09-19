@@ -1,3 +1,4 @@
+import HomeSkeleton from '@/components/common/home-skeleton';
 import RecentMaterials from '@/features/materials/components/recent-materials';
 import CurrentWorkCard from '@/features/students/components/current-work-card';
 import NextLessonCard from '@/features/students/components/next-lesson-card';
@@ -7,8 +8,17 @@ import {
 } from '@/features/students/constants/index';
 import { getStudentHome } from '@/features/students/queries';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
-export default async function Home() {
+export default function Home() {
+  return (
+    <Suspense fallback={<HomeSkeleton />}>
+      <HomContent />
+    </Suspense>
+  );
+}
+
+async function HomContent() {
   const { data } = await getStudentHome();
 
   if (!data) return null;
