@@ -8,18 +8,18 @@ export default async function StudentLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await requireStudent();
+  const profile = await requireStudent();
   return (
     <>
       <SkipLink />
-      <StudentTopBar />
+      <StudentTopBar name={profile.full_name} email={profile.email} />
       <main
         id="main"
         className="container-app flex-1 pb-28 pt-6 md:pb-12 md:pt-8"
       >
         {children}
       </main>
-      <StudentTabBar />
+      <StudentTabBar name={profile.full_name} email={profile.email} />
     </>
   );
 }

@@ -1,11 +1,17 @@
 'use client';
 
 import { STUDENT_TAB_NAV } from '@/constants/nav';
+import UserAvatar from '@/features/profile/components/user-avatar';
 import { cn, isActive } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-export default function StudentTabBar() {
+type Props = {
+  name: string;
+  email: string;
+};
+
+export default function StudentTabBar({ name, email }: Props) {
   const pathname = usePathname();
 
   return (
@@ -17,7 +23,7 @@ export default function StudentTabBar() {
       <ul
         className="grid"
         style={{
-          gridTemplateColumns: `repeat(${STUDENT_TAB_NAV.length}, minmax(0, 1fr))`,
+          gridTemplateColumns: `repeat(${STUDENT_TAB_NAV.length + 1}, minmax(0, 1fr))`,
         }}
       >
         {STUDENT_TAB_NAV.map(({ label, href, icon: Icon }) => {
@@ -52,6 +58,15 @@ export default function StudentTabBar() {
             </li>
           );
         })}
+
+        <li>
+          <UserAvatar
+            name={name}
+            email={email}
+            variant="tab"
+            active={isActive(pathname, '/profile')}
+          />
+        </li>
       </ul>
     </nav>
   );
