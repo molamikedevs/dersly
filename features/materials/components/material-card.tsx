@@ -11,67 +11,66 @@ export default function MaterialCard({ data }: { data: MaterialRecord }) {
   const site = url ? hostname(url) : null;
 
   return (
-    <article className="flex flex-col rounded-lg bg-card p-4 shadow-sm">
+    <article className="flex flex-col overflow-hidden rounded-lg bg-card shadow-sm transition-shadow hover:shadow-md">
       {videoId ? (
-        <div className="mb-4 overflow-hidden rounded-md bg-muted">
-          <iframe
-            src={`https://www.youtube-nocookie.com/embed/${videoId}`}
-            title={title}
-            loading="lazy"
-            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            className="aspect-video w-full border-0"
-          />
-        </div>
+        <iframe
+          src={`https://www.youtube-nocookie.com/embed/${videoId}?modestbranding=1&rel=0`}
+          title={title}
+          loading="lazy"
+          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="aspect-video w-full shrink-0 border-0 bg-muted"
+        />
       ) : null}
 
-      <div className="flex min-w-0 flex-1 items-start gap-3">
-        {!videoId && (
-          <span
-            aria-hidden
-            className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground"
-          >
-            <Link2 className="size-4" />
-          </span>
-        )}
+      <div className="flex flex-1 flex-col p-3.5">
+        <div className="flex items-start gap-1">
+          {!videoId && (
+            <span
+              aria-hidden
+              className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground"
+            >
+              <Link2 className="size-4" />
+            </span>
+          )}
 
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start gap-2">
-            <h3 className="min-w-0 flex-1 font-medium text-foreground">
-              {title}
-            </h3>
+          <h3 className="ml-2 min-w-0 flex-1 text-sm font-medium leading-snug text-foreground line-clamp-2">
+            {title}
+          </h3>
+
+          <div className="-mr-1.5 -mt-1.5 shrink-0">
             <MaterialMenu data={data} />
           </div>
+        </div>
 
-          <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
-            {level && <span className="capitalize">{level}</span>}
-            {level && site && (
-              <span aria-hidden className="text-border">
-                ·
-              </span>
-            )}
-            {site && <span className="truncate">{site}</span>}
-          </div>
+        {description && (
+          <p className="mt-1.5 text-sm leading-snug text-muted-foreground line-clamp-2">
+            {description}
+          </p>
+        )}
 
-          {description && (
-            <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+        <div className="mt-3 flex items-center gap-x-2 pt-0 text-xs text-muted-foreground">
+          {level && <span className="capitalize">{level}</span>}
+          {level && site && (
+            <span aria-hidden className="text-border">
+              ·
+            </span>
+          )}
+          {site && <span className="truncate">{site}</span>}
+
+          {url && !videoId && (
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-auto inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              Open
+              <ExternalLink className="size-3" aria-hidden />
+            </a>
           )}
         </div>
       </div>
-
-      {url && !videoId && (
-        <div className="mt-3 flex">
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="-ml-2 inline-flex h-11 items-center gap-2 rounded-md px-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            Open
-            <ExternalLink className="size-3.5" aria-hidden />
-          </a>
-        </div>
-      )}
     </article>
   );
 }

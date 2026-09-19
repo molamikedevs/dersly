@@ -12,8 +12,9 @@ import {
   PaginatedSearchParams,
 } from '@/types/global';
 
-export async function getStudents(
+async function fetchStudents(
   params: PaginatedSearchParams,
+  classId?: string,
 ): Promise<ActionResponse<{ students: StudentRecord[]; isNext: boolean }>> {
   const validationResult = await action({
     params,
@@ -31,15 +32,20 @@ export async function getStudents(
 
   try {
     const supabase = createClient(await cookies());
-    const { data, count, error } = await supabase
+
+    let request = supabase
       .from('enrollments')
       .select(
         `joined_at,
-     student:profiles!enrollments_student_id_fkey(id, full_name, email, level),
-     class:classes!enrollments_class_id_fkey(id, name, type, schedule)`,
+         student:profiles!enrollments_student_id_fkey(id, full_name, email, level),
+         class:classes!enrollments_class_id_fkey(id, name, type, schedule)`,
         { count: 'exact' },
       )
-      .eq('status', 'active')
+      .eq('status', 'active');
+
+    if (classId) request = request.eq('class_id', classId);
+
+    const { data, count, error } = await request
       .order('joined_at', { ascending: false })
       .range(from, to);
 
@@ -55,4 +61,15 @@ export async function getStudents(
   } catch (error) {
     return handleError(error) as ErrorResponse;
   }
+}
+
+export function getStudents(params: PaginatedSearchParams) {
+  return fetchStudents(params);
+}
+
+export function getClassStudents(
+  classId: string,
+  params: PaginatedSearchParams,
+) {
+  return fetchStudents(params, classId);
 }

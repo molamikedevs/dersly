@@ -9,7 +9,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import StudentRow from '@/features/students/components/student-row';
+import StudentRow, {
+  StudentCard,
+} from '@/features/students/components/student-row';
 import { getStudents } from '@/features/students/queries';
 import { RouteParams } from '@/types/global';
 
@@ -47,37 +49,48 @@ export default async function Students({ searchParams }: RouteParams) {
             button: { text: 'Go to classes', href: '/dashboard/classes' },
           }}
           render={(students) => (
-            <div className="overflow-x-auto rounded-lg bg-card shadow-sm">
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-border hover:bg-transparent">
-                    <TableHead className="h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Student
-                    </TableHead>
-                    <TableHead className="hidden h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground sm:table-cell">
-                      Email
-                    </TableHead>
-                    <TableHead className="h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Class
-                    </TableHead>
-                    <TableHead className="h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Level
-                    </TableHead>
-                    <TableHead className="hidden h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground md:table-cell">
-                      Schedule
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
+            <div className="rounded-lg bg-card shadow-sm">
+              <ul className="divide-y divide-border md:hidden">
+                {students.map((item) => (
+                  <StudentCard
+                    key={`${item.student.id}-${item.class.id}`}
+                    data={item}
+                  />
+                ))}
+              </ul>
 
-                <TableBody className="[&_td]:px-4">
-                  {students.map((item) => (
-                    <StudentRow
-                      key={`${item.student.id}-${item.class.id}`}
-                      data={item}
-                    />
-                  ))}
-                </TableBody>
-              </Table>
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-border hover:bg-transparent">
+                      <TableHead className="h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        Student
+                      </TableHead>
+                      <TableHead className="h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        Email
+                      </TableHead>
+                      <TableHead className="h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        Class
+                      </TableHead>
+                      <TableHead className="h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        Level
+                      </TableHead>
+                      <TableHead className="hidden h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground lg:table-cell">
+                        Schedule
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+
+                  <TableBody className="[&_td]:px-4">
+                    {students.map((item) => (
+                      <StudentRow
+                        key={`${item.student.id}-${item.class.id}`}
+                        data={item}
+                      />
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           )}
         />

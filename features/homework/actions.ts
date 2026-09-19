@@ -45,6 +45,7 @@ export async function createHomework(
         title,
         instructions: instructions || null,
         attachment_path: attachmentPath,
+        attachment_name: file?.name ?? null,
         is_published: true,
       })
       .select()
@@ -82,7 +83,7 @@ export async function updateHomework(
 
     const { data: existing, error: readError } = await supabase
       .from('homework')
-      .select('attachment_path')
+      .select('attachment_path, attachment_name')
       .eq('id', id)
       .maybeSingle();
 
@@ -91,6 +92,7 @@ export async function updateHomework(
 
     const newPath = file ? await uploadFile(file, HOMEWORK_BUCKET) : null;
     const attachmentPath = newPath ?? existing.attachment_path;
+    const attachmentName = file?.name ?? existing.attachment_name;
 
     const { data, error } = await supabase
       .from('homework')
@@ -98,6 +100,7 @@ export async function updateHomework(
         title,
         instructions: instructions || null,
         attachment_path: attachmentPath,
+        attachment_name: attachmentName,
       })
       .eq('id', id)
       .select()

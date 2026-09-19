@@ -1,8 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton';
 
-// Two lines on some cards, one on others, so the block does not read as a
-// grid of identical bars. Deterministic, since a random layout would differ
-// between server and client render.
 const SHAPES = [
   { title: ['w-full', 'w-3/5'], description: ['w-full', 'w-4/5'] },
   { title: ['w-4/5'], description: ['w-full', 'w-1/2'] },
