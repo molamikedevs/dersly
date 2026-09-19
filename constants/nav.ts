@@ -19,14 +19,14 @@ export type NavItemWithIcon = NavItem & {
 
 export const STUDENT_TOP_NAV: NavItem[] = [
   { label: 'Home', href: '/' },
-  { label: 'Classes', href: '/classes' },
   { label: 'Home work', href: '/homework' },
+  { label: 'Materials', href: '/materials' },
 ];
 
 export const STUDENT_TAB_NAV: NavItemWithIcon[] = [
   { label: 'Home', href: '/', icon: Home },
-  { label: 'Classes', href: '/classes', icon: BookOpen },
   { label: 'Home work', href: '/homework', icon: ClipboardList },
+  { label: 'Materials', href: '/materials', icon: FolderOpen },
 ];
 
 export const TEACHER_NAV: NavItemWithIcon[] = [
