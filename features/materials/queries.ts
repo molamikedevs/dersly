@@ -66,8 +66,9 @@ export async function getMaterials(
     await Promise.all(
       materials.map(async (item) => {
         if (!item.filePath) return;
-        const urls = await signStoragePath(supabase, item.filePath, item.title);
-        Object.assign(item, urls);
+        const urls = await signStoragePath(supabase, item.filePath);
+        item.signedUrl = urls.signedUrl;
+        item.downloadUrl = urls.downloadUrl;
       }),
     );
 

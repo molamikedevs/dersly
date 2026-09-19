@@ -4,8 +4,8 @@ type Props = {
   title: string;
   instructions: string | null;
   attachmentName: string | null;
-  signedUrl: string | null;
-  downloadUrl: string | null;
+  signedUrl?: string | null;
+  downloadUrl?: string | null;
   asQuestions?: boolean;
 };
 
@@ -57,7 +57,7 @@ export default function CurrentWorkCard({
         </ol>
       )}
 
-      {attachmentName && (
+      {(signedUrl || downloadUrl) && (
         <div className="mt-4 flex items-center gap-3 rounded-md bg-muted p-1.5 pl-3">
           <span
             aria-hidden
@@ -68,7 +68,7 @@ export default function CurrentWorkCard({
 
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-foreground">
-              {attachmentName}
+              {attachmentName ?? 'Attachment'}
             </p>
           </div>
 
@@ -87,8 +87,8 @@ export default function CurrentWorkCard({
           {downloadUrl && (
             <a
               href={downloadUrl}
-              download={attachmentName}
-              aria-label={`Download ${attachmentName}`}
+              download={attachmentName ?? undefined}
+              aria-label={`Download ${attachmentName ?? 'attachment'}`}
               className="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <Download className="size-4" aria-hidden />

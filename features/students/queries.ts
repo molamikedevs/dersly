@@ -146,7 +146,8 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
           homework.attachment_path,
           homework.attachment_name ?? homework.title,
         );
-        Object.assign(current, urls);
+        current.signedUrl = urls.signedUrl;
+        current.downloadUrl = urls.downloadUrl;
       }
     }
 
