@@ -12,14 +12,22 @@ export default async function StudentLayout({
   return (
     <>
       <SkipLink />
-      <StudentTopBar name={profile.full_name} email={profile.email} />
+      <StudentTopBar
+        name={profile.full_name}
+        email={profile.email}
+        avatarUrl={profile.avatarUrl}
+      />
       <main
         id="main"
         className="container-app flex-1 pb-28 pt-6 md:pb-12 md:pt-8"
       >
         {children}
       </main>
-      <StudentTabBar name={profile.full_name} email={profile.email} />
+      <StudentTabBar
+        name={profile.full_name}
+        email={profile.email}
+        avatarUrl={profile.avatarUrl}
+      />
     </>
   );
 }

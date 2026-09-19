@@ -18,12 +18,8 @@ import { cn } from '@/lib/utils';
 type Props = {
   name: string;
   email: string;
+  avatarUrl?: string | null;
   profileHref?: string;
-  /**
-   * button - circular trigger for the student top bar
-   * row    - full width name and email row for the teacher sidebar footer
-   * tab    - icon and label cell inside the student tab bar
-   */
   variant?: 'button' | 'row' | 'tab';
   active?: boolean;
   className?: string;
@@ -32,6 +28,7 @@ type Props = {
 export default function UserAvatar({
   name,
   email,
+  avatarUrl,
   profileHref = '/profile',
   variant = 'button',
   active = false,
@@ -54,7 +51,11 @@ export default function UserAvatar({
               className,
             )}
           >
-            <InitialsAvatar name={name} className="size-8 shrink-0" />
+            <InitialsAvatar
+              name={name}
+              src={avatarUrl}
+              className="size-8 shrink-0"
+            />
 
             <span className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
               <span className="block truncate text-sm font-medium text-foreground">
@@ -111,7 +112,7 @@ export default function UserAvatar({
               className,
             )}
           >
-            <InitialsAvatar name={name} className="size-8" />
+            <InitialsAvatar name={name} src={avatarUrl} className="size-8" />
           </button>
         )}
       </DropdownMenuTrigger>
@@ -123,7 +124,11 @@ export default function UserAvatar({
         className="w-60 p-1"
       >
         <div className="flex items-center gap-3 px-2 py-2.5">
-          <InitialsAvatar name={name} className="size-9 shrink-0" />
+          <InitialsAvatar
+            name={name}
+            src={avatarUrl}
+            className="size-9 shrink-0"
+          />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-foreground">
               {name}

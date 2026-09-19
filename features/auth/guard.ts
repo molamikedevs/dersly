@@ -12,12 +12,20 @@ const getProfile = cache(async () => {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, full_name, email, role, level')
+    .select('id, full_name, email, role, level, avatar_path')
     .eq('id', userId)
     .single();
 
   if (!profile) redirect('/login');
-  return profile;
+
+  const avatarUrl = profile.avatar_path
+    ? supabase.storage
+        .from('avatars')
+        .getPublicUrl(profile.avatar_path.split('/').slice(1).join('/')).data
+        .publicUrl
+    : null;
+
+  return { ...profile, avatarUrl };
 });
 
 export async function requireTeacher() {

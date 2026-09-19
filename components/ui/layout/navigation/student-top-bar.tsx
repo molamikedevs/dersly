@@ -10,9 +10,10 @@ import Logo from '../logo';
 type Props = {
   name: string;
   email: string;
+  avatarUrl?: string | null;
 };
 
-export default function StudentTopBar({ name, email }: Props) {
+export default function StudentTopBar({ name, email, avatarUrl }: Props) {
   const pathname = usePathname();
 
   return (
@@ -52,6 +53,7 @@ export default function StudentTopBar({ name, email }: Props) {
         <UserAvatar
           name={name}
           email={email}
+          avatarUrl={avatarUrl}
           className="-mr-2 hidden md:flex"
         />
       </div>

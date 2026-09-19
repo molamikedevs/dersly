@@ -9,9 +9,10 @@ import { usePathname } from 'next/navigation';
 type Props = {
   name: string;
   email: string;
+  avatarUrl?: string | null;
 };
 
-export default function StudentTabBar({ name, email }: Props) {
+export default function StudentTabBar({ name, email, avatarUrl }: Props) {
   const pathname = usePathname();
 
   return (
@@ -63,6 +64,7 @@ export default function StudentTabBar({ name, email }: Props) {
           <UserAvatar
             name={name}
             email={email}
+            avatarUrl={avatarUrl}
             variant="tab"
             active={isActive(pathname, '/profile')}
           />
