@@ -1,7 +1,5 @@
 'use client';
 
-import InitialsAvatar from '@/components/common/initials-avatar';
-import ThemeSwitch from '@/components/theme/theme-switch';
 import Logo from '@/components/ui/layout/logo';
 import {
   Sidebar,
@@ -11,7 +9,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { TEACHER_NAV } from '@/constants/nav';
-import SignOutButton from '@/features/auth/components/signout-button';
+import UserAvatar from '@/features/profile/components/user-avatar';
 import { cn, isActive } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -113,32 +111,13 @@ export function TeacherSidebar({
         </nav>
       </SidebarContent>
 
-      <SidebarFooter className="gap-1 border-t border-border p-3 group-data-[collapsible=icon]:px-2">
-        <div className="flex items-center gap-3 px-1 py-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
-          <InitialsAvatar name={name} className="size-8 shrink-0" />
-          <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
-            <p className="truncate text-sm font-medium text-foreground">
-              {name}
-            </p>
-            {/* Break on the @ rather than clipping "gmail...." mid-word. */}
-            <p className="truncate text-xs text-muted-foreground" title={email}>
-              {email}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1 group-data-[collapsible=icon]:hidden">
-          <SignOutButton className="min-w-0 flex-1" />
-          <ThemeSwitch />
-        </div>
-
-        <div className="hidden flex-col gap-1 group-data-[collapsible=icon]:flex">
-          <SignOutButton
-            collapsed
-            className="min-w-0 flex-1 [&>button]:w-full [&>button]:justify-start [&>button]:px-3"
-          />
-          <ThemeSwitch />
-        </div>
+      <SidebarFooter className="border-t border-border p-3 group-data-[collapsible=icon]:px-2">
+        <UserAvatar
+          name={name}
+          email={email}
+          variant="row"
+          profileHref="/dashboard/profile"
+        />
       </SidebarFooter>
     </Sidebar>
   );

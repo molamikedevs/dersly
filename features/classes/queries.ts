@@ -116,3 +116,52 @@ export async function getGroupedClasses(params: PaginatedSearchParams): Promise<
     },
   };
 }
+
+export async function getStudentClasses(): Promise<
+  ActionResponse<
+    {
+      id: string;
+      name: string;
+      schedule: string | null;
+      meetingUrl: string | null;
+    }[]
+  >
+> {
+  const validationResult = await action({ authorize: true });
+
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
+
+  const { user } = validationResult;
+
+  try {
+    const supabase = createClient(await cookies());
+
+    const { data, error } = await supabase
+      .from('enrollments')
+      .select(
+        'class:classes!enrollments_class_id_fkey(id, name, schedule, meeting_url)',
+      )
+      .eq('student_id', user!.id)
+      .eq('status', 'active');
+
+    if (error) throwPostgresError(error, 'Class');
+
+    const classes = (data ?? [])
+      .map((row) => row.class)
+      .filter(Boolean)
+      .map((item) =>
+        toCamel<{
+          id: string;
+          name: string;
+          schedule: string | null;
+          meetingUrl: string | null;
+        }>(item),
+      );
+
+    return { success: true, data: classes };
+  } catch (error) {
+    return handleError(error) as ErrorResponse;
+  }
+}

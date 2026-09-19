@@ -64,11 +64,6 @@ async function fetchHomework(
       }),
     );
 
-    console.log(
-      'SIGNED',
-      homework.map((h) => h.signedUrl),
-    );
-
     return { success: true, data: { homework, isNext: (count ?? 0) > to + 1 } };
   } catch (error) {
     return handleError(error) as ErrorResponse;

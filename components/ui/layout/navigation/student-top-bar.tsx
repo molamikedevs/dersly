@@ -1,14 +1,19 @@
 'use client';
 
-import ThemeSwitch from '@/components/theme/theme-switch';
 import { STUDENT_TOP_NAV } from '@/constants/nav';
-import SignOutButton from '@/features/auth/components/signout-button';
+import UserAvatar from '@/features/profile/components/user-avatar';
 import { cn, isActive } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Logo from '../logo';
 
-export default function StudentTopBar() {
+type Props = {
+  name: string;
+  email: string;
+  avatarUrl?: string | null;
+};
+
+export default function StudentTopBar({ name, email, avatarUrl }: Props) {
   const pathname = usePathname();
 
   return (
@@ -45,11 +50,12 @@ export default function StudentTopBar() {
           })}
         </nav>
 
-        <div className="flex items-center gap-1">
-          <ThemeSwitch />
-          <SignOutButton collapsed className="md:hidden" />
-          <SignOutButton className="hidden w-auto md:block" />
-        </div>
+        <UserAvatar
+          name={name}
+          email={email}
+          avatarUrl={avatarUrl}
+          className="-mr-2 hidden md:flex"
+        />
       </div>
     </header>
   );
