@@ -52,13 +52,21 @@ async function fetchHomework(
     await Promise.all(
       homework.map(async (item) => {
         if (!item.attachmentPath) return;
+
         const urls = await signStoragePath(
           supabase,
           item.attachmentPath,
-          item.title,
+          item.attachmentName ?? item.title,
         );
-        Object.assign(item, urls);
+
+        item.signedUrl = urls.signedUrl;
+        item.downloadUrl = urls.downloadUrl;
       }),
+    );
+
+    console.log(
+      'SIGNED',
+      homework.map((h) => h.signedUrl),
     );
 
     return { success: true, data: { homework, isNext: (count ?? 0) > to + 1 } };
