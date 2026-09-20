@@ -15,6 +15,8 @@ import StudentRow, {
 import { getStudents } from '@/features/students/queries';
 import { RouteParams } from '@/types/global';
 
+export const metadata = { title: 'Students' };
+
 export default async function Students({ searchParams }: RouteParams) {
   const { page, pageSize } = await searchParams;
 

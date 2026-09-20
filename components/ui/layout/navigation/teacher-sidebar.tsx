@@ -18,11 +18,13 @@ import { useEffect, useRef } from 'react';
 type TeacherSidebarProps = {
   name?: string;
   email?: string;
+  avatarUrl?: string | null;
 };
 
 export function TeacherSidebar({
   name = 'Kevin Roberts',
   email = 'teacher@dersly.app',
+  avatarUrl,
 }: TeacherSidebarProps) {
   const pathname = usePathname();
   const { open, setOpen, isMobile, setOpenMobile } = useSidebar();
@@ -115,6 +117,7 @@ export function TeacherSidebar({
         <UserAvatar
           name={name}
           email={email}
+          avatarUrl={avatarUrl}
           variant="row"
           profileHref="/dashboard/profile"
         />

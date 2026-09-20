@@ -8,6 +8,10 @@ import MaterialCard from '@/features/materials/components/material-card';
 import { getMaterials } from '@/features/materials/queries';
 import type { RouteParams } from '@/types/global';
 
+export const metadata = {
+  title: 'Materials',
+};
+
 export default async function Materials({ searchParams }: RouteParams) {
   const { page, pageSize } = await searchParams;
 

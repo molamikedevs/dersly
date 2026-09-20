@@ -11,6 +11,7 @@ import {
   ErrorResponse,
   PaginatedSearchParams,
 } from '@/types/global';
+import { cache } from 'react';
 
 type ClassRow = Record<string, unknown> & {
   enrollments?: { count: number }[];
@@ -67,32 +68,32 @@ export async function getClasses(
   }
 }
 
-export async function getClass(
-  id: string,
-): Promise<ActionResponse<ClassWithCount>> {
-  const validationResult = await action({ authorize: true });
+export const getClass = cache(
+  async (id: string): Promise<ActionResponse<ClassWithCount>> => {
+    const validationResult = await action({ authorize: true });
 
-  if (validationResult instanceof Error) {
-    return handleError(validationResult) as ErrorResponse;
-  }
+    if (validationResult instanceof Error) {
+      return handleError(validationResult) as ErrorResponse;
+    }
 
-  try {
-    const supabase = createClient(await cookies());
+    try {
+      const supabase = createClient(await cookies());
 
-    const { data, error } = await supabase
-      .from('classes')
-      .select('*, enrollments(count)')
-      .eq('id', id)
-      .maybeSingle();
+      const { data, error } = await supabase
+        .from('classes')
+        .select('*, enrollments(count)')
+        .eq('id', id)
+        .maybeSingle();
 
-    if (error) throwPostgresError(error, 'Class');
-    if (!data) throw new NotFoundError('Class');
+      if (error) throwPostgresError(error, 'Class');
+      if (!data) throw new NotFoundError('Class');
 
-    return { success: true, data: withCount(data) };
-  } catch (error) {
-    return handleError(error) as ErrorResponse;
-  }
-}
+      return { success: true, data: withCount(data) };
+    } catch (error) {
+      return handleError(error) as ErrorResponse;
+    }
+  },
+);
 
 export async function getGroupedClasses(params: PaginatedSearchParams): Promise<
   ActionResponse<{

@@ -7,6 +7,10 @@ import {
 } from '@/components/ui/sidebar';
 import { requireTeacher } from '@/features/auth/guard';
 
+export const metadata = {
+  title: { default: 'Dashboard', template: '%s | Dashboard | Dersly' },
+};
+
 export default async function TeacherLayout({
   children,
 }: {
@@ -17,7 +21,11 @@ export default async function TeacherLayout({
   return (
     <SidebarProvider>
       <SkipLink />
-      <TeacherSidebar name={profile.full_name} email={profile.email} />
+      <TeacherSidebar
+        name={profile.full_name}
+        email={profile.email}
+        avatarUrl={profile.avatarUrl}
+      />
 
       <SidebarInset className="bg-transparent">
         <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-border bg-background px-2 md:hidden">
