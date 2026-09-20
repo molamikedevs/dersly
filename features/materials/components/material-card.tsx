@@ -4,7 +4,13 @@ import { hostname, youTubeId } from '@/lib/utils';
 import { MaterialRecord } from '@/types/materials';
 import MaterialMenu from './material-menu';
 
-export default function MaterialCard({ data }: { data: MaterialRecord }) {
+export default function MaterialCard({
+  data,
+  editable = false,
+}: {
+  data: MaterialRecord;
+  editable?: boolean;
+}) {
   const { title, description, url, level } = data;
 
   const videoId = url ? youTubeId(url) : null;
@@ -38,9 +44,11 @@ export default function MaterialCard({ data }: { data: MaterialRecord }) {
             {title}
           </h3>
 
-          <div className="-mr-1.5 -mt-1.5 shrink-0">
-            <MaterialMenu data={data} />
-          </div>
+          {editable && (
+            <div className="-mr-1.5 -mt-1.5 shrink-0">
+              <MaterialMenu data={data} />
+            </div>
+          )}
         </div>
 
         {description && (
