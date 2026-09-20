@@ -1,5 +1,6 @@
 type StudentHome = {
   firstName: string;
+  studentLevel: string | null;
   enrolment: {
     classId: string;
     className: string;
