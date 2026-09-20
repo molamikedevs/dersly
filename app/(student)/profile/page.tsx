@@ -3,6 +3,7 @@ import { Video } from 'lucide-react';
 import { requireStudent } from '@/features/auth/guard';
 import { getStudentClasses } from '@/features/classes/queries';
 import AvatarUploader from '@/features/profile/components/avatar-uploader';
+import Link from 'next/link';
 
 export const metadata = {
   title: 'Profile details',
@@ -36,7 +37,7 @@ export default async function Profile() {
         <dl className="mt-6 border-t border-border pt-5">
           <div className="flex items-center justify-between gap-4 py-1.5">
             <dt className="text-sm text-muted-foreground">Level</dt>
-            <dd className="text-sm">
+            <dd className="flex items-center gap-3 text-sm">
               {profile.level ? (
                 <span className="font-medium capitalize text-foreground">
                   {profile.level}
@@ -44,6 +45,13 @@ export default async function Profile() {
               ) : (
                 <span className="text-muted-foreground">Not set yet</span>
               )}
+
+              <Link
+                href="/level-test"
+                className="text-sm font-medium text-primary transition-colors hover:underline"
+              >
+                {profile.level ? 'Retake test' : 'Take the test'}
+              </Link>
             </dd>
           </div>
         </dl>

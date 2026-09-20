@@ -1,4 +1,5 @@
 import HomeSkeleton from '@/components/common/home-skeleton';
+import PromptCard from '@/features/level-test/components/prompt-card';
 import RecentMaterials from '@/features/materials/components/recent-materials';
 import CurrentWorkCard from '@/features/students/components/current-work-card';
 import NextLessonCard from '@/features/students/components/next-lesson-card';
@@ -27,7 +28,7 @@ async function HomContent() {
 
   if (!data) return null;
 
-  const { firstName, enrolment, current, materials } = data;
+  const { firstName, studentLevel, enrolment, current, materials } = data;
   const { type, lessonsCompleted } = enrolment;
 
   const today = new Date().toLocaleDateString('en-GB', {
@@ -47,6 +48,7 @@ async function HomContent() {
 
       <div className="grid gap-6 lg:grid-cols-3 lg:items-start lg:gap-5">
         <div className="flex flex-col gap-6 lg:col-span-2 lg:gap-5">
+          {!studentLevel && <PromptCard />}
           <NextLessonCard
             className={enrolment.className}
             level={enrolment.level}

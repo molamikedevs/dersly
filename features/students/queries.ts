@@ -89,7 +89,7 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
 
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('full_name')
+      .select('full_name, level')
       .eq('id', user!.id)
       .maybeSingle();
 
@@ -164,6 +164,7 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
       success: true,
       data: {
         firstName: profile.full_name.split(' ')[0],
+        studentLevel: profile.level,
         enrolment: {
           classId: owner.id,
           className: owner.name,
