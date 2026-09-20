@@ -1,6 +1,6 @@
 import { Video } from 'lucide-react';
 
-import { requireStudent } from '@/features/auth/guard';
+import { requireTeacher } from '@/features/auth/guard';
 import { getStudentClasses } from '@/features/classes/queries';
 import AvatarUploader from '@/features/profile/components/avatar-uploader';
 
@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 export default async function Profile() {
-  const profile = await requireStudent();
+  const profile = await requireTeacher();
   const { data } = await getStudentClasses();
   const classes = data ?? [];
 

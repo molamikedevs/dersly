@@ -5,6 +5,10 @@ import PageHeader from '@/components/common/page-header';
 import { getClasses } from '@/features/classes/queries';
 import { getAllHomework } from '@/features/homework/queries';
 
+export const metadata = {
+  title: 'Dashboard',
+};
+
 export default async function Dashboard() {
   const [classResult, homeworkResult] = await Promise.all([
     getClasses({ page: 1, pageSize: 50 }),

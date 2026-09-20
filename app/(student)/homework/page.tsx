@@ -5,6 +5,10 @@ import { getAllHomework } from '@/features/homework/queries';
 import CurrentWorkCard from '@/features/students/components/current-work-card';
 import type { RouteParams } from '@/types/global';
 
+export const metadata = {
+  title: 'Homework',
+};
+
 export default async function Homework({ searchParams }: RouteParams) {
   const { page, pageSize } = await searchParams;
 

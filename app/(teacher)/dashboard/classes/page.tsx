@@ -9,6 +9,8 @@ import ClassSection from '@/features/classes/components/class-section';
 import { getGroupedClasses } from '@/features/classes/queries';
 import { RouteParams } from '@/types/global';
 
+export const metadata = { title: 'Classes' };
+
 export default async function Page({ searchParams }: RouteParams) {
   const { page, pageSize } = await searchParams;
 

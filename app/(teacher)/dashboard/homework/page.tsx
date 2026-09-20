@@ -7,6 +7,8 @@ import { getGroupedHomework } from '@/features/homework/queries';
 import { formatDueDate } from '@/lib/utils';
 import { RouteParams } from '@/types/global';
 
+export const metadata = { title: 'Homework' };
+
 export default async function HomeWork({ searchParams }: RouteParams) {
   const { page, pageSize } = await searchParams;
 

@@ -8,6 +8,14 @@ import HomeWorkSection from '@/features/homework/components/homework-section';
 import { getClassHomework } from '@/features/homework/queries';
 import { getClassStudents } from '@/features/students/queries';
 
+export async function generateMetadata({
+  params,
+}: RouteParams<{ classId: string }>) {
+  const { classId } = await params;
+  const { data } = await getClass(classId);
+  return { title: data?.name ?? 'Class' };
+}
+
 import { RouteParams } from '@/types/global';
 
 export default async function Page({

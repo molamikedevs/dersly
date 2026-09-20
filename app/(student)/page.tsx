@@ -10,6 +10,10 @@ import { getStudentHome } from '@/features/students/queries';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
+export const metadata = {
+  title: 'Home',
+};
+
 export default function Home() {
   return (
     <Suspense fallback={<HomeSkeleton />}>
