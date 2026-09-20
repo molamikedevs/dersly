@@ -3,6 +3,7 @@ import { FolderOpen } from 'lucide-react';
 import DataRenderer from '@/components/common/data-renderer';
 import FormDialog from '@/components/common/form-dialog';
 import PageHeader from '@/components/common/page-header';
+import Pagination from '@/components/common/pagination';
 import AddMaterialForm from '@/features/materials/components/add-material-form';
 import MaterialCard from '@/features/materials/components/material-card';
 import { getMaterials } from '@/features/materials/queries';
@@ -15,7 +16,7 @@ export default async function Materials({ searchParams }: RouteParams) {
 
   const { data, success, error } = await getMaterials({
     page: Number(page) || 1,
-    pageSize: Number(pageSize) || 12,
+    pageSize: Number(pageSize) || 9,
   });
 
   const { materials } = data || {};
@@ -54,12 +55,14 @@ export default async function Materials({ searchParams }: RouteParams) {
           render={(materials) => (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {materials.map((item) => (
-                <MaterialCard key={item.id} data={item} />
+                <MaterialCard key={item.id} data={item} editable={true} />
               ))}
             </div>
           )}
         />
       </div>
+
+      <Pagination isNext={data?.isNext ?? false} />
     </div>
   );
 }
