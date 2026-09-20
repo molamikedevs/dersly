@@ -156,7 +156,7 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
       .select('id, title, level, url')
       .is('class_id', null)
       .order('uploaded_at', { ascending: false })
-      .limit(4);
+      .limit(5);
 
     if (materialsError) throwPostgresError(materialsError, 'Material');
 

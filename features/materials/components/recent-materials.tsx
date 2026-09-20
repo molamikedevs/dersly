@@ -1,4 +1,5 @@
 import { FileText, Play } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { youTubeId } from '@/lib/utils';
@@ -29,23 +30,38 @@ export default function RecentMaterials({ items }: { items: Item[] }) {
 
       <ul className="mt-2 divide-y divide-border rounded-lg bg-card px-3.5 shadow-sm">
         {items.map(({ id, title, level, url }) => {
-          const isVideo = url ? Boolean(youTubeId(url)) : false;
-          const Icon = isVideo ? Play : FileText;
+          const videoId = url ? youTubeId(url) : null;
 
           return (
             <li key={id}>
               <Link
-                href="/materials"
-                className="flex min-h-14 items-center gap-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                href={`/materials/${id}`}
+                className="flex min-h-14 items-center gap-3 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <span
-                  aria-hidden
-                  className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground"
-                >
-                  <Icon
-                    className={isVideo ? 'size-4 fill-current' : 'size-4'}
-                  />
-                </span>
+                {videoId ? (
+                  <span className="relative block aspect-video w-20 shrink-0 overflow-hidden rounded-md bg-muted">
+                    <Image
+                      src={`https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`}
+                      alt=""
+                      fill
+                      sizes="80px"
+                      className="object-cover"
+                    />
+                    <span
+                      aria-hidden
+                      className="absolute inset-0 flex items-center justify-center bg-black/25"
+                    >
+                      <Play className="size-4 fill-white text-white" />
+                    </span>
+                  </span>
+                ) : (
+                  <span
+                    aria-hidden
+                    className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground"
+                  >
+                    <FileText className="size-4" />
+                  </span>
+                )}
 
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-medium text-foreground">
@@ -55,7 +71,7 @@ export default function RecentMaterials({ items }: { items: Item[] }) {
                     {level && (
                       <span className="capitalize">{level} &middot; </span>
                     )}
-                    {isVideo ? 'Video' : 'Document'}
+                    {videoId ? 'Video' : 'Document'}
                   </span>
                 </span>
               </Link>
