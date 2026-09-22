@@ -33,16 +33,16 @@ export function LoginForm() {
   }
 
   return (
-    <div className="w-full rounded-lg bg-card p-5 shadow-sm sm:p-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-        Welcome back
+    <div className="w-full rounded-2xl border border-border bg-card p-6 sm:p-10">
+      <h1 className="font-serif text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+        Welcome back.
       </h1>
-      <p className="mt-1.5 text-sm text-muted-foreground">
+      <p className="mt-2 text-[15px] text-muted-foreground">
         Log in to see your lessons and homework.
       </p>
 
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="mt-8">
-        <FieldGroup>
+        <FieldGroup className="gap-5">
           <Controller
             name="email"
             control={form.control}
@@ -54,7 +54,7 @@ export function LoginForm() {
                   id="login-email"
                   type="email"
                   inputMode="email"
-                  className="h-11"
+                  className="h-12 rounded-xl text-[15px]"
                   autoComplete="email"
                   placeholder="you@example.com"
                   aria-invalid={fieldState.invalid}
@@ -75,7 +75,7 @@ export function LoginForm() {
                   <FieldLabel htmlFor="login-password">Password</FieldLabel>
                   <Link
                     href="/forgot-password"
-                    className="text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+                    className="text-sm font-medium text-primary underline-offset-4 hover:underline"
                   >
                     Forgot?
                   </Link>
@@ -83,7 +83,7 @@ export function LoginForm() {
                 <PasswordInput
                   {...field}
                   id="login-password"
-                  className="h-11"
+                  className="h-12 rounded-xl text-[15px]"
                   autoComplete="current-password"
                   placeholder="••••••••"
                   aria-invalid={fieldState.invalid}
@@ -95,7 +95,11 @@ export function LoginForm() {
             )}
           />
 
-          <Button type="submit" className="h-11 w-full" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            className="mt-1 h-12 w-full rounded-xl text-[15px] font-semibold"
+            disabled={isSubmitting}
+          >
             {isSubmitting && (
               <Loader2 className="size-4 animate-spin" aria-hidden />
             )}
@@ -108,7 +112,7 @@ export function LoginForm() {
         New student?{' '}
         <Link
           href="/register"
-          className="font-medium text-primary underline-offset-4 hover:underline"
+          className="font-semibold text-primary underline-offset-4 hover:underline"
         >
           Create an account
         </Link>
