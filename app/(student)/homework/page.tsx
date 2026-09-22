@@ -21,56 +21,54 @@ export default async function Homework({ searchParams }: RouteParams) {
   const [current, ...past] = homework;
 
   return (
-    <div className="pb-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+    <div className="flex w-full max-w-4xl min-w-0 flex-col gap-10 pb-16">
+      <h1 className="font-serif text-4xl font-medium tracking-tight text-foreground sm:text-5xl">
         Homework
       </h1>
 
-      <div className="mt-6">
-        <DataRenderer
-          success={success}
-          error={error}
-          data={homework}
-          empty={{
-            icon: ClipboardList,
-            title: 'No homework yet',
-            message: 'Your teacher will post work here before the next lesson.',
-          }}
-          render={() => (
-            <>
-              <CurrentWorkCard
-                title={current.title}
-                instructions={current.instructions}
-                attachmentName={current.attachmentName}
-                signedUrl={current.signedUrl}
-                downloadUrl={current.downloadUrl}
-                asQuestions={current.classes?.type === 'conversation'}
-              />
+      <DataRenderer
+        success={success}
+        error={error}
+        data={homework}
+        empty={{
+          icon: ClipboardList,
+          title: 'No homework yet',
+          message: 'Your teacher will post work here before the next lesson.',
+        }}
+        render={() => (
+          <div className="flex flex-col gap-10">
+            <CurrentWorkCard
+              title={current.title}
+              instructions={current.instructions}
+              attachmentName={current.attachmentName}
+              signedUrl={current.signedUrl}
+              downloadUrl={current.downloadUrl}
+              asQuestions={current.classes?.type === 'conversation'}
+            />
 
-              {past.length > 0 && (
-                <section className="mt-8">
-                  <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Earlier
-                  </h2>
-                  <div className="mt-3 flex flex-col gap-3">
-                    {past.map((item) => (
-                      <CurrentWorkCard
-                        key={item.id}
-                        title={item.title}
-                        instructions={item.instructions}
-                        attachmentName={item.attachmentName}
-                        signedUrl={item.signedUrl}
-                        downloadUrl={item.downloadUrl}
-                        asQuestions={item.classes?.type === 'conversation'}
-                      />
-                    ))}
-                  </div>
-                </section>
-              )}
-            </>
-          )}
-        />
-      </div>
+            {past.length > 0 && (
+              <section className="flex flex-col gap-4">
+                <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-[28px]">
+                  Earlier
+                </h2>
+                <div className="flex flex-col gap-4">
+                  {past.map((item) => (
+                    <CurrentWorkCard
+                      key={item.id}
+                      title={item.title}
+                      instructions={item.instructions}
+                      attachmentName={item.attachmentName}
+                      signedUrl={item.signedUrl}
+                      downloadUrl={item.downloadUrl}
+                      asQuestions={item.classes?.type === 'conversation'}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+          </div>
+        )}
+      />
     </div>
   );
 }
