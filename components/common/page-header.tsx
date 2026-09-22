@@ -6,11 +6,13 @@ export default function PageHeader({
   subText: string;
 }) {
   return (
-    <header>
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+    <header className="flex flex-col gap-2">
+      <h1 className="font-serif text-4xl font-medium tracking-tight text-foreground sm:text-5xl">
         {title}
       </h1>
-      <p className="mt-1.5 text-sm text-muted-foreground">{subText}</p>
+      <p className="text-[15px] text-muted-foreground sm:text-base">
+        {subText}
+      </p>
     </header>
   );
 }

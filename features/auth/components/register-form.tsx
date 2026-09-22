@@ -40,16 +40,16 @@ export function RegisterForm() {
   }
 
   return (
-    <div className="w-full rounded-lg bg-card p-5 shadow-sm sm:p-6">
-      <h1 className="text-xl font-semibold tracking-tight text-foreground">
-        Create your account
+    <div className="w-full rounded-2xl border border-border bg-card p-6 sm:p-10">
+      <h1 className="font-serif text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+        Create your account.
       </h1>
-      <p className="mt-1 text-sm text-muted-foreground">
+      <p className="mt-2 text-[15px] text-muted-foreground">
         Use the class code your teacher gave you.
       </p>
 
-      <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="mt-6">
-        <FieldGroup className="gap-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="mt-8">
+        <FieldGroup className="gap-5">
           <Controller
             name="code"
             control={form.control}
@@ -66,7 +66,7 @@ export function RegisterForm() {
                   spellCheck={false}
                   placeholder="ABC123"
                   aria-invalid={fieldState.invalid}
-                  className="invite-code h-11 text-center"
+                  className="invite-code h-12 rounded-xl bg-muted text-center text-base"
                 />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
@@ -84,7 +84,7 @@ export function RegisterForm() {
                 <Input
                   {...field}
                   id="register-name"
-                  className="h-11"
+                  className="h-12 rounded-xl text-[15px]"
                   autoComplete="name"
                   placeholder="Aysel Mammadova"
                   aria-invalid={fieldState.invalid}
@@ -107,7 +107,7 @@ export function RegisterForm() {
                   id="register-email"
                   type="email"
                   inputMode="email"
-                  className="h-11"
+                  className="h-12 rounded-xl text-[15px]"
                   autoComplete="email"
                   placeholder="you@example.com"
                   aria-invalid={fieldState.invalid}
@@ -128,7 +128,7 @@ export function RegisterForm() {
                 <PasswordInput
                   {...field}
                   id="register-password"
-                  className="h-11"
+                  className="h-12 rounded-xl text-[15px]"
                   autoComplete="new-password"
                   placeholder="••••••••"
                   aria-invalid={fieldState.invalid}
@@ -146,7 +146,7 @@ export function RegisterForm() {
 
           <Button
             type="submit"
-            className="mt-1 h-11 w-full"
+            className="mt-1 h-12 w-full rounded-xl text-[15px] font-semibold"
             disabled={isSubmitting}
           >
             {isSubmitting && (
@@ -157,11 +157,11 @@ export function RegisterForm() {
         </FieldGroup>
       </form>
 
-      <p className="mt-5 border-t border-border pt-4 text-center text-sm text-muted-foreground">
+      <p className="mt-8 border-t border-border pt-6 text-center text-sm text-muted-foreground">
         Already have an account?{' '}
         <Link
           href="/login"
-          className="font-medium text-primary underline-offset-4 hover:underline"
+          className="font-semibold text-primary underline-offset-4 hover:underline"
         >
           Log in
         </Link>

@@ -18,7 +18,7 @@ export default function StudentTabBar({ name, email, avatarUrl }: Props) {
   return (
     <nav
       aria-label="Main"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/90 backdrop-blur-md md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur-md md:hidden"
       style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 0.25rem)' }}
     >
       <ul
@@ -50,7 +50,7 @@ export default function StudentTabBar({ name, email, avatarUrl }: Props) {
                 <span
                   className={cn(
                     'max-w-full truncate text-[11px] leading-tight',
-                    active ? 'font-medium' : 'font-normal',
+                    active ? 'font-semibold' : 'font-medium',
                   )}
                 >
                   {label}

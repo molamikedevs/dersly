@@ -7,47 +7,48 @@ const EARLIER = [
 
 function AttachmentRow() {
   return (
-    <div className="mt-4 flex items-center gap-3 rounded-md bg-muted p-1.5 pl-3">
-      <Skeleton className="size-9 shrink-0 rounded-md" />
-      <Skeleton className="h-4 w-48 flex-1" />
-      <Skeleton className="h-4 w-12 shrink-0" />
-      <Skeleton className="size-5 shrink-0" />
+    <div className="flex items-center gap-3 rounded-xl bg-muted p-3 sm:gap-4">
+      <Skeleton className="size-11 shrink-0 rounded-lg" />
+      <Skeleton className="h-4 flex-1" />
+      <Skeleton className="h-11 w-20 shrink-0 rounded-lg" />
+      <Skeleton className="size-11 shrink-0 rounded-lg" />
+    </div>
+  );
+}
+
+function CardSkeleton({ title, body }: { title: string; body: string[] }) {
+  return (
+    <div className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-5 sm:p-7">
+      <div className="flex flex-col gap-2.5">
+        <Skeleton className={`h-6 ${title}`} />
+        {body.map((width, line) => (
+          <Skeleton key={line} className={`h-4 ${width}`} />
+        ))}
+      </div>
+      <AttachmentRow />
     </div>
   );
 }
 
 export default function HomeworkSkeleton() {
   return (
-    <div aria-busy aria-live="polite" className="max-w-5xl pb-16">
-      <span className="sr-only">Loading your homework</span>
+    <div
+      aria-busy
+      className="flex w-full max-w-4xl min-w-0 flex-col gap-10 pb-16"
+    >
+      <span role="status" className="sr-only">
+        Loading your homework
+      </span>
 
-      <Skeleton className="h-8 w-44 sm:h-9" />
+      <Skeleton className="h-10 w-48 sm:h-12 sm:w-56" />
 
-      <div className="mt-8 rounded-lg bg-card p-4 shadow-sm sm:p-5">
-        <Skeleton className="h-6 w-56" />
-        <Skeleton className="mt-2.5 h-4 w-full max-w-md" />
-        <AttachmentRow />
-      </div>
+      <CardSkeleton title="w-56" body={['w-full max-w-md']} />
 
-      <div className="mt-10">
-        <Skeleton className="h-3 w-16" />
-
-        <div className="mt-3 flex flex-col gap-4">
-          {EARLIER.map(({ title, body }, index) => (
-            <div
-              key={index}
-              className="rounded-lg bg-card p-4 shadow-sm sm:p-5"
-            >
-              <Skeleton className={`h-6 ${title}`} />
-              <div className="mt-2.5 space-y-1.5">
-                {body.map((width, line) => (
-                  <Skeleton key={line} className={`h-4 ${width}`} />
-                ))}
-              </div>
-              <AttachmentRow />
-            </div>
-          ))}
-        </div>
+      <div className="flex flex-col gap-4">
+        <Skeleton className="h-7 w-28" />
+        {EARLIER.map(({ title, body }, index) => (
+          <CardSkeleton key={index} title={title} body={body} />
+        ))}
       </div>
     </div>
   );

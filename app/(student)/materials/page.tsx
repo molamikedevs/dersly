@@ -27,19 +27,13 @@ export default async function Materials({ searchParams }: RouteParams) {
   const activeFilter = typeof filter === 'string' ? filter : undefined;
 
   return (
-    <div className="pb-16">
-      <div className="flex flex-wrap items-center justify-between gap-4">
+    <div className="flex w-full min-w-0 flex-col gap-8 pb-16">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <PageHeader
           title="Materials"
           subText="Reading, listening and reference material for all students."
         />
 
-        <FormDialog triggerLabel="Add material" title="New material">
-          <AddMaterialForm />
-        </FormDialog>
-      </div>
-
-      <div className="mt-6 flex justify-end">
         <Filter
           options={[
             { label: 'Beginner', value: 'beginner' },
@@ -50,45 +44,45 @@ export default async function Materials({ searchParams }: RouteParams) {
           allLabel="All levels"
         />
       </div>
-      <div className="mt-6">
-        <DataRenderer
-          success={success}
-          error={error}
-          data={materials}
-          empty={
-            activeFilter
-              ? {
-                  icon: FolderOpen,
-                  title: 'Nothing at this level',
-                  message:
-                    'Try another level, or clear the filter to see everything.',
-                }
-              : {
-                  icon: FolderOpen,
-                  title: 'No materials yet',
-                  message:
-                    'Add a document or a link and every student will be able to see it.',
-                  action: (
-                    <div className="mt-6">
-                      <FormDialog
-                        triggerLabel="Add material"
-                        title="New material"
-                      >
-                        <AddMaterialForm />
-                      </FormDialog>
-                    </div>
-                  ),
-                }
-          }
-          render={(materials) => (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {materials.map((item) => (
-                <MaterialCard key={item.id} data={item} />
-              ))}
-            </div>
-          )}
-        />
-      </div>
+
+      <DataRenderer
+        success={success}
+        error={error}
+        data={materials}
+        empty={
+          activeFilter
+            ? {
+                icon: FolderOpen,
+                title: 'Nothing at this level',
+                message:
+                  'Try another level, or clear the filter to see everything.',
+              }
+            : {
+                icon: FolderOpen,
+                title: 'No materials yet',
+                message:
+                  'Add a document or a link and every student will be able to see it.',
+                action: (
+                  <div className="mt-6">
+                    <FormDialog
+                      triggerLabel="Add material"
+                      title="New material"
+                    >
+                      <AddMaterialForm />
+                    </FormDialog>
+                  </div>
+                ),
+              }
+        }
+        render={(materials) => (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {materials.map((item) => (
+              <MaterialCard key={item.id} data={item} />
+            ))}
+          </div>
+        )}
+      />
+
       <Pagination isNext={data?.isNext ?? false} />
     </div>
   );

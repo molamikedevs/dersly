@@ -14,9 +14,9 @@ export default function HomeWorkSection({ classId, homeWork }: Props) {
   const [current, ...past] = homeWork;
 
   return (
-    <section className="mt-10 sm:mt-12">
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="text-lg font-semibold tracking-tight text-foreground">
+    <section className="flex flex-col gap-5">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-[28px]">
           Homework
         </h2>
 
@@ -26,41 +26,41 @@ export default function HomeWorkSection({ classId, homeWork }: Props) {
       </div>
 
       {!current ? (
-        <div className="mt-4 flex flex-col items-center justify-center rounded-lg bg-muted px-6 py-12 text-center">
-          <ClipboardList
-            className="size-9 text-muted-foreground"
-            strokeWidth={1.5}
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-input-border px-6 py-14 text-center">
+          <span
             aria-hidden
-          />
-          <p className="mt-4 font-medium text-foreground">No homework yet</p>
-          <p className="mt-1 mb-6 max-w-sm text-sm text-muted-foreground">
+            className="flex size-12 items-center justify-center rounded-xl bg-muted text-muted-foreground"
+          >
+            <ClipboardList className="size-5" />
+          </span>
+          <p className="mt-4 text-base font-semibold text-foreground">
+            No homework yet
+          </p>
+          <p className="mt-1 max-w-sm text-sm text-muted-foreground">
             Post homework for this class and students will see it here.
           </p>
-          <FormDialog triggerLabel="New homework" title="New homework">
-            <AddHomeWorkForm classId={classId} />
-          </FormDialog>
         </div>
       ) : (
-        <div className="mt-4">
+        <div className="flex flex-col gap-8">
           <HomeWorkCard data={current} />
 
           {past.length > 0 && (
-            <details className="group mt-8">
-              <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <details className="group">
+              <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-lg text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden">
                 <ChevronRight
-                  className="size-3.5 transition-transform group-open:rotate-90"
+                  className="size-4 transition-transform group-open:rotate-90"
                   aria-hidden
                 />
                 Earlier homework ({past.length})
               </summary>
 
-              <ul className="mt-1 divide-y divide-border">
+              <ul className="mt-3 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
                 {past.map((item) => (
                   <li
                     key={item.id}
-                    className="flex min-h-11 items-center gap-4 py-2.5"
+                    className="flex min-h-14 items-center gap-4 px-5 py-2 sm:px-6"
                   >
-                    <span className="min-w-0 flex-1 truncate text-sm text-foreground">
+                    <span className="min-w-0 flex-1 truncate text-[15px] font-medium text-foreground">
                       {item.title}
                     </span>
                     <HomeworkMenu data={item} />

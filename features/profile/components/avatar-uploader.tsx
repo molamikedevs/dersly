@@ -57,22 +57,22 @@ export default function AvatarUploader({ name, src }: Props) {
         onChange={handleChange}
       />
 
-      <div className="size-20 overflow-hidden rounded-full bg-muted">
+      <div className="size-24 overflow-hidden rounded-full bg-muted ring-1 ring-border">
         {preview ? (
           <Image
             src={preview}
             alt=""
-            width={80}
-            height={80}
-            className="size-20 object-cover"
+            width={96}
+            height={96}
+            className="size-24 object-cover"
           />
         ) : (
-          <InitialsAvatar name={name} className="size-20 text-xl" />
+          <InitialsAvatar name={name} className="size-24 text-2xl" />
         )}
       </div>
 
       {pending && (
-        <div className="absolute inset-0 flex items-center justify-center rounded-full bg-background/70">
+        <div className="absolute inset-0 flex items-center justify-center rounded-full bg-card/70">
           <Loader2
             className="size-5 animate-spin text-foreground"
             aria-hidden
@@ -86,7 +86,7 @@ export default function AvatarUploader({ name, src }: Props) {
         onClick={() => inputRef.current?.click()}
         disabled={pending}
         aria-label="Change your photo"
-        className="absolute -bottom-1 -right-1 flex size-9 items-center justify-center rounded-full bg-card text-muted-foreground shadow-sm ring-2 ring-background transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-60"
+        className="absolute -bottom-0.5 -right-0.5 flex size-10 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-sm ring-4 ring-card transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-60"
       >
         <Camera className="size-4" aria-hidden />
       </button>

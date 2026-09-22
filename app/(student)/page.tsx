@@ -38,17 +38,18 @@ async function HomContent() {
   });
 
   return (
-    <div className="flex max-w-5xl flex-col gap-6 pb-8 sm:gap-7">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-          Hi {firstName}
+    <div className="flex w-full max-w-6xl min-w-0 flex-col gap-8 pb-10 sm:gap-10">
+      <header className="flex flex-col gap-2">
+        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+          {today}
+        </p>
+        <h1 className="font-serif text-4xl font-medium tracking-tight text-foreground sm:text-5xl">
+          Welcome back, {firstName}.
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">{today}</p>
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-3 lg:items-start lg:gap-5">
-        <div className="flex flex-col gap-6 lg:col-span-2 lg:gap-5">
-          {!studentLevel && <PromptCard />}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+        <div className="flex min-w-0 flex-col gap-8">
           <NextLessonCard
             className={enrolment.className}
             level={enrolment.level}
@@ -57,47 +58,47 @@ async function HomContent() {
           />
 
           {current && (
-            <section>
+            <section className="flex flex-col gap-4">
               <div className="flex items-baseline justify-between gap-3">
-                <h2 className="text-[15px] font-semibold tracking-tight text-foreground">
+                <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-[28px]">
                   {WORK_LABEL[type]}
                 </h2>
                 <Link
                   href="/homework"
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  className="text-sm font-semibold text-primary hover:underline"
                 >
                   {WORK_LINK_LABEL[type]}
                 </Link>
               </div>
 
-              <div className="mt-2">
-                <CurrentWorkCard
-                  title={current.title}
-                  instructions={current.instructions}
-                  attachmentName={current.attachmentName}
-                  signedUrl={current.signedUrl}
-                  downloadUrl={current.downloadUrl}
-                  asQuestions={type === 'conversation'}
-                />
-              </div>
+              <CurrentWorkCard
+                title={current.title}
+                instructions={current.instructions}
+                attachmentName={current.attachmentName}
+                signedUrl={current.signedUrl}
+                downloadUrl={current.downloadUrl}
+                asQuestions={type === 'conversation'}
+              />
             </section>
           )}
         </div>
 
-        <div className="flex flex-col gap-6 lg:gap-5">
+        <aside className="flex min-w-0 flex-col gap-8">
+          {!studentLevel && <PromptCard />}
+
           {lessonsCompleted > 0 && (
-            <section className="flex items-center justify-between gap-4 rounded-lg bg-card p-4 shadow-sm">
-              <span className="text-sm text-muted-foreground">
+            <section className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-card px-6 py-5">
+              <span className="text-sm font-medium text-muted-foreground">
                 Lessons completed
               </span>
-              <span className="text-xl font-semibold tracking-tight text-foreground">
+              <span className="font-serif text-3xl font-medium tracking-tight text-foreground">
                 {lessonsCompleted}
               </span>
             </section>
           )}
 
           <RecentMaterials items={materials} />
-        </div>
+        </aside>
       </div>
     </div>
   );

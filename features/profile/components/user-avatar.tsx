@@ -37,20 +37,34 @@ export default function UserAvatar({
   const side = variant === 'button' ? 'bottom' : 'top';
   const align = variant === 'button' ? 'end' : 'start';
 
+  const triggerClass =
+    variant === 'row'
+      ? cn(
+          'flex w-full items-center gap-3 rounded-lg px-1 py-2 text-left transition-colors',
+          'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          'group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0',
+          className,
+        )
+      : variant === 'tab'
+        ? cn(
+            'flex h-14 w-full flex-col items-center justify-center gap-1 px-1',
+            'transition-colors active:bg-muted',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
+            active ? 'text-primary' : 'text-muted-foreground',
+            className,
+          )
+        : cn(
+            'flex size-11 shrink-0 items-center justify-center rounded-full',
+            'transition-opacity hover:opacity-80',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+            className,
+          );
+
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger aria-label="Account" className={triggerClass}>
         {variant === 'row' ? (
-          <button
-            type="button"
-            aria-label="Account"
-            className={cn(
-              'flex w-full items-center gap-3 rounded-md px-1 py-2 text-left transition-colors',
-              'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-              'group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0',
-              className,
-            )}
-          >
+          <>
             <InitialsAvatar
               name={name}
               src={avatarUrl}
@@ -61,7 +75,6 @@ export default function UserAvatar({
               <span className="block truncate text-sm font-medium text-foreground">
                 {name}
               </span>
-              {/* Break on the @ rather than clipping "gmail...." mid-word. */}
               <span
                 className="block truncate text-xs text-muted-foreground"
                 title={email}
@@ -74,19 +87,9 @@ export default function UserAvatar({
               className="size-4 shrink-0 text-muted-foreground group-data-[collapsible=icon]:hidden"
               aria-hidden
             />
-          </button>
+          </>
         ) : variant === 'tab' ? (
-          <button
-            type="button"
-            aria-label="Account"
-            className={cn(
-              'flex h-14 w-full flex-col items-center justify-center gap-1 px-1',
-              'transition-colors active:bg-muted',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
-              active ? 'text-primary' : 'text-muted-foreground',
-              className,
-            )}
-          >
+          <>
             <User
               className="size-5 shrink-0"
               aria-hidden
@@ -100,20 +103,13 @@ export default function UserAvatar({
             >
               Profile
             </span>
-          </button>
+          </>
         ) : (
-          <button
-            type="button"
-            aria-label="Account"
-            className={cn(
-              'flex size-11 shrink-0 items-center justify-center rounded-full',
-              'transition-opacity hover:opacity-80',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-              className,
-            )}
-          >
-            <InitialsAvatar name={name} src={avatarUrl} className="size-8" />
-          </button>
+          <InitialsAvatar
+            name={name}
+            src={avatarUrl}
+            className="size-9 ring-1 ring-border"
+          />
         )}
       </DropdownMenuTrigger>
 
@@ -121,16 +117,16 @@ export default function UserAvatar({
         side={side}
         align={align}
         sideOffset={8}
-        className="w-60 p-1"
+        className="w-64 rounded-xl p-1.5"
       >
-        <div className="flex items-center gap-3 px-2 py-2.5">
+        <div className="flex items-center gap-3 px-2.5 py-3">
           <InitialsAvatar
             name={name}
             src={avatarUrl}
-            className="size-9 shrink-0"
+            className="size-10 shrink-0"
           />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-foreground">
+            <p className="truncate text-sm font-semibold text-foreground">
               {name}
             </p>
             <p className="truncate text-xs text-muted-foreground" title={email}>
@@ -141,16 +137,17 @@ export default function UserAvatar({
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="h-11 px-2 text-sm">
-          <Link href={profileHref}>
-            <User className="size-4 text-muted-foreground" aria-hidden />
-            Your profile
-          </Link>
+        <DropdownMenuItem
+          render={<Link href={profileHref} />}
+          className="flex h-11 items-center gap-2.5 rounded-lg px-2.5 text-sm"
+        >
+          <User className="size-4 text-muted-foreground" aria-hidden />
+          Your profile
         </DropdownMenuItem>
 
         <div
           onClick={(event) => event.stopPropagation()}
-          className="flex h-11 items-center justify-between gap-2 rounded-sm px-2 text-sm text-foreground"
+          className="flex h-11 items-center justify-between gap-2 rounded-lg px-2.5 text-sm text-foreground"
         >
           Theme
           <ThemeSwitch />
@@ -158,7 +155,7 @@ export default function UserAvatar({
 
         <DropdownMenuSeparator />
 
-        <SignOutButton className="[&>button]:h-11 [&>button]:w-full [&>button]:justify-start [&>button]:rounded-sm [&>button]:px-2" />
+        <SignOutButton className="[&>button]:h-11 [&>button]:w-full [&>button]:justify-start [&>button]:rounded-lg [&>button]:px-2.5" />
       </DropdownMenuContent>
     </DropdownMenu>
   );

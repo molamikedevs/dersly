@@ -22,15 +22,16 @@ export default function InviteCode({ code }: { code: string }) {
   }
 
   return (
-    <div className="flex items-stretch overflow-hidden rounded-md border bg-muted">
-      <span className="px-3 py-2 font-mono text-sm tracking-widest">
+    <div className="flex h-11 items-stretch overflow-hidden rounded-xl border border-border bg-muted">
+      <span className="invite-code flex items-center px-3.5 text-sm font-semibold text-foreground">
         {code}
       </span>
+
       <button
         type="button"
         onClick={handleCopy}
-        aria-label={copied ? 'Code copied' : `Copy invite code ${code}`}
-        className="border-l px-2.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+        aria-label={`Copy invite code ${code}`}
+        className="flex w-11 items-center justify-center border-l border-border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
       >
         {copied ? (
           <Check className="size-4 text-success" aria-hidden />
@@ -38,6 +39,10 @@ export default function InviteCode({ code }: { code: string }) {
           <Copy className="size-4" aria-hidden />
         )}
       </button>
+
+      <span className="sr-only" aria-live="polite">
+        {copied ? 'Invite code copied' : ''}
+      </span>
     </div>
   );
 }

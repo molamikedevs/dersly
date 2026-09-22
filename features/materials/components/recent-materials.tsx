@@ -15,20 +15,20 @@ export default function RecentMaterials({ items }: { items: Item[] }) {
   if (items.length === 0) return null;
 
   return (
-    <section>
+    <section className="flex flex-col gap-4">
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="text-[15px] font-semibold tracking-tight text-foreground">
+        <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-[28px]">
           Recent materials
         </h2>
         <Link
           href="/materials"
-          className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="text-sm font-semibold text-primary hover:underline"
         >
           See all
         </Link>
       </div>
 
-      <ul className="mt-2 divide-y divide-border rounded-lg bg-card px-3.5 shadow-sm">
+      <ul className="flex flex-col rounded-2xl border border-border bg-card p-2">
         {items.map(({ id, title, level, url }) => {
           const videoId = url ? youTubeId(url) : null;
 
@@ -36,38 +36,40 @@ export default function RecentMaterials({ items }: { items: Item[] }) {
             <li key={id}>
               <Link
                 href={`/materials/${id}`}
-                className="flex min-h-14 items-center gap-3 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex items-center gap-3.5 rounded-xl p-3 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {videoId ? (
-                  <span className="relative block aspect-video w-20 shrink-0 overflow-hidden rounded-md bg-muted">
+                  <span className="relative block aspect-video w-24 shrink-0 overflow-hidden rounded-lg bg-muted">
                     <Image
                       src={`https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`}
                       alt=""
                       fill
-                      sizes="80px"
+                      sizes="96px"
                       className="object-cover"
                     />
                     <span
                       aria-hidden
-                      className="absolute inset-0 flex items-center justify-center bg-black/25"
+                      className="absolute inset-0 flex items-center justify-center"
                     >
-                      <Play className="size-4 fill-white text-white" />
+                      <span className="flex size-7 items-center justify-center rounded-full bg-card/95">
+                        <Play className="size-3 fill-foreground text-foreground" />
+                      </span>
                     </span>
                   </span>
                 ) : (
                   <span
                     aria-hidden
-                    className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground"
+                    className="flex aspect-video w-24 shrink-0 items-center justify-center rounded-lg bg-highlight-muted text-highlight"
                   >
-                    <FileText className="size-4" />
+                    <FileText className="size-5" />
                   </span>
                 )}
 
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium text-foreground">
+                  <span className="line-clamp-2 text-[15px] font-semibold leading-snug text-foreground">
                     {title}
                   </span>
-                  <span className="block truncate text-xs text-muted-foreground">
+                  <span className="mt-1 block truncate text-[13px] text-muted-foreground">
                     {level && (
                       <span className="capitalize">{level} &middot; </span>
                     )}

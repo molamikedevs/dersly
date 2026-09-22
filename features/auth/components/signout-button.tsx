@@ -16,17 +16,17 @@ function SubmitButton({ collapsed }: { collapsed?: boolean }) {
       disabled={pending}
       aria-label={collapsed ? 'Sign out' : undefined}
       className={cn(
-        'group inline-flex shrink-0 select-none items-center rounded-md',
-        'bg-transparent text-sm font-normal text-muted-foreground',
-        'transition-colors hover:text-foreground',
+        'group inline-flex shrink-0 select-none items-center rounded-lg',
+        'bg-transparent text-sm font-medium text-foreground',
+        'transition-colors hover:bg-muted',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         'disabled:pointer-events-none disabled:opacity-60',
-        collapsed ? 'size-11 justify-center' : 'h-11 gap-2 px-2',
+        collapsed ? 'size-11 justify-center' : 'h-11 gap-2.5 px-2.5',
       )}
     >
       <Icon
         className={cn(
-          'size-4 shrink-0 transition-transform',
+          'size-4 shrink-0 text-muted-foreground transition-transform',
           pending ? 'animate-spin' : 'group-hover:translate-x-0.5',
         )}
         aria-hidden

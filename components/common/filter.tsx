@@ -32,6 +32,8 @@ export default function Filter({
   const searchParams = useSearchParams();
   const current = searchParams.get(paramKey) ?? '';
 
+  const items = [{ label: allLabel, value: 'all' }, ...options];
+
   function handleChange(value: string | null) {
     const url =
       value === null || value === 'all'
@@ -49,13 +51,14 @@ export default function Filter({
   }
 
   return (
-    <Select value={current || 'all'} onValueChange={handleChange}>
-      <SelectTrigger className={className ?? 'h-11 w-44'}>
+    <Select items={items} value={current || 'all'} onValueChange={handleChange}>
+      <SelectTrigger
+        className={className ?? 'h-11 w-44 rounded-xl bg-card font-medium'}
+      >
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="all">{allLabel}</SelectItem>
-        {options.map(({ label, value }) => (
+        {items.map(({ label, value }) => (
           <SelectItem key={value} value={value}>
             {label}
           </SelectItem>

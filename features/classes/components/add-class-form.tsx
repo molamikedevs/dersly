@@ -63,9 +63,18 @@ export default function AddClassForm({
     form.reset();
     onSuccess?.();
   }
+
+  const submitLabel = isSubmitting
+    ? isEdit
+      ? 'Saving'
+      : 'Creating class'
+    : isEdit
+      ? 'Save changes'
+      : 'Create class';
+
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
-      <FieldGroup>
+      <FieldGroup className="gap-5">
         <Controller
           name="name"
           control={form.control}
@@ -75,7 +84,7 @@ export default function AddClassForm({
               <Input
                 {...field}
                 id="class-name"
-                className="h-11"
+                className="h-11 rounded-xl text-[15px]"
                 autoComplete="off"
                 placeholder="Conversation Club"
                 aria-invalid={fieldState.invalid}
@@ -89,17 +98,21 @@ export default function AddClassForm({
           )}
         />
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-4">
           <Controller
             name="type"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="class-type">Type</FieldLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  items={TYPES}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                >
                   <SelectTrigger
                     id="class-type"
-                    className="h-11 w-full"
+                    className="h-11 w-full rounded-xl text-[15px]"
                     aria-invalid={fieldState.invalid}
                   >
                     <SelectValue placeholder="Choose a type" />
@@ -130,10 +143,14 @@ export default function AddClassForm({
                     optional
                   </span>
                 </FieldLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  items={LEVELS}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                >
                   <SelectTrigger
                     id="class-level"
-                    className="h-11 w-full"
+                    className="h-11 w-full rounded-xl text-[15px]"
                     aria-invalid={fieldState.invalid}
                   >
                     <SelectValue placeholder="All levels" />
@@ -154,67 +171,60 @@ export default function AddClassForm({
           />
         </div>
 
-        <div className="border-t border-border pt-5">
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            When and where
-          </p>
+        <Controller
+          name="schedule"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="class-schedule">Schedule</FieldLabel>
+              <Input
+                {...field}
+                id="class-schedule"
+                className="h-11 rounded-xl text-[15px]"
+                autoComplete="off"
+                placeholder="Mon & Thu, 18:00"
+                aria-invalid={fieldState.invalid}
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
-          <div className="mt-4 space-y-4">
-            <Controller
-              name="schedule"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="class-schedule">Schedule</FieldLabel>
-                  <Input
-                    {...field}
-                    id="class-schedule"
-                    className="h-11"
-                    autoComplete="off"
-                    placeholder="Mon & Thu, 18:00"
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
+        <Controller
+          name="meetingUrl"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="class-meeting">
+                Lesson link{' '}
+                <span className="font-normal text-muted-foreground">
+                  online only
+                </span>
+              </FieldLabel>
+              <Input
+                {...field}
+                id="class-meeting"
+                type="url"
+                inputMode="url"
+                className="h-11 rounded-xl text-[15px]"
+                autoComplete="off"
+                placeholder="https://meet.google.com/abc-defg-hij"
+                aria-invalid={fieldState.invalid}
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
-            <Controller
-              name="meetingUrl"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="class-meeting">Lesson link</FieldLabel>
-                  <Input
-                    {...field}
-                    id="class-meeting"
-                    type="url"
-                    inputMode="url"
-                    className="h-11"
-                    autoComplete="off"
-                    placeholder="https://meet.google.com/uqy-jrgj-zse"
-                    aria-invalid={fieldState.invalid}
-                    aria-describedby="class-meeting-hint"
-                  />
-                  <FieldDescription id="class-meeting-hint">
-                    Only for online classes.
-                  </FieldDescription>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-          </div>
-        </div>
-
-        <Button type="submit" className="h-11 w-full" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          className="mt-1 h-12 w-full rounded-xl text-[15px] font-semibold"
+          disabled={isSubmitting}
+        >
           {isSubmitting && (
             <Loader2 className="size-4 animate-spin" aria-hidden />
           )}
-          {isSubmitting ? 'Creating class' : 'Create class'}
+          {submitLabel}
         </Button>
       </FieldGroup>
     </form>

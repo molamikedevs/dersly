@@ -10,49 +10,52 @@ type Props = {
 
 export default function StudentsSection({ students, inviteCode }: Props) {
   return (
-    <section className="mt-14 sm:mt-16">
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+    <section className="flex flex-col gap-5">
+      <div className="flex items-center gap-3">
+        <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-[28px]">
           Students
         </h2>
         {students.length > 0 && (
-          <span className="text-xs text-muted-foreground">
+          <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
             {students.length}
           </span>
         )}
       </div>
 
       {students.length === 0 ? (
-        <div className="mt-4 flex flex-col items-center justify-center rounded-lg bg-muted px-6 py-10 text-center">
-          <Users
-            className="size-9 text-muted-foreground"
-            strokeWidth={1.5}
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-input-border px-6 py-14 text-center">
+          <span
             aria-hidden
-          />
-          <p className="mt-4 font-medium text-foreground">No students yet</p>
-          <p className="mt-1 text-sm text-muted-foreground">
+            className="flex size-12 items-center justify-center rounded-xl bg-muted text-muted-foreground"
+          >
+            <Users className="size-5" />
+          </span>
+          <p className="mt-4 text-base font-semibold text-foreground">
+            No students yet
+          </p>
+          <p className="mt-1 max-w-sm text-sm text-muted-foreground">
             Give this code to your students so they can join.
           </p>
-          <div className="mt-5">
+          <div className="mt-6">
             <InviteCode code={inviteCode} />
           </div>
         </div>
       ) : (
-        <ul className="mt-2 divide-y divide-border">
+        <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
           {students.map(({ student, joinedAt }) => (
             <li
               key={student.id}
-              className="flex min-h-11 items-center gap-3 py-2.5"
+              className="flex min-h-16 items-center gap-3.5 px-5 py-3 sm:px-6"
             >
               <InitialsAvatar
                 name={student.fullName}
-                className="size-7 shrink-0"
+                className="size-9 shrink-0"
               />
-              <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
+              <span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-foreground">
                 {student.fullName}
               </span>
               {student.level && (
-                <span className="shrink-0 text-sm capitalize text-muted-foreground">
+                <span className="shrink-0 rounded-full bg-accent px-2.5 py-0.5 text-xs font-semibold capitalize text-accent-foreground">
                   {student.level}
                 </span>
               )}

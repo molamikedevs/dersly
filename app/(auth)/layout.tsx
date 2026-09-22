@@ -19,14 +19,15 @@ export default function AuthLayout({
           alt=""
           fill
           priority
+          placeholder="blur"
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-background/80 sm:bg-background/70" />
+        <div className="absolute inset-0 bg-linear-to-b from-background/85 to-background/95" />
       </div>
 
-      <div className="relative z-10 flex min-h-svh flex-col items-center justify-center gap-5 px-4 pb-12 pt-6 sm:gap-6 sm:py-8">
-        <Logo />
+      <div className="relative z-10 flex min-h-svh flex-col items-center justify-center gap-8 px-4 py-10">
+        <Logo className="scale-110" />
 
         <main id="main" className="w-full max-w-md">
           {children}
