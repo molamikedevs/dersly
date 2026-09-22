@@ -22,8 +22,8 @@ export default async function Materials({ searchParams }: RouteParams) {
   const { materials } = data || {};
 
   return (
-    <div className="pb-16">
-      <div className="flex items-start justify-between gap-4">
+    <div className="flex w-full max-w-6xl min-w-0 flex-col gap-10 pb-16">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <PageHeader
           title="Materials"
           subText="Reading, listening and reference material for all students."
@@ -34,33 +34,31 @@ export default async function Materials({ searchParams }: RouteParams) {
         </FormDialog>
       </div>
 
-      <div className="mt-6">
-        <DataRenderer
-          success={success}
-          error={error}
-          data={materials}
-          empty={{
-            icon: FolderOpen,
-            title: 'No materials yet',
-            message:
-              'Add a document or a link and every student will be able to see it.',
-            action: (
-              <div className="mt-6">
-                <FormDialog triggerLabel="Add material" title="New material">
-                  <AddMaterialForm />
-                </FormDialog>
-              </div>
-            ),
-          }}
-          render={(materials) => (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {materials.map((item) => (
-                <MaterialCard key={item.id} data={item} editable={true} />
-              ))}
+      <DataRenderer
+        success={success}
+        error={error}
+        data={materials}
+        empty={{
+          icon: FolderOpen,
+          title: 'No materials yet',
+          message:
+            'Add a document or a link and every student will be able to see it.',
+          action: (
+            <div className="mt-6">
+              <FormDialog triggerLabel="Add material" title="New material">
+                <AddMaterialForm />
+              </FormDialog>
             </div>
-          )}
-        />
-      </div>
+          ),
+        }}
+        render={(materials) => (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {materials.map((item) => (
+              <MaterialCard key={item.id} data={item} editable />
+            ))}
+          </div>
+        )}
+      />
 
       <Pagination isNext={data?.isNext ?? false} />
     </div>

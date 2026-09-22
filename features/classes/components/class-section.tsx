@@ -20,15 +20,17 @@ export default function ClassSection({
   if (classes.length === 0) return null;
 
   return (
-    <section className="mt-10 sm:mt-12">
-      <div className="flex items-baseline gap-2.5">
-        <h2 className="text-lg font-semibold tracking-tight text-foreground">
+    <section className="flex flex-col gap-4">
+      <div className="flex items-center gap-3">
+        <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-[28px]">
           {title}
         </h2>
-        <span className="text-sm text-muted-foreground">{meta}</span>
+        <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
+          {meta}
+        </span>
       </div>
 
-      <ul className="mt-3 divide-y divide-border">
+      <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
         {classes.map((item) => {
           const { id, name, level, schedule, meetingUrl, enrollmentOpen } =
             item;
@@ -36,42 +38,38 @@ export default function ClassSection({
           return (
             <li
               key={id}
-              className="group relative -mx-2 transition-colors hover:bg-muted"
+              className="relative transition-colors hover:bg-muted/60"
             >
               <Link
                 href={`/dashboard/classes/${id}`}
                 aria-label={`Open ${name}`}
-                className="absolute inset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="absolute inset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
               />
 
-              <div className="pointer-events-none relative flex min-h-11 flex-wrap items-center gap-x-4 gap-y-3 px-2 py-4 sm:flex-nowrap">
+              <div className="pointer-events-none relative flex flex-wrap items-center gap-x-4 gap-y-3 px-5 py-4 sm:flex-nowrap sm:px-6">
                 <InitialsAvatar
                   name={name}
-                  className="size-9 shrink-0 sm:size-10"
+                  className="size-10 shrink-0 sm:size-11"
                 />
 
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium text-foreground">{name}</p>
+                  <p className="truncate text-base font-semibold text-foreground">
+                    {name}
+                  </p>
 
-                  <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
-                    {level && <span>{level}</span>}
-                    {level && schedule && (
-                      <span aria-hidden className="text-border">
-                        ·
-                      </span>
-                    )}
+                  <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+                    {level && <span className="capitalize">{level}</span>}
+                    {level && schedule && <span aria-hidden>&middot;</span>}
                     {schedule && <span>{schedule}</span>}
                     {meetingUrl && (
                       <>
-                        <span aria-hidden className="text-border">
-                          ·
-                        </span>
+                        <span aria-hidden>&middot;</span>
 
                         <a
                           href={meetingUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="pointer-events-auto inline-flex items-center gap-1.5 text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          className="pointer-events-auto inline-flex items-center gap-1.5 font-semibold text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         >
                           <Video className="size-3.5" aria-hidden />
                           Join lesson

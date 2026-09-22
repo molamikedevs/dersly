@@ -17,6 +17,9 @@ import { RouteParams } from '@/types/global';
 
 export const metadata = { title: 'Students' };
 
+const headClass =
+  'h-12 px-5 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground';
+
 export default async function Students({ searchParams }: RouteParams) {
   const { page, pageSize } = await searchParams;
 
@@ -28,7 +31,7 @@ export default async function Students({ searchParams }: RouteParams) {
   const students = data?.students ?? [];
 
   return (
-    <div className="pb-16">
+    <div className="flex w-full max-w-6xl min-w-0 flex-col gap-10 pb-16">
       <PageHeader
         title="Students"
         subText={
@@ -38,65 +41,55 @@ export default async function Students({ searchParams }: RouteParams) {
         }
       />
 
-      <div className="mt-8">
-        <DataRenderer
-          success={success}
-          error={error}
-          data={students}
-          empty={{
-            icon: Users,
-            title: 'No students yet',
-            message:
-              'Students appear here once they join a class with your invite code.',
-            button: { text: 'Go to classes', href: '/dashboard/classes' },
-          }}
-          render={(students) => (
-            <div className="rounded-lg bg-card shadow-sm">
-              <ul className="divide-y divide-border md:hidden">
-                {students.map((item) => (
-                  <StudentCard
-                    key={`${item.student.id}-${item.class.id}`}
-                    data={item}
-                  />
-                ))}
-              </ul>
+      <DataRenderer
+        success={success}
+        error={error}
+        data={students}
+        empty={{
+          icon: Users,
+          title: 'No students yet',
+          message:
+            'Students appear here once they join a class with your invite code.',
+          button: { text: 'Go to classes', href: '/dashboard/classes' },
+        }}
+        render={(students) => (
+          <div className="overflow-hidden rounded-2xl border border-border bg-card">
+            <ul className="divide-y divide-border md:hidden">
+              {students.map((item) => (
+                <StudentCard
+                  key={`${item.student.id}-${item.class.id}`}
+                  data={item}
+                />
+              ))}
+            </ul>
 
-              <div className="hidden md:block">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-border hover:bg-transparent">
-                      <TableHead className="h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                        Student
-                      </TableHead>
-                      <TableHead className="h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                        Email
-                      </TableHead>
-                      <TableHead className="h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                        Class
-                      </TableHead>
-                      <TableHead className="h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                        Level
-                      </TableHead>
-                      <TableHead className="hidden h-11 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground lg:table-cell">
-                        Schedule
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader className="bg-muted">
+                  <TableRow className="border-border hover:bg-transparent">
+                    <TableHead className={headClass}>Student</TableHead>
+                    <TableHead className={headClass}>Email</TableHead>
+                    <TableHead className={headClass}>Class</TableHead>
+                    <TableHead className={headClass}>Level</TableHead>
+                    <TableHead className={`hidden lg:table-cell ${headClass}`}>
+                      Schedule
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
 
-                  <TableBody className="[&_td]:px-4">
-                    {students.map((item) => (
-                      <StudentRow
-                        key={`${item.student.id}-${item.class.id}`}
-                        data={item}
-                      />
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                <TableBody className="[&_td]:px-5">
+                  {students.map((item) => (
+                    <StudentRow
+                      key={`${item.student.id}-${item.class.id}`}
+                      data={item}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
             </div>
-          )}
-        />
-      </div>
+          </div>
+        )}
+      />
     </div>
   );
 }

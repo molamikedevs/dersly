@@ -1,3 +1,4 @@
+import Logo from '@/components/ui/layout/logo';
 import { TeacherSidebar } from '@/components/ui/layout/navigation/teacher-sidebar';
 import SkipLink from '@/components/ui/layout/skip-link';
 import {
@@ -28,14 +29,15 @@ export default async function TeacherLayout({
       />
 
       <SidebarInset className="bg-transparent">
-        <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-border bg-background px-2 md:hidden">
-          <SidebarTrigger className="tap-target" />
-          <span className="text-sm font-semibold tracking-tight text-foreground">
-            Dersly
-          </span>
+        <header className="sticky top-0 z-20 flex h-16 items-center gap-2 border-b border-border bg-background/85 px-2 backdrop-blur-md md:hidden">
+          <SidebarTrigger className="tap-target rounded-lg" />
+          <Logo href="/dashboard" />
         </header>
 
-        <main id="main" className="flex-1 px-4 py-6 sm:px-6 sm:py-8">
+        <main
+          id="main"
+          className="flex-1 px-4 pb-16 pt-8 sm:px-6 md:px-10 md:pt-14"
+        >
           <div className="mx-auto w-full max-w-6xl">{children}</div>
         </main>
       </SidebarInset>

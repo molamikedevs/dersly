@@ -8,7 +8,7 @@ import {
   type ReactElement,
 } from 'react';
 
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
 
 type Props = {
   triggerLabel: string;
@@ -47,28 +48,34 @@ export default function FormDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
-        <Button variant={triggerVariant} size={triggerSize} className="h-11">
-          {triggerIcon ?? <Plus className="size-4" aria-hidden />}
-          {triggerLabel}
-        </Button>
+      <DialogTrigger
+        className={cn(
+          buttonVariants({ variant: triggerVariant, size: triggerSize }),
+          'h-11 gap-2 rounded-xl px-5 text-[15px] font-semibold',
+        )}
+      >
+        {triggerIcon ?? <Plus className="size-4" aria-hidden />}
+        {triggerLabel}
       </DialogTrigger>
 
       <DialogContent
-        className={`flex max-h-[85svh] flex-col gap-0 p-0 ${contentClassName}`}
+        className={cn(
+          'flex max-h-[90svh] flex-col gap-0 overflow-hidden rounded-2xl p-0',
+          contentClassName,
+        )}
       >
-        <DialogHeader className="shrink-0 space-y-1 px-5 pb-4 pt-5 text-left sm:px-6 sm:pt-6">
-          <DialogTitle className="text-lg font-semibold tracking-tight">
+        <DialogHeader className="shrink-0 gap-1.5 px-6 pb-4 pt-6 text-left sm:px-8 sm:pt-7">
+          <DialogTitle className="font-serif text-2xl font-medium tracking-tight">
             {title}
           </DialogTitle>
           {description && (
-            <DialogDescription className="text-sm text-muted-foreground">
+            <DialogDescription className="text-[15px] text-muted-foreground">
               {description}
             </DialogDescription>
           )}
         </DialogHeader>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 sm:px-6 sm:pb-6">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-6 [scrollbar-gutter:stable_both-edges] [scrollbar-width:thin] sm:px-7 sm:pb-7">
           {form}
         </div>
       </DialogContent>

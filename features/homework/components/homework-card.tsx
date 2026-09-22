@@ -19,61 +19,61 @@ export default function HomeWorkCard({ data, action }: Props) {
   } = data;
 
   return (
-    <article className="rounded-xl border bg-card">
-      <div className="p-5 sm:p-6">
+    <article className="overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="p-6 sm:p-7">
         <header className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <h3 className="min-w-0 text-base font-semibold tracking-tight text-foreground sm:text-lg">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h3 className="min-w-0 text-xl font-bold tracking-tight text-foreground">
                 {title}
               </h3>
 
               {!isPublished && (
-                <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                <span className="shrink-0 rounded-full border border-input-border px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
                   Draft
                 </span>
               )}
             </div>
 
             {instructions && (
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+              <p className="mt-2 max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
                 {instructions}
               </p>
             )}
           </div>
 
-          <div className="shrink-0">
+          <div className="-mr-2 -mt-1 shrink-0">
             {action ?? <HomeworkMenu data={data} />}
           </div>
         </header>
       </div>
 
       {attachmentPath && (
-        <div className="border-t px-5 py-4 sm:px-6">
-          <div className="flex items-center gap-3">
+        <div className="border-t border-border bg-muted/50 px-6 py-4 sm:px-7">
+          <div className="flex items-center gap-3 sm:gap-4">
             <div
               aria-hidden
-              className="flex size-10 shrink-0 items-center justify-center rounded-lg border bg-muted/50"
+              className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-warning-subtle-foreground"
             >
-              <FileText className="size-4 text-muted-foreground" />
+              <FileText className="size-5" />
             </div>
 
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-foreground">
+              <p className="truncate text-[15px] font-semibold text-foreground">
                 {attachmentName ?? 'Attachment'}
               </p>
-
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[13px] text-muted-foreground">
                 Homework attachment
               </p>
             </div>
 
-            <div className="flex shrink-0 items-center gap-1">
+            <div className="flex shrink-0 items-center gap-2">
               {signedUrl && (
                 <a
                   href={signedUrl}
+                  target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex h-9 items-center gap-1.5 rounded-md px-3 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="inline-flex h-11 items-center gap-2 rounded-lg border border-input-border bg-card px-4 text-sm font-semibold text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   Open
                   <ExternalLink className="size-3.5" aria-hidden />
@@ -85,7 +85,7 @@ export default function HomeWorkCard({ data, action }: Props) {
                   href={downloadUrl}
                   download={attachmentName ?? undefined}
                   aria-label={`Download ${attachmentName ?? 'attachment'}`}
-                  className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="inline-flex size-11 items-center justify-center rounded-lg border border-input-border bg-card text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <Download className="size-4" aria-hidden />
                 </a>

@@ -7,6 +7,7 @@ import { getClass } from '@/features/classes/queries';
 import HomeWorkSection from '@/features/homework/components/homework-section';
 import { getClassHomework } from '@/features/homework/queries';
 import { getClassStudents } from '@/features/students/queries';
+import { RouteParams } from '@/types/global';
 
 export async function generateMetadata({
   params,
@@ -15,8 +16,6 @@ export async function generateMetadata({
   const { data } = await getClass(classId);
   return { title: data?.name ?? 'Class' };
 }
-
-import { RouteParams } from '@/types/global';
 
 export default async function Page({
   params,
@@ -41,24 +40,17 @@ export default async function Page({
   const students = studentResult.data?.students ?? [];
 
   return (
-    <main className="mx-auto max-w-6xl pb-16">
-      <BackLink
-        href="/dashboard/classes"
-        label="Back to classes"
-        className="mb-4"
-      />
+    <div className="flex w-full max-w-6xl min-w-0 flex-col gap-10 pb-16">
+      <div className="flex flex-col gap-5">
+        <BackLink href="/dashboard/classes" label="Back to classes" />
+        <ClassHeader data={data} />
+      </div>
 
-      <ClassHeader data={data} />
-
-      <section className="mt-10">
-        <HomeWorkSection homeWork={homework} classId={classId} />
-      </section>
+      <HomeWorkSection homeWork={homework} classId={classId} />
 
       {data.type === 'course' && (
-        <section className="mt-12">
-          <StudentsSection students={students} inviteCode={data.inviteCode} />
-        </section>
+        <StudentsSection students={students} inviteCode={data.inviteCode} />
       )}
-    </main>
+    </div>
   );
 }

@@ -22,11 +22,14 @@ export default async function Page({ searchParams }: RouteParams) {
   const { groups = [], private: privateClasses = [] } = data || {};
 
   return (
-    <div className="pb-16">
-      <div className="flex items-center justify-between gap-4">
-        <PageHeader title="Classes" subText="class categories" />
+    <div className="flex w-full max-w-6xl min-w-0 flex-col gap-10 pb-16">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <PageHeader
+          title="Classes"
+          subText="Groups, clubs and one-to-one students."
+        />
 
-        <FormDialog triggerLabel="Add Class" title="New class">
+        <FormDialog triggerLabel="Add class" title="New class">
           <AddClassForm />
         </FormDialog>
       </div>
@@ -49,11 +52,11 @@ export default async function Page({ searchParams }: RouteParams) {
           ),
         }}
         render={() => (
-          <>
+          <div className="flex flex-col gap-10">
             {groups.length > 0 && (
               <ClassSection
                 title="Groups & clubs"
-                meta={`${groups.length} classes`}
+                meta={`${groups.length} ${groups.length === 1 ? 'class' : 'classes'}`}
                 classes={groups}
                 rowAction={(item) => <ClassMenu data={item} />}
               />
@@ -61,12 +64,12 @@ export default async function Page({ searchParams }: RouteParams) {
             {privateClasses.length > 0 && (
               <ClassSection
                 title="One to one"
-                meta={`${privateClasses.length} students`}
+                meta={`${privateClasses.length} ${privateClasses.length === 1 ? 'student' : 'students'}`}
                 classes={privateClasses}
                 rowAction={(item) => <ClassMenu data={item} />}
               />
             )}
-          </>
+          </div>
         )}
       />
     </div>

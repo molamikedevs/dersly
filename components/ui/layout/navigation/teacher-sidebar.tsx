@@ -16,14 +16,14 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 
 type TeacherSidebarProps = {
-  name?: string;
-  email?: string;
+  name: string;
+  email: string;
   avatarUrl?: string | null;
 };
 
 export function TeacherSidebar({
-  name = 'Kevin Roberts',
-  email = 'teacher@dersly.app',
+  name,
+  email,
   avatarUrl,
 }: TeacherSidebarProps) {
   const pathname = usePathname();
@@ -62,13 +62,13 @@ export function TeacherSidebar({
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
-      <SidebarHeader className="h-14 justify-center px-3 group-data-[collapsible=icon]:px-2">
+      <SidebarHeader className="h-16 justify-center px-4 group-data-[collapsible=icon]:px-2">
         <Logo href="/dashboard" />
       </SidebarHeader>
 
-      <SidebarContent className="px-3 py-2 group-data-[collapsible=icon]:px-2">
+      <SidebarContent className="px-3 py-3 group-data-[collapsible=icon]:px-2">
         <nav aria-label="Dashboard">
-          <ul className="flex flex-col gap-0.5">
+          <ul className="flex flex-col gap-1">
             {TEACHER_NAV.map(({ label, href, icon: Icon }) => {
               const active = isActive(pathname, href, href === '/dashboard');
               return (
@@ -86,17 +86,17 @@ export function TeacherSidebar({
                     title={label}
                     aria-current={active ? 'page' : undefined}
                     className={cn(
-                      'tap-row relative flex items-center gap-3 rounded-md px-3 text-sm transition-colors',
+                      'flex h-11 items-center gap-3 rounded-lg px-3 text-[15px] transition-colors',
                       'group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0',
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                       active
-                        ? 'bg-accent font-medium text-accent-foreground'
-                        : 'font-normal text-muted-foreground hover:bg-muted hover:text-foreground',
+                        ? 'bg-accent font-semibold text-accent-foreground'
+                        : 'font-medium text-muted-foreground hover:bg-muted hover:text-foreground',
                     )}
                   >
                     <Icon
                       className={cn(
-                        'size-4 shrink-0',
+                        'size-[18px] shrink-0',
                         active ? 'text-primary' : 'text-current',
                       )}
                       aria-hidden
