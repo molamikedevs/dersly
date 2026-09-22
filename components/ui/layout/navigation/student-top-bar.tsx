@@ -17,11 +17,11 @@ export default function StudentTopBar({ name, email, avatarUrl }: Props) {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm">
-      <div className="container-app flex h-14 items-center justify-between gap-4 md:h-16">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-md">
+      <div className="container-app flex h-16 items-center justify-between gap-4 md:h-20">
         <Logo />
 
-        <nav aria-label="Main" className="hidden items-center gap-6 md:flex">
+        <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
           {STUDENT_TOP_NAV.map(({ label, href }) => {
             const active = isActive(pathname, href);
             return (
@@ -30,21 +30,14 @@ export default function StudentTopBar({ name, email, avatarUrl }: Props) {
                 href={href}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'relative flex h-16 items-center text-sm transition-colors',
+                  'flex h-10 items-center rounded-full px-4 text-[15px] transition-colors',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                   active
-                    ? 'font-medium text-foreground'
-                    : 'font-normal text-muted-foreground hover:text-foreground',
+                    ? 'bg-accent font-semibold text-accent-foreground'
+                    : 'font-medium text-muted-foreground hover:bg-muted hover:text-foreground',
                 )}
               >
                 {label}
-                <span
-                  aria-hidden
-                  className={cn(
-                    'absolute inset-x-0 bottom-0 h-0.5 rounded-t-full bg-primary transition-opacity',
-                    active ? 'opacity-100' : 'opacity-0',
-                  )}
-                />
               </Link>
             );
           })}
@@ -54,7 +47,7 @@ export default function StudentTopBar({ name, email, avatarUrl }: Props) {
           name={name}
           email={email}
           avatarUrl={avatarUrl}
-          className="-mr-2 hidden md:flex"
+          className="-mr-1.5 hidden md:flex"
         />
       </div>
     </header>

@@ -19,7 +19,7 @@ export default async function StudentLayout({
       />
       <main
         id="main"
-        className="container-app flex-1 pb-28 pt-6 md:pb-12 md:pt-8"
+        className="container-app flex-1 pb-28 pt-8 md:pb-16 md:pt-14"
       >
         {children}
       </main>

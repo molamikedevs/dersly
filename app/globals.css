@@ -1,8 +1,8 @@
 /* ==========================================================================
    Dersly design system
    Tailwind CSS v4 (CSS-first) + shadcn/ui
-   Teal primary. Warm neutrals in light, teal-tinted near-black in dark.
-   Radius 0.5rem. Geist Sans / Geist Mono.
+   Deep green primary. Warm paper neutrals in light, green-tinted near-black
+   in dark. Radius 0.5rem. Figtree (sans), Fraunces (serif), Geist Mono.
    ========================================================================== */
 
 @import 'tailwindcss';
@@ -20,7 +20,8 @@
    pick it up, which is why there is no manual html { font-family } rule.
    -------------------------------------------------------------------------- */
 @theme {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
   /* Tabular figures and a slashed zero on every font-mono element.
@@ -99,32 +100,33 @@
 
 /* --------------------------------------------------------------------------
    Light
+   Warm paper background, off-white cards, deep green ink as primary.
    -------------------------------------------------------------------------- */
 :root {
   color-scheme: light;
 
   --radius: 0.5rem;
 
-  --background: oklch(0.993 0.003 95);
-  --foreground: oklch(0.205 0.008 75);
+  --background: oklch(0.962 0.009 85);
+  --foreground: oklch(0.26 0.02 165);
   --background-gradient: none;
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.205 0.008 75);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.205 0.008 75);
+  --card: oklch(0.994 0.006 90);
+  --card-foreground: oklch(0.26 0.02 165);
+  --popover: oklch(0.994 0.006 90);
+  --popover-foreground: oklch(0.26 0.02 165);
 
-  --primary: oklch(0.505 0.088 188);
-  --primary-foreground: oklch(0.985 0.005 180);
+  --primary: oklch(0.38 0.055 168);
+  --primary-foreground: oklch(0.962 0.009 85);
 
-  --secondary: oklch(0.965 0.006 90);
-  --secondary-foreground: oklch(0.265 0.01 80);
+  --secondary: oklch(0.948 0.012 85);
+  --secondary-foreground: oklch(0.26 0.02 165);
 
-  --muted: oklch(0.965 0.006 90);
-  --muted-foreground: oklch(0.525 0.012 80);
+  --muted: oklch(0.948 0.012 85);
+  --muted-foreground: oklch(0.5 0.013 160);
 
-  --accent: oklch(0.955 0.018 185);
-  --accent-foreground: oklch(0.34 0.055 190);
+  --accent: oklch(0.912 0.018 85);
+  --accent-foreground: oklch(0.26 0.02 165);
 
   --destructive: oklch(0.565 0.196 26);
   --destructive-foreground: oklch(0.985 0.005 60);
@@ -137,40 +139,40 @@
   --success-subtle-foreground: oklch(0.395 0.085 150);
 
   /* --warning is a FILL colour only in light mode. As text on background,
-     card or muted it measures 2.86, 2.92 and 2.64 to 1, failing both 4.5
-     and 3.0. For "due soon" text use --warning-subtle-foreground. */
+     card or muted it fails both 4.5 and 3.0. For warm accent text and
+     icons use --warning-subtle-foreground on --warning-subtle. */
   --warning: oklch(0.685 0.145 68);
   --warning-foreground: oklch(0.255 0.05 60);
-  --warning-subtle: oklch(0.96 0.045 80);
-  --warning-subtle-foreground: oklch(0.415 0.095 62);
+  --warning-subtle: oklch(0.935 0.035 72);
+  --warning-subtle-foreground: oklch(0.43 0.1 58);
 
-  --border: oklch(0.912 0.006 88);
-  --input: oklch(0.912 0.006 88);
+  --border: oklch(0.899 0.017 85);
+  --input: oklch(0.899 0.017 85);
   /* Separate from --input because shadcn uses --input as a translucent
      surface too. This one carries the 3:1 control boundary of WCAG 1.4.11. */
-  --input-border: oklch(0.669 0.008 88);
-  --ring: oklch(0.505 0.088 188);
+  --input-border: oklch(0.62 0.02 85);
+  --ring: oklch(0.38 0.055 168);
 
-  --chart-1: oklch(0.505 0.088 188);
-  --chart-2: oklch(0.625 0.075 190);
-  --chart-3: oklch(0.735 0.06 192);
+  --chart-1: oklch(0.38 0.055 168);
+  --chart-2: oklch(0.52 0.065 168);
+  --chart-3: oklch(0.66 0.055 168);
   --chart-4: oklch(0.685 0.145 68);
   --chart-5: oklch(0.545 0.108 152);
 
-  --sidebar: oklch(0.978 0.005 92);
-  --sidebar-foreground: oklch(0.205 0.008 75);
-  --sidebar-primary: oklch(0.505 0.088 188);
-  --sidebar-primary-foreground: oklch(0.985 0.005 180);
-  --sidebar-accent: oklch(0.955 0.018 185);
-  --sidebar-accent-foreground: oklch(0.34 0.055 190);
-  --sidebar-border: oklch(0.912 0.006 88);
-  --sidebar-ring: oklch(0.505 0.088 188);
+  --sidebar: oklch(0.948 0.012 85);
+  --sidebar-foreground: oklch(0.26 0.02 165);
+  --sidebar-primary: oklch(0.38 0.055 168);
+  --sidebar-primary-foreground: oklch(0.962 0.009 85);
+  --sidebar-accent: oklch(0.912 0.018 85);
+  --sidebar-accent-foreground: oklch(0.26 0.02 165);
+  --sidebar-border: oklch(0.899 0.017 85);
+  --sidebar-ring: oklch(0.38 0.055 168);
 }
 
 /* --------------------------------------------------------------------------
    Dark
 
-   Surfaces are a single teal-tinted near-black family, stepping up in
+   Surfaces are a single green-tinted near-black family, stepping up in
    lightness rather than switching hue: sidebar 0.152, background 0.162,
    card 0.202, popover 0.212, muted 0.238. Depth comes from that step plus
    a border, not from transparency. All opaque, so nothing has to be
@@ -186,26 +188,26 @@
      keeps the top of the page from reading as flat. */
   --background-gradient: radial-gradient(
     100% 60% at 15% 0%,
-    oklch(0.212 0.028 172) 0%,
+    oklch(0.212 0.028 168) 0%,
     transparent 75%
   );
 
-  --card: oklch(0.202 0.015 170);
+  --card: oklch(0.202 0.015 168);
   --card-foreground: oklch(0.945 0.004 90);
-  --popover: oklch(0.212 0.015 170);
+  --popover: oklch(0.212 0.015 168);
   --popover-foreground: oklch(0.945 0.004 90);
 
-  --primary: oklch(0.735 0.098 186);
-  --primary-foreground: oklch(0.195 0.03 190);
+  --primary: oklch(0.74 0.085 165);
+  --primary-foreground: oklch(0.195 0.03 168);
 
-  --secondary: oklch(0.238 0.013 170);
+  --secondary: oklch(0.238 0.013 168);
   --secondary-foreground: oklch(0.945 0.004 90);
 
-  --muted: oklch(0.238 0.013 170);
+  --muted: oklch(0.238 0.013 168);
   --muted-foreground: oklch(0.705 0.011 88);
 
-  --accent: oklch(0.272 0.028 188);
-  --accent-foreground: oklch(0.885 0.045 185);
+  --accent: oklch(0.272 0.028 168);
+  --accent-foreground: oklch(0.885 0.045 165);
 
   --destructive: oklch(0.665 0.172 24);
   /* Was oklch(0.985 0.005 60) at 3.16:1, a fail. Now 7.9:1. */
@@ -225,25 +227,25 @@
 
   /* Tinted rather than white-alpha, so edges read green on a green
      surface instead of grey. */
-  --border: oklch(0.3 0.012 170);
-  --input: oklch(0.3 0.012 170);
-  --input-border: oklch(0.508 0.012 170);
-  --ring: oklch(0.735 0.098 186);
+  --border: oklch(0.3 0.012 168);
+  --input: oklch(0.3 0.012 168);
+  --input-border: oklch(0.508 0.012 168);
+  --ring: oklch(0.74 0.085 165);
 
-  --chart-1: oklch(0.735 0.098 186);
-  --chart-2: oklch(0.635 0.085 188);
-  --chart-3: oklch(0.535 0.072 190);
+  --chart-1: oklch(0.74 0.085 165);
+  --chart-2: oklch(0.635 0.075 165);
+  --chart-3: oklch(0.535 0.065 165);
   --chart-4: oklch(0.775 0.135 72);
   --chart-5: oklch(0.685 0.108 152);
 
   --sidebar: oklch(0.152 0.015 168);
   --sidebar-foreground: oklch(0.945 0.004 90);
-  --sidebar-primary: oklch(0.735 0.098 186);
-  --sidebar-primary-foreground: oklch(0.195 0.03 190);
-  --sidebar-accent: oklch(0.272 0.028 188);
-  --sidebar-accent-foreground: oklch(0.885 0.045 185);
-  --sidebar-border: oklch(0.3 0.012 170);
-  --sidebar-ring: oklch(0.735 0.098 186);
+  --sidebar-primary: oklch(0.74 0.085 165);
+  --sidebar-primary-foreground: oklch(0.195 0.03 168);
+  --sidebar-accent: oklch(0.272 0.028 168);
+  --sidebar-accent-foreground: oklch(0.885 0.045 165);
+  --sidebar-border: oklch(0.3 0.012 168);
+  --sidebar-ring: oklch(0.74 0.085 165);
 }
 
 /* --------------------------------------------------------------------------
@@ -320,7 +322,7 @@
 @utility container-app {
   margin-inline: auto;
   width: 100%;
-  max-width: 64rem;
+  max-width: 72rem;
   padding-inline: 1rem;
 
   @variant sm {

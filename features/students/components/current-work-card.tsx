@@ -28,28 +28,27 @@ export default function CurrentWorkCard({
   const showAsList = lines.length > 1;
 
   return (
-    <div className="rounded-lg bg-card p-4 shadow-sm sm:p-5">
-      <p className="text-base font-semibold tracking-tight text-foreground">
-        {title}
-      </p>
-
-      {instructions && !showAsList && (
-        <p className="mt-2 max-w-prose text-sm leading-relaxed text-muted-foreground">
-          {instructions}
+    <div className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-5 sm:p-7">
+      <div className="flex flex-col gap-2">
+        <p className="text-xl font-bold tracking-tight text-foreground">
+          {title}
         </p>
-      )}
+
+        {instructions && !showAsList && (
+          <p className="max-w-prose text-base leading-relaxed text-muted-foreground">
+            {instructions}
+          </p>
+        )}
+      </div>
 
       {showAsList && (
-        <ol className="mt-3 overflow-hidden rounded-md">
+        <ol className="flex flex-col gap-px overflow-hidden rounded-xl">
           {lines.map((line, index) => (
-            <li
-              key={index}
-              className="flex gap-3 bg-muted px-3.5 py-3 [&+li]:mt-px"
-            >
-              <span className="shrink-0 text-sm font-medium text-primary">
+            <li key={index} className="flex gap-4 bg-muted px-4 py-3.5">
+              <span className="shrink-0 font-serif text-base font-medium text-primary">
                 {index + 1}
               </span>
-              <span className="text-sm leading-relaxed text-foreground">
+              <span className="text-[15px] leading-relaxed text-foreground">
                 {line}
               </span>
             </li>
@@ -58,16 +57,16 @@ export default function CurrentWorkCard({
       )}
 
       {(signedUrl || downloadUrl) && (
-        <div className="mt-4 flex items-center gap-3 rounded-md bg-muted p-1.5 pl-3">
+        <div className="flex items-center gap-3 rounded-xl bg-muted p-3 sm:gap-4 sm:px-4">
           <span
             aria-hidden
-            className="flex size-9 shrink-0 items-center justify-center rounded-md bg-background"
+            className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-highlight"
           >
-            <FileText className="size-4 text-muted-foreground" />
+            <FileText className="size-5" />
           </span>
 
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-foreground">
+            <p className="truncate text-[15px] font-semibold text-foreground">
               {attachmentName ?? 'Attachment'}
             </p>
           </div>
@@ -77,7 +76,7 @@ export default function CurrentWorkCard({
               href={signedUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-md px-3 text-sm font-medium text-foreground transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="inline-flex h-11 shrink-0 items-center gap-2 rounded-lg border border-input bg-card px-4 text-sm font-semibold text-foreground transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               Open
               <ExternalLink className="size-3.5" aria-hidden />
@@ -89,7 +88,7 @@ export default function CurrentWorkCard({
               href={downloadUrl}
               download={attachmentName ?? undefined}
               aria-label={`Download ${attachmentName ?? 'attachment'}`}
-              className="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg border border-input bg-card text-foreground transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <Download className="size-4" aria-hidden />
             </a>

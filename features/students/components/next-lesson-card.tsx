@@ -16,29 +16,31 @@ export default function NextLessonCard({
   const Icon = meetingUrl ? Video : CalendarDays;
 
   return (
-    <section className="rounded-lg bg-accent p-5">
-      <div className="flex items-center gap-1.5 text-primary">
-        <Icon className="size-3.5" aria-hidden />
-        <span className="text-[11px] font-medium uppercase tracking-wider">
-          Next lesson
-        </span>
+    <section className="flex flex-col gap-6 rounded-3xl bg-primary p-6 text-primary-foreground sm:p-9">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2 text-primary-foreground/75">
+          <Icon className="size-4" aria-hidden />
+          <span className="text-xs font-semibold uppercase tracking-[0.12em]">
+            Next lesson
+          </span>
+        </div>
+
+        <p className="font-serif text-4xl font-medium leading-tight tracking-tight sm:text-6xl">
+          {schedule ?? 'Schedule to be confirmed'}
+        </p>
+
+        <p className="text-base text-primary-foreground/85 sm:text-lg">
+          {className}
+          {level && <span className="capitalize"> &middot; {level}</span>}
+        </p>
       </div>
-
-      <p className="mt-3 text-xl font-semibold tracking-tight text-foreground">
-        {schedule ?? 'Schedule to be confirmed'}
-      </p>
-
-      <p className="mt-1 text-sm text-muted-foreground">
-        {className}
-        {level && <span className="capitalize"> &middot; {level}</span>}
-      </p>
 
       {meetingUrl && (
         <a
           href={meetingUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-4 flex h-12 items-center justify-center gap-2 rounded-md bg-primary text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="flex h-12 items-center justify-center gap-2 rounded-xl bg-background px-6 text-[15px] font-bold text-primary transition-colors hover:bg-background/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-background focus-visible:ring-offset-2 focus-visible:ring-offset-primary sm:self-start"
         >
           <Video className="size-4" aria-hidden />
           Join lesson
