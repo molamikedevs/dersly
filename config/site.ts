@@ -2,10 +2,10 @@ import type { Metadata, Viewport } from 'next';
 
 export const siteConfig = {
   name: 'Dersly',
-  url: 'https://dersly.app',
+  url: 'https://dersly.pro',
   tagline: 'Your English lessons, all in one place',
   description:
-    'Dersly is where students access their lessons, assignments and materials. Submit your work, track your progress and join your class from any device.',
+    'Dersly is where students access their lessons, assignments and materials. Read your homework, check your level and join your class from any device.',
 } as const;
 
 export const metadata: Metadata = {
