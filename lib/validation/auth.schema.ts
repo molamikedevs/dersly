@@ -35,5 +35,29 @@ export const RegisterSchema = z.object({
     .transform((value) => value.toUpperCase()),
 });
 
+export const ForgotPasswordSchema = z.object({
+  email: z.email({ message: 'Please provide a valid email address.' }),
+});
+
+export const ResetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, { message: 'Password must be at least 8 characters long.' })
+      .regex(/[a-zA-Z]/, {
+        message: 'Password must contain at least one letter.',
+      })
+      .regex(/[0-9]/, {
+        message: 'Password must contain at least one number.',
+      }),
+    confirm: z.string(),
+  })
+  .refine((data) => data.password === data.confirm, {
+    message: 'Passwords do not match.',
+    path: ['confirm'],
+  });
+
+export type ForgotPasswordValues = z.infer<typeof ForgotPasswordSchema>;
+export type ResetPasswordValues = z.infer<typeof ResetPasswordSchema>;
 export type LogInValues = z.infer<typeof LogInSchema>;
 export type RegisterValues = z.infer<typeof RegisterSchema>;

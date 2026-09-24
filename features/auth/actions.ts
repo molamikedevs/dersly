@@ -1,7 +1,12 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { LogInSchema, RegisterSchema } from '@/lib/validation/auth.schema';
+import {
+  ForgotPasswordSchema,
+  LogInSchema,
+  RegisterSchema,
+  ResetPasswordSchema,
+} from '@/lib/validation/auth.schema';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -70,4 +75,36 @@ export async function signOut() {
   const supabase = createClient(await cookies());
   await supabase.auth.signOut();
   redirect('/login');
+}
+
+export async function requestPasswordReset(
+  values: unknown,
+): Promise<ActionResult> {
+  const parsed = ForgotPasswordSchema.safeParse(values);
+  if (!parsed.success) return { error: 'Enter a valid email address.' };
+
+  const supabase = createClient(await cookies());
+
+  await supabase.auth.resetPasswordForEmail(parsed.data.email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?next=/reset-password`,
+  });
+
+  return undefined;
+}
+
+export async function updatePassword(values: unknown): Promise<ActionResult> {
+  const parsed = ResetPasswordSchema.safeParse(values);
+  if (!parsed.success) return { error: 'Please check the form and try again.' };
+
+  const supabase = createClient(await cookies());
+
+  const { error } = await supabase.auth.updateUser({
+    password: parsed.data.password,
+  });
+
+  if (error) {
+    return { error: 'Could not update your password. Try the link again.' };
+  }
+
+  redirect('/');
 }
