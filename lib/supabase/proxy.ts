@@ -29,10 +29,17 @@ export async function updateSession(request: NextRequest) {
   const user = data?.claims ?? null;
 
   const { pathname } = request.nextUrl;
-  const isAuthRoute =
-    pathname.startsWith('/login') || pathname.startsWith('/register');
 
-  if (!user && !isAuthRoute) {
+  const isAuthRoute =
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/register') ||
+    pathname.startsWith('/forgot-password');
+
+  const isPublicRoute =
+    pathname.startsWith('/reset-password') ||
+    pathname.startsWith('/auth/callback');
+
+  if (!user && !isAuthRoute && !isPublicRoute) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     url.searchParams.set('next', pathname);

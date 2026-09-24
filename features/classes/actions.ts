@@ -47,7 +47,6 @@ export async function createClass(
 
     if (error) throwPostgresError(error, 'Class');
     if (error) {
-      console.error('CLASS INSERT', error);
       throwPostgresError(error, 'Class');
     }
 
