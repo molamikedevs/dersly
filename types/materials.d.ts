@@ -1,4 +1,4 @@
-type MaterialKind = 'file' | 'link';
+type MaterialKind = 'file' | 'link' | 'article';
 
 export interface MaterialRecord {
   id: string;
@@ -7,6 +7,7 @@ export interface MaterialRecord {
   description: string | null;
   kind: MaterialKind;
   filePath: string | null;
+  fileName: string | null;
   url: string | null;
   signedUrl?: string | null;
   downloadUrl?: string | null;

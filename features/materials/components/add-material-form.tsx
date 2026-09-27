@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FileText, Link2, Loader2, Upload, X } from 'lucide-react';
+import { BookOpen, FileText, Loader2, Play, Upload, X } from 'lucide-react';
 import { useRef } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { createMaterialAction, updateMaterialAction } from '../actions';
@@ -33,7 +33,8 @@ import { MaterialRecord } from '@/types/materials';
 
 const KINDS = [
   { value: 'file' as const, label: 'Document', icon: FileText },
-  { value: 'link' as const, label: 'Link', icon: Link2 },
+  { value: 'link' as const, label: 'Video', icon: Play },
+  { value: 'article' as const, label: 'Reading', icon: BookOpen },
 ];
 
 export default function AddMaterialForm({
@@ -88,7 +89,7 @@ export default function AddMaterialForm({
             <div
               role="radiogroup"
               aria-label="Type"
-              className="grid grid-cols-2 gap-1 rounded-md bg-muted p-1"
+              className="grid grid-cols-3 gap-1 rounded-md bg-muted p-1"
             >
               {KINDS.map(({ value, label, icon: Icon }) => {
                 const selected = field.value === value;
@@ -135,7 +136,7 @@ export default function AddMaterialForm({
           )}
         />
 
-        {kind === 'link' ? (
+        {kind !== 'file' ? (
           <Controller
             name="url"
             control={form.control}
@@ -149,12 +150,18 @@ export default function AddMaterialForm({
                   inputMode="url"
                   className="h-11"
                   autoComplete="off"
-                  placeholder="https://youtube.com/watch?v=..."
+                  placeholder={
+                    kind === 'link'
+                      ? 'https://youtube.com/watch?v=...'
+                      : 'https://example.com/article'
+                  }
                   aria-invalid={fieldState.invalid}
                   aria-describedby="material-url-hint"
                 />
                 <FieldDescription id="material-url-hint">
-                  YouTube links play inline for students.
+                  {kind === 'link'
+                    ? 'YouTube links play inline for students.'
+                    : 'Opens in a new tab for students to read.'}
                 </FieldDescription>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />

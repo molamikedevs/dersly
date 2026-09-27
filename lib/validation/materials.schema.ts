@@ -2,7 +2,7 @@ import * as z from 'zod';
 
 export const MaterialSchema = z
   .object({
-    kind: z.enum(['file', 'link']),
+    kind: z.enum(['file', 'link', 'article']),
     title: z.string().trim().min(2, { message: 'Give this a title.' }),
     description: z.string().trim().optional(),
     existingPath: z.string().optional(),
@@ -12,7 +12,7 @@ export const MaterialSchema = z
     url: z.string().trim().optional(),
     file: z.instanceof(File).optional(),
   })
-  .refine((data) => data.kind !== 'link' || !!data.url, {
+  .refine((data) => data.kind === 'file' || !!data.url, {
     message: 'Enter a link.',
     path: ['url'],
   })

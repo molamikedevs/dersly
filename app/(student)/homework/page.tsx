@@ -16,14 +16,15 @@ export default async function Homework({ searchParams }: RouteParams) {
     page: Number(page) || 1,
     pageSize: Number(pageSize) || 20,
   });
-
   const homework = data?.homework ?? [];
   const [current, ...past] = homework;
 
   return (
     <div className="flex w-full max-w-4xl min-w-0 flex-col gap-10 pb-16">
       <h1 className="font-serif text-4xl font-medium tracking-tight text-foreground sm:text-5xl">
-        Homework
+        {homework[0]?.classes?.type === 'conversation'
+          ? 'Next topic'
+          : 'Homework'}
       </h1>
 
       <DataRenderer

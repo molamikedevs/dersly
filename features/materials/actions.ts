@@ -28,7 +28,8 @@ export async function createMaterialAction(
     return handleError(validationResult) as ErrorResponse;
   }
 
-  const { kind, title, description, level, url, file } = params!;
+  const { kind, title, description, level, url, file } =
+    validationResult.params!;
 
   try {
     const supabase = createClient(await cookies());
@@ -36,19 +37,26 @@ export async function createMaterialAction(
     const filePath =
       kind === 'file' && file ? await uploadMaterialFile(file) : null;
 
-    const { data, error } = await supabase.from('materials').insert({
-      title,
-      kind,
-      description: description || null,
-      level: level ?? null,
-      url: kind === 'link' ? url : null,
-      file_path: filePath,
-      class_id: null,
-    });
+    const { data, error } = await supabase
+      .from('materials')
+      .insert({
+        title,
+        kind,
+        description: description || null,
+        level: level ?? null,
+        url: kind === 'file' ? null : url,
+        file_path: filePath,
+        file_name: kind === 'file' ? (file?.name ?? null) : null,
+        class_id: null,
+      })
+      .select()
+      .single();
 
     if (error) throwPostgresError(error, 'Material');
 
     revalidatePath('/dashboard/materials');
+    revalidatePath('/materials');
+    revalidatePath('/');
 
     return { success: true, data: toCamel<MaterialRecord>(data) };
   } catch (error) {
@@ -78,7 +86,7 @@ export async function updateMaterialAction(
 
     const { data: existing, error: readError } = await supabase
       .from('materials')
-      .select('file_path')
+      .select('file_path, file_name')
       .eq('id', id)
       .maybeSingle();
 
@@ -88,7 +96,9 @@ export async function updateMaterialAction(
     const newPath =
       kind === 'file' && file ? await uploadMaterialFile(file) : null;
 
-    const filePath = kind === 'link' ? null : (newPath ?? existing.file_path);
+    const filePath = kind === 'file' ? (newPath ?? existing.file_path) : null;
+    const fileName =
+      kind === 'file' ? (file?.name ?? existing.file_name) : null;
 
     const { data, error } = await supabase
       .from('materials')
@@ -97,8 +107,9 @@ export async function updateMaterialAction(
         kind,
         description: description || null,
         level: level ?? null,
-        url: kind === 'link' ? url : null,
+        url: kind === 'file' ? null : url,
         file_path: filePath,
+        file_name: fileName,
       })
       .eq('id', id)
       .select()
@@ -113,6 +124,8 @@ export async function updateMaterialAction(
     }
 
     revalidatePath('/dashboard/materials');
+    revalidatePath('/materials');
+    revalidatePath('/');
 
     return { success: true, data: toCamel<MaterialRecord>(data) };
   } catch (error) {
@@ -149,6 +162,8 @@ export async function deleteMaterialAction(
     }
 
     revalidatePath('/dashboard/materials');
+    revalidatePath('/materials');
+    revalidatePath('/');
 
     return { success: true, data: null };
   } catch (error) {

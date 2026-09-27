@@ -1,5 +1,6 @@
 import HomeSkeleton from '@/components/common/home-skeleton';
 import PromptCard from '@/features/level-test/components/prompt-card';
+import ReadingList from '@/features/materials/components/reading-list';
 import RecentMaterials from '@/features/materials/components/recent-materials';
 import CurrentWorkCard from '@/features/students/components/current-work-card';
 import NextLessonCard from '@/features/students/components/next-lesson-card';
@@ -28,7 +29,8 @@ async function HomContent() {
 
   if (!data) return null;
 
-  const { firstName, studentLevel, enrolment, current, materials } = data;
+  const { firstName, studentLevel, enrolment, current, materials, reading } =
+    data;
   const { type, lessonsCompleted } = enrolment;
 
   const today = new Date().toLocaleDateString('en-GB', {
@@ -98,6 +100,8 @@ async function HomContent() {
           )}
 
           <RecentMaterials items={materials} />
+
+          <ReadingList items={reading} />
         </aside>
       </div>
     </div>

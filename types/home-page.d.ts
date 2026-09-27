@@ -10,6 +10,11 @@ type StudentHome = {
     meetingUrl: string | null;
     lessonsCompleted: number;
   };
+  reading: {
+    id: string;
+    title: string;
+    url: string | null;
+  }[];
   current: {
     id: string;
     title: string;

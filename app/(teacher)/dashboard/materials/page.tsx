@@ -6,23 +6,27 @@ import PageHeader from '@/components/common/page-header';
 import Pagination from '@/components/common/pagination';
 import AddMaterialForm from '@/features/materials/components/add-material-form';
 import MaterialCard from '@/features/materials/components/material-card';
+import MaterialTabs from '@/features/materials/components/material-tabs';
+import ReadingRow from '@/features/materials/components/reading-row';
 import { getMaterials } from '@/features/materials/queries';
 import type { RouteParams } from '@/types/global';
 
 export const metadata = { title: 'Materials' };
 
 export default async function Materials({ searchParams }: RouteParams) {
-  const { page, pageSize } = await searchParams;
+  const { page, pageSize, kind } = await searchParams;
+  const activeKind = typeof kind === 'string' ? kind : 'link';
 
   const { data, success, error } = await getMaterials({
     page: Number(page) || 1,
     pageSize: Number(pageSize) || 9,
+    filter: activeKind,
   });
 
   const { materials } = data || {};
 
   return (
-    <div className="flex w-full max-w-6xl min-w-0 flex-col gap-10 pb-16">
+    <div className="flex w-full max-w-6xl min-w-0 flex-col gap-8 pb-16">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <PageHeader
           title="Materials"
@@ -34,15 +38,18 @@ export default async function Materials({ searchParams }: RouteParams) {
         </FormDialog>
       </div>
 
+      <MaterialTabs />
       <DataRenderer
         success={success}
         error={error}
         data={materials}
         empty={{
           icon: FolderOpen,
-          title: 'No materials yet',
+          title: 'Nothing here yet',
           message:
-            'Add a document or a link and every student will be able to see it.',
+            activeKind === 'article'
+              ? 'Add a reading link and students will see it on their home page.'
+              : 'Add material here and every student will be able to see it.',
           action: (
             <div className="mt-6">
               <FormDialog triggerLabel="Add material" title="New material">
@@ -51,13 +58,21 @@ export default async function Materials({ searchParams }: RouteParams) {
             </div>
           ),
         }}
-        render={(materials) => (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {materials.map((item) => (
-              <MaterialCard key={item.id} data={item} editable />
-            ))}
-          </div>
-        )}
+        render={(materials) =>
+          activeKind === 'article' ? (
+            <ul className="flex flex-col divide-y divide-border rounded-2xl border border-border bg-card px-5">
+              {materials.map((item) => (
+                <ReadingRow key={item.id} data={item} editable />
+              ))}
+            </ul>
+          ) : (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {materials.map((item) => (
+                <MaterialCard key={item.id} data={item} editable />
+              ))}
+            </div>
+          )
+        }
       />
 
       <Pagination isNext={data?.isNext ?? false} />
