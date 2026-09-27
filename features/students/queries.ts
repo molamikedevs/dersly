@@ -160,6 +160,16 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
 
     if (materialsError) throwPostgresError(materialsError, 'Material');
 
+    const { data: reading, error: readingError } = await supabase
+      .from('materials')
+      .select('id, title, url')
+      .is('class_id', null)
+      .eq('kind', 'article')
+      .order('uploaded_at', { ascending: false })
+      .limit(5);
+
+    if (readingError) throwPostgresError(readingError, 'Material');
+
     return {
       success: true,
       data: {
@@ -176,6 +186,7 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
         },
         current,
         materials: toCamel(materials ?? []),
+        reading: toCamel(reading ?? []),
       },
     };
   } catch (error) {

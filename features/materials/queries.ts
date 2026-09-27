@@ -40,6 +40,7 @@ export async function getMaterials(
 
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
+  const kind = filter ?? 'link';
 
   try {
     const supabase = createClient(await cookies());
@@ -50,7 +51,7 @@ export async function getMaterials(
       .is('class_id', null);
 
     if (query) request = request.ilike('title', `%${query}%`);
-    if (filter) request = request.eq('level', filter);
+    request = request.eq('kind', kind);
 
     const column = SORTABLE.includes(sort as never)
       ? (sort as string)
