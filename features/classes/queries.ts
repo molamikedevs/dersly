@@ -125,6 +125,7 @@ export async function getStudentClasses(): Promise<
       name: string;
       schedule: string | null;
       meetingUrl: string | null;
+      type: ClassType;
     }[]
   >
 > {
@@ -142,7 +143,7 @@ export async function getStudentClasses(): Promise<
     const { data, error } = await supabase
       .from('enrollments')
       .select(
-        'class:classes!enrollments_class_id_fkey(id, name, schedule, meeting_url)',
+        'class:classes!enrollments_class_id_fkey(id, name, schedule, meeting_url, type)',
       )
       .eq('student_id', user!.id)
       .eq('status', 'active');
@@ -157,6 +158,7 @@ export async function getStudentClasses(): Promise<
           id: string;
           name: string;
           schedule: string | null;
+          type: ClassType;
           meetingUrl: string | null;
         }>(item),
       );
