@@ -1,6 +1,6 @@
 'use client';
 
-import { STUDENT_TOP_NAV } from '@/constants/nav';
+import { studentTopNav } from '@/constants/nav';
 import UserAvatar from '@/features/profile/components/user-avatar';
 import { cn, isActive } from '@/lib/utils';
 import Link from 'next/link';
@@ -11,10 +11,17 @@ type Props = {
   name: string;
   email: string;
   avatarUrl?: string | null;
+  classType?: ClassType | null;
 };
 
-export default function StudentTopBar({ name, email, avatarUrl }: Props) {
+export default function StudentTopBar({
+  name,
+  email,
+  avatarUrl,
+  classType,
+}: Props) {
   const pathname = usePathname();
+  const items = studentTopNav(classType);
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-md">
@@ -22,7 +29,7 @@ export default function StudentTopBar({ name, email, avatarUrl }: Props) {
         <Logo />
 
         <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
-          {STUDENT_TOP_NAV.map(({ label, href }) => {
+          {items.map(({ label, href }) => {
             const active = isActive(pathname, href);
             return (
               <Link

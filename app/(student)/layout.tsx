@@ -2,6 +2,7 @@ import StudentTabBar from '@/components/ui/layout/navigation/student-tab-bar';
 import StudentTopBar from '@/components/ui/layout/navigation/student-top-bar';
 import SkipLink from '@/components/ui/layout/skip-link';
 import { requireStudent } from '@/features/auth/guard';
+import { getStudentClasses } from '@/features/classes/queries';
 
 export default async function StudentLayout({
   children,
@@ -9,6 +10,8 @@ export default async function StudentLayout({
   children: React.ReactNode;
 }) {
   const profile = await requireStudent();
+  const { data } = await getStudentClasses();
+  const classType = data?.[0]?.type ?? null;
   return (
     <>
       <SkipLink />
@@ -16,6 +19,7 @@ export default async function StudentLayout({
         name={profile.full_name}
         email={profile.email}
         avatarUrl={profile.avatarUrl}
+        classType={classType}
       />
       <main
         id="main"
@@ -27,6 +31,7 @@ export default async function StudentLayout({
         name={profile.full_name}
         email={profile.email}
         avatarUrl={profile.avatarUrl}
+        classType={classType}
       />
     </>
   );
