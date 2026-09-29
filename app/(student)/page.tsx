@@ -33,11 +33,12 @@ async function HomContent() {
     data;
   const { type, lessonsCompleted } = enrolment;
 
-  const today = new Date().toLocaleDateString('en-GB', {
+  const today = new Intl.DateTimeFormat('en-GB', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
-  });
+    timeZone: 'Asia/Baku',
+  }).format(new Date());
 
   return (
     <div className="flex w-full max-w-6xl min-w-0 flex-col gap-8 pb-10 sm:gap-10">

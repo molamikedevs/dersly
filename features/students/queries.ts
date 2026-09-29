@@ -38,7 +38,7 @@ async function fetchStudents(
       .from('enrollments')
       .select(
         `joined_at,
-         student:profiles!enrollments_student_id_fkey(id, full_name, email, level),
+         student:profiles!enrollments_student_id_fkey(id, full_name, email, level, last_seen_at),
          class:classes!enrollments_class_id_fkey(id, name, type, schedule)`,
         { count: 'exact' },
       )

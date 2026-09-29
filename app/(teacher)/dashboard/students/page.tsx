@@ -2,6 +2,7 @@ import { Users } from 'lucide-react';
 
 import DataRenderer from '@/components/common/data-renderer';
 import PageHeader from '@/components/common/page-header';
+import Pagination from '@/components/common/pagination';
 import {
   Table,
   TableBody,
@@ -25,7 +26,7 @@ export default async function Students({ searchParams }: RouteParams) {
 
   const { data, success, error } = await getStudents({
     page: Number(page) || 1,
-    pageSize: Number(pageSize) || 50,
+    pageSize: Number(pageSize) || 10,
   });
 
   const students = data?.students ?? [];
@@ -53,7 +54,7 @@ export default async function Students({ searchParams }: RouteParams) {
           button: { text: 'Go to classes', href: '/dashboard/classes' },
         }}
         render={(students) => (
-          <div className="overflow-hidden rounded-2xl border border-border bg-card">
+          <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-card">
             <ul className="divide-y divide-border md:hidden">
               {students.map((item) => (
                 <StudentCard
@@ -63,15 +64,30 @@ export default async function Students({ searchParams }: RouteParams) {
               ))}
             </ul>
 
-            <div className="hidden md:block">
-              <Table>
+            <div className="hidden min-w-0 md:block">
+              <Table className="w-full table-fixed">
                 <TableHeader className="bg-muted">
                   <TableRow className="border-border hover:bg-transparent">
-                    <TableHead className={headClass}>Student</TableHead>
-                    <TableHead className={headClass}>Email</TableHead>
-                    <TableHead className={headClass}>Class</TableHead>
-                    <TableHead className={headClass}>Level</TableHead>
-                    <TableHead className={`hidden lg:table-cell ${headClass}`}>
+                    <TableHead className={`w-[28%] ${headClass}`}>
+                      Student
+                    </TableHead>
+                    <TableHead className={`w-[30%] ${headClass}`}>
+                      Email
+                    </TableHead>
+                    <TableHead className={`w-[22%] ${headClass}`}>
+                      Class
+                    </TableHead>
+                    <TableHead className={`w-[20%] ${headClass}`}>
+                      Level
+                    </TableHead>
+                    <TableHead
+                      className={`hidden w-[18%] lg:table-cell ${headClass}`}
+                    >
+                      Last seen
+                    </TableHead>
+                    <TableHead
+                      className={`hidden w-[20%] xl:table-cell ${headClass}`}
+                    >
                       Schedule
                     </TableHead>
                   </TableRow>
@@ -90,6 +106,8 @@ export default async function Students({ searchParams }: RouteParams) {
           </div>
         )}
       />
+
+      <Pagination isNext={data?.isNext ?? false} />
     </div>
   );
 }

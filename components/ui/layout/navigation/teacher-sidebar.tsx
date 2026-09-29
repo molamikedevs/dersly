@@ -119,7 +119,8 @@ export function TeacherSidebar({
           email={email}
           avatarUrl={avatarUrl}
           variant="row"
-          profileHref="/dashboard/profile"
+          href="/dashboard/profile"
+          active={isActive(pathname, '/dashboard/profile')}
         />
       </SidebarFooter>
     </Sidebar>

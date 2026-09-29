@@ -4,6 +4,7 @@ type StudentRecord = {
     id: string;
     fullName: string;
     email: string;
+    lastSeenAt: string;
     level: ClassLevel | null;
   };
   class: {

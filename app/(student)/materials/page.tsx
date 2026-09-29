@@ -2,29 +2,41 @@ import { FolderOpen } from 'lucide-react';
 
 import DataRenderer from '@/components/common/data-renderer';
 import Filter from '@/components/common/filter';
-import FormDialog from '@/components/common/form-dialog';
 import PageHeader from '@/components/common/page-header';
 import Pagination from '@/components/common/pagination';
-import AddMaterialForm from '@/features/materials/components/add-material-form';
 import MaterialCard from '@/features/materials/components/material-card';
+import MaterialTabs from '@/features/materials/components/material-tabs';
+import ReadingRow from '@/features/materials/components/reading-row';
 import { getMaterials } from '@/features/materials/queries';
+import { toMaterialKind } from '@/lib/utils';
 import type { RouteParams } from '@/types/global';
 
 export const metadata = {
   title: 'Materials',
 };
 
-export default async function Materials({ searchParams }: RouteParams) {
-  const { page, pageSize, filter } = await searchParams;
+const EMPTY_LABEL = {
+  link: 'No videos yet',
+  file: 'No documents yet',
+  article: 'Nothing to read yet',
+} as const;
 
-  const { data, success, error } = await getMaterials({
-    page: Number(page) || 1,
-    pageSize: Number(pageSize) || 8,
-    filter: typeof filter === 'string' ? filter : undefined,
-  });
+export default async function Materials({ searchParams }: RouteParams) {
+  const { page, pageSize, filter, kind } = await searchParams;
+
+  const activeKind = toMaterialKind(kind);
+  const activeFilter = typeof filter === 'string' ? filter : undefined;
+
+  const { data, success, error } = await getMaterials(
+    {
+      page: Number(page) || 1,
+      pageSize: Number(pageSize) || 8,
+      filter: activeFilter,
+    },
+    activeKind,
+  );
 
   const { materials } = data || {};
-  const activeFilter = typeof filter === 'string' ? filter : undefined;
 
   return (
     <div className="flex w-full min-w-0 flex-col gap-8 pb-16">
@@ -45,6 +57,8 @@ export default async function Materials({ searchParams }: RouteParams) {
         />
       </div>
 
+      <MaterialTabs />
+
       <DataRenderer
         success={success}
         error={error}
@@ -59,28 +73,25 @@ export default async function Materials({ searchParams }: RouteParams) {
               }
             : {
                 icon: FolderOpen,
-                title: 'No materials yet',
-                message:
-                  'Add a document or a link and every student will be able to see it.',
-                action: (
-                  <div className="mt-6">
-                    <FormDialog
-                      triggerLabel="Add material"
-                      title="New material"
-                    >
-                      <AddMaterialForm />
-                    </FormDialog>
-                  </div>
-                ),
+                title: EMPTY_LABEL[activeKind],
+                message: 'New material will appear here when it is added.',
               }
         }
-        render={(materials) => (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {materials.map((item) => (
-              <MaterialCard key={item.id} data={item} />
-            ))}
-          </div>
-        )}
+        render={(materials) =>
+          activeKind === 'article' ? (
+            <ul className="flex flex-col gap-3">
+              {materials.map((item) => (
+                <ReadingRow key={item.id} data={item} />
+              ))}
+            </ul>
+          ) : (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {materials.map((item) => (
+                <MaterialCard key={item.id} data={item} />
+              ))}
+            </div>
+          )
+        }
       />
 
       <Pagination isNext={data?.isNext ?? false} />
