@@ -9,19 +9,19 @@ import MaterialCard from '@/features/materials/components/material-card';
 import MaterialTabs from '@/features/materials/components/material-tabs';
 import ReadingRow from '@/features/materials/components/reading-row';
 import { getMaterials } from '@/features/materials/queries';
+import { toMaterialKind } from '@/lib/utils';
 import type { RouteParams } from '@/types/global';
 
 export const metadata = { title: 'Materials' };
 
 export default async function Materials({ searchParams }: RouteParams) {
   const { page, pageSize, kind } = await searchParams;
-  const activeKind = typeof kind === 'string' ? kind : 'link';
+  const activeKind = toMaterialKind(kind);
 
-  const { data, success, error } = await getMaterials({
-    page: Number(page) || 1,
-    pageSize: Number(pageSize) || 9,
-    filter: activeKind,
-  });
+  const { data, success, error } = await getMaterials(
+    { page: Number(page) || 1, pageSize: Number(pageSize) || 8 },
+    activeKind,
+  );
 
   const { materials } = data || {};
 

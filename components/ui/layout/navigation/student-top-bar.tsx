@@ -54,6 +54,7 @@ export default function StudentTopBar({
           name={name}
           email={email}
           avatarUrl={avatarUrl}
+          active={isActive(pathname, '/profile')}
           className="-mr-1.5 hidden md:flex"
         />
       </div>

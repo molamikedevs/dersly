@@ -102,3 +102,30 @@ export function shuffle<T>(items: T[]): T[] {
 
   return copy;
 }
+
+export function formatLastSeen(value: string | null) {
+  if (!value) return 'Never';
+
+  const minutes = Math.round((Date.now() - new Date(value).getTime()) / 60000);
+  if (minutes < 1) return 'Just now';
+
+  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+  if (minutes < 60) return rtf.format(-minutes, 'minute');
+
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return rtf.format(-hours, 'hour');
+
+  const days = Math.round(hours / 24);
+  if (days < 30) return rtf.format(-days, 'day');
+
+  return rtf.format(-Math.round(days / 30), 'month');
+}
+
+const MATERIAL_KINDS = ['link', 'file', 'article'] as const;
+export type MaterialKind = (typeof MATERIAL_KINDS)[number];
+
+export function toMaterialKind(value: unknown): MaterialKind {
+  return MATERIAL_KINDS.includes(value as MaterialKind)
+    ? (value as MaterialKind)
+    : 'link';
+}

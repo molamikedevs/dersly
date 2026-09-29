@@ -5,7 +5,7 @@ import handleError from '@/lib/handlers/errors';
 import { NotFoundError, throwPostgresError } from '@/lib/http-errors';
 import { createClient } from '@/lib/supabase/server';
 import { signStoragePath } from '@/lib/supabase/sign';
-import { toCamel } from '@/lib/utils';
+import { MaterialKind, toCamel } from '@/lib/utils';
 import { PaginatedSearchParamsSchema } from '@/lib/validation/global.schema';
 import type {
   ActionResponse,
@@ -19,6 +19,7 @@ const SORTABLE = ['uploaded_at', 'title'] as const;
 
 export async function getMaterials(
   params: PaginatedSearchParams,
+  kind: MaterialKind = 'link',
 ): Promise<ActionResponse<{ materials: MaterialRecord[]; isNext: boolean }>> {
   const validationResult = await action({
     params,
@@ -40,7 +41,6 @@ export async function getMaterials(
 
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
-  const kind = filter ?? 'link';
 
   try {
     const supabase = createClient(await cookies());
@@ -48,10 +48,11 @@ export async function getMaterials(
     let request = supabase
       .from('materials')
       .select('*', { count: 'exact' })
-      .is('class_id', null);
+      .is('class_id', null)
+      .eq('kind', kind);
 
+    if (filter) request = request.eq('level', filter);
     if (query) request = request.ilike('title', `%${query}%`);
-    request = request.eq('kind', kind);
 
     const column = SORTABLE.includes(sort as never)
       ? (sort as string)
