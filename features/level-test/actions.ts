@@ -67,6 +67,7 @@ export async function submitAttempt(
     const total = answers.length;
     const level = bandFor(score, total);
 
+    // The quiz_attempts_apply_level trigger copies level_result into profiles.level
     const { error: attemptError } = await supabase
       .from('quiz_attempts')
       .insert({
@@ -78,13 +79,6 @@ export async function submitAttempt(
       });
 
     if (attemptError) throwPostgresError(attemptError, 'Test');
-
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .update({ level })
-      .eq('id', user!.id);
-
-    if (profileError) throwPostgresError(profileError, 'Profile');
 
     revalidatePath('/');
     revalidatePath('/profile');
