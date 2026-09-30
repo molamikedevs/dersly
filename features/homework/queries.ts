@@ -1,18 +1,19 @@
 import { cookies } from 'next/headers';
+import { cache } from 'react';
+import * as z from 'zod';
 
 import action from '@/lib/handlers/action';
 import handleError from '@/lib/handlers/errors';
-import { throwPostgresError } from '@/lib/http-errors';
+import { NotFoundError, throwPostgresError } from '@/lib/http-errors';
 import { createClient } from '@/lib/supabase/server';
 import { signStoragePath } from '@/lib/supabase/sign';
 import { toCamel } from '@/lib/utils';
+import { PaginatedSearchParamsSchema } from '@/lib/validation/global.schema';
 import {
   ActionResponse,
   ErrorResponse,
   PaginatedSearchParams,
 } from '@/types/global';
-
-import { PaginatedSearchParamsSchema } from '@/lib/validation/global.schema';
 
 async function fetchHomework(
   params: PaginatedSearchParams,
@@ -104,3 +105,47 @@ export async function getGroupedHomework(
 
   return { success: true, data: { groups, isNext } };
 }
+
+export const getHomework = cache(
+  async (id: string): Promise<ActionResponse<HomeWorkRecord>> => {
+    const validationResult = await action({
+      params: { id },
+      schema: z.object({ id: z.uuid() }),
+      authorize: true,
+    });
+
+    if (validationResult instanceof Error) {
+      return handleError(new NotFoundError('Homework')) as ErrorResponse;
+    }
+
+    try {
+      const supabase = createClient(await cookies());
+
+      const { data, error } = await supabase
+        .from('homework')
+        .select('*, classes(id, name, type)')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (error) throwPostgresError(error, 'Homework');
+      if (!data) throw new NotFoundError('Homework');
+
+      const homework = toCamel<HomeWorkRecord>(data);
+
+      if (homework.attachmentPath) {
+        const urls = await signStoragePath(
+          supabase,
+          homework.attachmentPath,
+          homework.attachmentName ?? homework.title,
+        );
+
+        homework.signedUrl = urls.signedUrl;
+        homework.downloadUrl = urls.downloadUrl;
+      }
+
+      return { success: true, data: homework };
+    } catch (error) {
+      return handleError(error) as ErrorResponse;
+    }
+  },
+);

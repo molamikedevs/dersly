@@ -127,7 +127,9 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
 
     const { data: homework, error: homeworkError } = await supabase
       .from('homework')
-      .select('id, title, instructions, attachment_path, attachment_name')
+      .select(
+        'id, title, instructions, content, attachment_path, attachment_name',
+      )
       .eq('class_id', owner.id)
       .eq('is_published', true)
       .order('created_at', { ascending: false })
@@ -146,6 +148,7 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
         attachmentName: homework.attachment_name,
         signedUrl: null,
         downloadUrl: null,
+        hasGuide: Boolean(homework.content),
       };
 
       if (homework.attachment_path) {

@@ -22,6 +22,7 @@ type StudentHome = {
     attachmentName: string | null;
     signedUrl: string | null;
     downloadUrl: string | null;
+    hasGuide: boolean;
   } | null;
   materials: {
     id: string;

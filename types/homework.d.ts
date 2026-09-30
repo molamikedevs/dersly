@@ -3,6 +3,7 @@ type HomeWorkRecord = {
   classId: string;
   title: string;
   instructions: string | null;
+  content: string | null;
   attachmentPath: string | null;
   attachmentName: string | null;
   dueDate: string | null;

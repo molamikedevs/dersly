@@ -9,6 +9,10 @@ export const metadata = {
   title: 'Homework',
 };
 
+function readHref(item: HomeWorkRecord) {
+  return item.content ? `/homework/${item.id}` : undefined;
+}
+
 export default async function Homework({ searchParams }: RouteParams) {
   const { page, pageSize } = await searchParams;
 
@@ -45,6 +49,7 @@ export default async function Homework({ searchParams }: RouteParams) {
               signedUrl={current.signedUrl}
               downloadUrl={current.downloadUrl}
               asQuestions={current.classes?.type === 'conversation'}
+              readHref={readHref(current)}
             />
 
             {past.length > 0 && (
@@ -62,6 +67,7 @@ export default async function Homework({ searchParams }: RouteParams) {
                       signedUrl={item.signedUrl}
                       downloadUrl={item.downloadUrl}
                       asQuestions={item.classes?.type === 'conversation'}
+                      readHref={readHref(item)}
                     />
                   ))}
                 </div>

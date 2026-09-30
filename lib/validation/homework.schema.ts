@@ -26,6 +26,12 @@ export const HomeworkSchema = z
       .max(500, { message: 'Keep the instructions short.' })
       .optional(),
 
+    content: z
+      .string()
+      .trim()
+      .max(20000, { message: 'The guide is too long.' })
+      .optional(),
+
     existingPath: z.string().optional(),
 
     file: z
@@ -39,9 +45,16 @@ export const HomeworkSchema = z
       })
       .optional(),
   })
-  .refine((data) => !!data.file || !!data.existingPath || !!data.instructions, {
-    message: 'Add a file or write instructions.',
-    path: ['file'],
-  });
+  .refine(
+    (data) =>
+      !!data.content ||
+      !!data.file ||
+      !!data.existingPath ||
+      !!data.instructions,
+    {
+      message: 'Write a guide or instructions.',
+      path: ['content'],
+    },
+  );
 
 export type HomeworkValues = z.infer<typeof HomeworkSchema>;
