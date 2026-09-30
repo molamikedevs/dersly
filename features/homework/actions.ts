@@ -29,7 +29,8 @@ export async function createHomework(
     return handleError(validationResult) as ErrorResponse;
   }
 
-  const { classId, title, instructions, file } = validationResult.params!;
+  const { classId, title, instructions, content, file } =
+    validationResult.params!;
 
   try {
     const attachmentPath = file
@@ -44,6 +45,7 @@ export async function createHomework(
         class_id: classId,
         title,
         instructions: instructions || null,
+        content: content || null,
         attachment_path: attachmentPath,
         attachment_name: file?.name ?? null,
         is_published: true,
@@ -76,7 +78,8 @@ export async function updateHomework(
     return handleError(validationResult) as ErrorResponse;
   }
 
-  const { classId, title, instructions, file } = validationResult.params!;
+  const { classId, title, instructions, content, file } =
+    validationResult.params!;
 
   try {
     const supabase = createClient(await cookies());
@@ -99,6 +102,7 @@ export async function updateHomework(
       .update({
         title,
         instructions: instructions || null,
+        content: content || null,
         attachment_path: attachmentPath,
         attachment_name: attachmentName,
       })
@@ -116,6 +120,8 @@ export async function updateHomework(
 
     revalidatePath('/dashboard/homework');
     revalidatePath(`/dashboard/classes/${classId}`);
+    revalidatePath(`/dashboard/homework/${id}`);
+    revalidatePath(`/homework/${id}`);
 
     return { success: true, data: toCamel<HomeWorkRecord>(data) };
   } catch (error) {

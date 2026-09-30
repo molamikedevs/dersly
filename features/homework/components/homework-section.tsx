@@ -20,7 +20,11 @@ export default function HomeWorkSection({ classId, homeWork }: Props) {
           Homework
         </h2>
 
-        <FormDialog triggerLabel="New homework" title="New homework">
+        <FormDialog
+          triggerLabel="New homework"
+          title="New homework"
+          contentClassName="sm:max-w-2xl"
+        >
           <AddHomeWorkForm classId={classId} />
         </FormDialog>
       </div>
@@ -42,7 +46,10 @@ export default function HomeWorkSection({ classId, homeWork }: Props) {
         </div>
       ) : (
         <div className="flex flex-col gap-8">
-          <HomeWorkCard data={current} />
+          <HomeWorkCard
+            data={current}
+            readHref={`/dashboard/homework/${current.id}`}
+          />
 
           {past.length > 0 && (
             <details className="group">

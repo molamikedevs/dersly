@@ -2,8 +2,8 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FileText, Loader2, Upload, X } from 'lucide-react';
-import { useRef } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useRef, useState } from 'react';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -17,11 +17,14 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/toast';
 import { createHomework, updateHomework } from '@/features/homework/actions';
-import { formatSize } from '@/lib/utils';
+import MarkdownContent from '@/features/homework/components/markdown-content';
+import { cn, formatSize } from '@/lib/utils';
 import {
   HomeworkSchema,
   type HomeworkValues,
 } from '@/lib/validation/homework.schema';
+
+const VIEWS = ['write', 'preview'] as const;
 
 export default function AddHomeworkForm({
   classId,
@@ -33,6 +36,7 @@ export default function AddHomeworkForm({
   onSuccess?: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [view, setView] = useState<(typeof VIEWS)[number]>('write');
   const isEdit = Boolean(homework);
 
   const form = useForm<HomeworkValues>({
@@ -41,10 +45,12 @@ export default function AddHomeworkForm({
       classId,
       title: homework?.title ?? '',
       instructions: homework?.instructions ?? '',
+      content: homework?.content ?? '',
       existingPath: homework?.attachmentPath ?? undefined,
     },
   });
 
+  const content = useWatch({ control: form.control, name: 'content' });
   const { isSubmitting } = form.formState;
 
   async function onSubmit(data: HomeworkValues) {
@@ -62,6 +68,7 @@ export default function AddHomeworkForm({
 
     toast.add({ title: isEdit ? 'Homework updated' : 'Homework posted' });
     form.reset();
+    setView('write');
     onSuccess?.();
   }
 
@@ -79,9 +86,102 @@ export default function AddHomeworkForm({
                 id="homework-title"
                 className="h-11"
                 autoComplete="off"
-                placeholder="Past simple worksheet"
+                placeholder="People I Know"
                 aria-invalid={fieldState.invalid}
               />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="instructions"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="homework-instructions">
+                Instructions{' '}
+                <span className="font-normal text-muted-foreground">
+                  optional
+                </span>
+              </FieldLabel>
+              <Textarea
+                {...field}
+                id="homework-instructions"
+                rows={2}
+                placeholder="What should students do before the next lesson?"
+                aria-invalid={fieldState.invalid}
+              />
+              <FieldDescription>Shown on the homework card.</FieldDescription>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="content"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <FieldLabel htmlFor="homework-content">
+                  Guide{' '}
+                  <span className="font-normal text-muted-foreground">
+                    optional
+                  </span>
+                </FieldLabel>
+
+                <div
+                  role="group"
+                  aria-label="Guide view"
+                  className="flex rounded-lg bg-muted p-1"
+                >
+                  {VIEWS.map((value) => (
+                    <button
+                      key={value}
+                      type="button"
+                      aria-pressed={view === value}
+                      onClick={() => setView(value)}
+                      className={cn(
+                        'h-9 rounded-md px-3 text-sm font-semibold capitalize transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                        view === value
+                          ? 'bg-card text-foreground shadow-sm'
+                          : 'text-muted-foreground hover:text-foreground',
+                      )}
+                    >
+                      {value}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {view === 'write' ? (
+                <Textarea
+                  {...field}
+                  id="homework-content"
+                  rows={12}
+                  className="font-mono text-sm"
+                  placeholder={
+                    '## Key vocabulary\n\n| Word | Meaning |\n| --- | --- |\n| tall | higher than most people |'
+                  }
+                  aria-invalid={fieldState.invalid}
+                />
+              ) : (
+                <div className="max-h-[50svh] overflow-y-auto rounded-xl border border-border p-4">
+                  {content ? (
+                    <MarkdownContent content={content} />
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Nothing to preview yet.
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <FieldDescription>
+                Markdown: ## for headings, **bold**, tables, and &gt; for tip
+                boxes.
+              </FieldDescription>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -92,7 +192,12 @@ export default function AddHomeworkForm({
           control={form.control}
           render={({ field: { onChange, value }, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="homework-file">Document</FieldLabel>
+              <FieldLabel htmlFor="homework-file">
+                File{' '}
+                <span className="font-normal text-muted-foreground">
+                  optional
+                </span>
+              </FieldLabel>
 
               <input
                 ref={inputRef}
@@ -167,31 +272,9 @@ export default function AddHomeworkForm({
               )}
 
               <FieldDescription>
-                PDF, Word or image. Up to 10MB.
+                A printable version, if you have one. PDF, Word or image. Up to
+                10MB.
               </FieldDescription>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-
-        <Controller
-          name="instructions"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="homework-instructions">
-                Instructions{' '}
-                <span className="font-normal text-muted-foreground">
-                  optional
-                </span>
-              </FieldLabel>
-              <Textarea
-                {...field}
-                id="homework-instructions"
-                rows={3}
-                placeholder="What should students do before the next lesson?"
-                aria-invalid={fieldState.invalid}
-              />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
