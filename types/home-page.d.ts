@@ -8,7 +8,7 @@ type StudentHome = {
     level: string | null;
     schedule: string | null;
     meetingUrl: string | null;
-    lessonsCompleted: number;
+    lessonsDone: number;
   };
   reading: {
     id: string;

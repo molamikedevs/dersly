@@ -24,6 +24,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { toast } from '@/components/ui/toast';
@@ -40,6 +41,7 @@ type Props = {
   deleteErrorToast: string;
   deleteLabel?: string;
   deletePendingLabel?: string;
+  extraItems?: ReactNode;
 };
 
 export default function RowMenu({
@@ -53,6 +55,7 @@ export default function RowMenu({
   deleteErrorToast,
   deleteLabel = 'Delete',
   deletePendingLabel = 'Deleting',
+  extraItems,
 }: Props) {
   const [editing, setEditing] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -91,7 +94,17 @@ export default function RowMenu({
           }
         />
 
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent
+          align="end"
+          className="w-auto min-w-52 whitespace-nowrap"
+        >
+          {extraItems && (
+            <>
+              {extraItems}
+              <DropdownMenuSeparator />
+            </>
+          )}
+
           <DropdownMenuItem
             onClick={() => setTimeout(() => setEditing(true), 0)}
           >

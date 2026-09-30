@@ -3,6 +3,7 @@ import PromptCard from '@/features/level-test/components/prompt-card';
 import ReadingList from '@/features/materials/components/reading-list';
 import RecentMaterials from '@/features/materials/components/recent-materials';
 import CurrentWorkCard from '@/features/students/components/current-work-card';
+import LessonPackageCard from '@/features/students/components/lesson-package-card';
 import NextLessonCard from '@/features/students/components/next-lesson-card';
 import {
   WORK_LABEL,
@@ -19,19 +20,19 @@ export const metadata = {
 export default function Home() {
   return (
     <Suspense fallback={<HomeSkeleton />}>
-      <HomContent />
+      <HomeContent />
     </Suspense>
   );
 }
 
-async function HomContent() {
+async function HomeContent() {
   const { data } = await getStudentHome();
 
   if (!data) return null;
 
   const { firstName, studentLevel, enrolment, current, materials, reading } =
     data;
-  const { type, lessonsCompleted } = enrolment;
+  const { type, lessonsDone } = enrolment;
 
   const today = new Intl.DateTimeFormat('en-GB', {
     weekday: 'long',
@@ -59,6 +60,10 @@ async function HomContent() {
             schedule={enrolment.schedule}
             meetingUrl={enrolment.meetingUrl}
           />
+
+          {type === 'one_to_one' && (
+            <LessonPackageCard lessonsDone={lessonsDone} />
+          )}
 
           {current && (
             <section className="flex flex-col gap-4">
@@ -88,17 +93,6 @@ async function HomContent() {
 
         <aside className="flex min-w-0 flex-col gap-8">
           {!studentLevel && <PromptCard />}
-
-          {lessonsCompleted > 0 && (
-            <section className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-card px-6 py-5">
-              <span className="text-sm font-medium text-muted-foreground">
-                Lessons completed
-              </span>
-              <span className="font-serif text-3xl font-medium tracking-tight text-foreground">
-                {lessonsCompleted}
-              </span>
-            </section>
-          )}
 
           <RecentMaterials items={materials} />
 

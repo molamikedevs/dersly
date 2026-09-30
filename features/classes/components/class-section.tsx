@@ -4,19 +4,19 @@ import Link from 'next/link';
 import InitialsAvatar from '@/components/common/initials-avatar';
 import InviteCode from '@/features/classes/components/invite-code';
 
-type Props = {
+type Props<T extends ClassWithCount> = {
   title: string;
   meta: string;
-  classes: ClassWithCount[];
-  rowAction?: (item: ClassWithCount) => React.ReactNode;
+  classes: T[];
+  rowAction?: (item: T) => React.ReactNode;
 };
 
-export default function ClassSection({
+export default function ClassSection<T extends ClassWithCount>({
   title,
   meta,
   classes,
   rowAction,
-}: Props) {
+}: Props<T>) {
   if (classes.length === 0) return null;
 
   return (

@@ -19,7 +19,7 @@ export class ValidationError extends RequestError {
     const message = ValidationError.formatFieldErrors(fieldErrors);
     super(400, message);
     this.errors = fieldErrors;
-    this.name = 'ValidationErrors';
+    this.name = 'ValidationError';
   }
 
   static formatFieldErrors(errors: Record<string, string[]>): string {
@@ -43,26 +43,28 @@ export class ValidationError extends RequestError {
 }
 
 export class NotFoundError extends RequestError {
-  constructor(resource: string = 'NotFoundError') {
-    super(404, `${resource} not found!`);
+  constructor(resource: string = 'Resource') {
+    super(404, `${resource} not found.`);
     this.name = 'NotFoundError';
   }
 }
 
 export class ForbiddenError extends RequestError {
-  constructor(message: string = 'ForbiddenError') {
+  constructor(message: string = 'You do not have permission to do this.') {
     super(403, message);
     this.name = 'ForbiddenError';
   }
 }
+
 export class UnauthorizedError extends RequestError {
-  constructor(message: string = 'UnauthorizedError') {
+  constructor(message: string = 'Please sign in to continue.') {
     super(401, message);
     this.name = 'UnauthorizedError';
   }
 }
+
 export class ConflictError extends RequestError {
-  constructor(message: string = 'ConflictError') {
+  constructor(message: string = 'This already exists.') {
     super(409, message);
     this.name = 'ConflictError';
   }
@@ -79,5 +81,7 @@ export function throwPostgresError(
       `You cannot modify this ${resource.toLowerCase()}.`,
     );
   if (error.code === '23503') throw new NotFoundError(resource);
+  // Business rule raised by our own SQL functions: the message is written for users
+  if (error.code === 'P0001') throw new ConflictError(error.message);
   throw new RequestError(500, `Could not save the ${resource.toLowerCase()}.`);
 }

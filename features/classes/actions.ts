@@ -6,9 +6,15 @@ import { NotFoundError, throwPostgresError } from '@/lib/http-errors';
 import { createClient } from '@/lib/supabase/server';
 import { generateInviteCode, toCamel } from '@/lib/utils';
 import { ClassSchema, ClassValues } from '@/lib/validation/class.schema';
+import { LessonSchema, LessonValues } from '@/lib/validation/lesson.schema';
 import { ActionResponse, ErrorResponse } from '@/types/global';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
+
+function revalidateLessonPaths() {
+  revalidatePath('/dashboard/classes');
+  revalidatePath('/');
+}
 
 export async function createClass(
   params: ClassValues,
@@ -25,7 +31,6 @@ export async function createClass(
 
   const { name, type, level, schedule, meetingUrl } = validationResult.params!;
   const { user } = validationResult;
-  console.log('CREATE CLASS', { userId: validationResult.user?.id });
 
   try {
     const supabase = createClient(await cookies());
@@ -46,9 +51,6 @@ export async function createClass(
       .single();
 
     if (error) throwPostgresError(error, 'Class');
-    if (error) {
-      throwPostgresError(error, 'Class');
-    }
 
     revalidatePath('/dashboard/classes');
 
@@ -122,6 +124,102 @@ export async function archiveClass(id: string): Promise<ActionResponse<null>> {
     if (!data?.length) throw new NotFoundError('Class');
 
     revalidatePath('/dashboard/classes');
+
+    return { success: true, data: null };
+  } catch (error) {
+    return handleError(error) as ErrorResponse;
+  }
+}
+
+export async function markLesson(
+  params: LessonValues,
+): Promise<ActionResponse<{ lessonsDone: number }>> {
+  const validationResult = await action({
+    params,
+    schema: LessonSchema,
+    authorize: true,
+  });
+
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
+
+  const { enrollmentId } = validationResult.params!;
+
+  try {
+    const supabase = createClient(await cookies());
+
+    const { data, error } = await supabase.rpc('mark_lesson', {
+      p_enrollment_id: enrollmentId,
+    });
+
+    if (error) throwPostgresError(error, 'Lesson');
+
+    revalidateLessonPaths();
+
+    return { success: true, data: { lessonsDone: data as number } };
+  } catch (error) {
+    return handleError(error) as ErrorResponse;
+  }
+}
+
+export async function undoLesson(
+  params: LessonValues,
+): Promise<ActionResponse<{ lessonsDone: number }>> {
+  const validationResult = await action({
+    params,
+    schema: LessonSchema,
+    authorize: true,
+  });
+
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
+
+  const { enrollmentId } = validationResult.params!;
+
+  try {
+    const supabase = createClient(await cookies());
+
+    const { data, error } = await supabase.rpc('undo_lesson', {
+      p_enrollment_id: enrollmentId,
+    });
+
+    if (error) throwPostgresError(error, 'Lesson');
+
+    revalidateLessonPaths();
+
+    return { success: true, data: { lessonsDone: data as number } };
+  } catch (error) {
+    return handleError(error) as ErrorResponse;
+  }
+}
+
+export async function resetPackage(
+  params: LessonValues,
+): Promise<ActionResponse<null>> {
+  const validationResult = await action({
+    params,
+    schema: LessonSchema,
+    authorize: true,
+  });
+
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
+
+  const { enrollmentId } = validationResult.params!;
+
+  try {
+    const supabase = createClient(await cookies());
+
+    const { error } = await supabase.rpc('reset_package', {
+      p_enrollment_id: enrollmentId,
+    });
+
+    if (error) throwPostgresError(error, 'Package');
+
+    revalidateLessonPaths();
 
     return { success: true, data: null };
   } catch (error) {
