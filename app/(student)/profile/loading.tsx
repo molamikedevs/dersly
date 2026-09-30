@@ -1,4 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton';
+import AccountSettingsSkeleton from '@/features/profile/components/account-settings-skeleton';
 
 export default function Loading() {
   return (
@@ -43,6 +44,8 @@ export default function Loading() {
           </div>
         </div>
       </section>
+
+      <AccountSettingsSkeleton allowDelete />
     </div>
   );
 }
