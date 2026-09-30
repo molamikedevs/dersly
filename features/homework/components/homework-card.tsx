@@ -54,25 +54,14 @@ export default function HomeWorkCard({ data, action, readHref }: Props) {
       </div>
 
       {canRead ? (
-        <div className="flex items-center gap-2 border-t border-border bg-muted/50 px-6 py-4 sm:px-7">
+        <div className="border-t border-border bg-muted/50 px-6 py-4 sm:px-7">
           <Link
             href={readHref!}
-            className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
           >
             <BookOpen className="size-4" aria-hidden />
             Read guide
           </Link>
-
-          {downloadUrl && (
-            <a
-              href={downloadUrl}
-              download={attachmentName ?? undefined}
-              aria-label={`Download ${attachmentName ?? 'file'}`}
-              className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg border border-input-border bg-card text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <Download className="size-4" aria-hidden />
-            </a>
-          )}
         </div>
       ) : (
         attachmentPath && (

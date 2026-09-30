@@ -1,4 +1,4 @@
-import { ArrowLeft, Download } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 import MarkdownContent from './markdown-content';
@@ -10,8 +10,7 @@ type Props = {
 };
 
 export default function HomeworkReader({ data, backHref, backLabel }: Props) {
-  const { title, instructions, content, downloadUrl, attachmentName, classes } =
-    data;
+  const { title, instructions, content, classes } = data;
 
   return (
     <article className="mx-auto flex w-full max-w-3xl min-w-0 flex-col pb-16">
@@ -38,17 +37,6 @@ export default function HomeworkReader({ data, backHref, backLabel }: Props) {
           <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
             {instructions}
           </p>
-        )}
-
-        {downloadUrl && (
-          <a
-            href={downloadUrl}
-            download={attachmentName ?? undefined}
-            className="mt-6 inline-flex h-11 items-center gap-2 rounded-xl border border-input-border px-4 text-sm font-semibold text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <Download className="size-4" aria-hidden />
-            Download file
-          </a>
         )}
       </header>
 

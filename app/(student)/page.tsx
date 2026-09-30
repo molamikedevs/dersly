@@ -86,6 +86,9 @@ async function HomeContent() {
                 signedUrl={current.signedUrl}
                 downloadUrl={current.downloadUrl}
                 asQuestions={type === 'conversation'}
+                readHref={
+                  current.hasGuide ? `/homework/${current.id}` : undefined
+                }
               />
             </section>
           )}

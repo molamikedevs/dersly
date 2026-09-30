@@ -52,7 +52,7 @@ export const HomeworkSchema = z
       !!data.existingPath ||
       !!data.instructions,
     {
-      message: 'Write a guide, add a file or write instructions.',
+      message: 'Write a guide or instructions.',
       path: ['content'],
     },
   );

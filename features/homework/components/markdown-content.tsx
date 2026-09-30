@@ -1,6 +1,8 @@
 import Markdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
+import rehypeTableLabels from '@/features/homework/constant/index';
+
 const components: Components = {
   h1: ({ children }) => (
     <h2 className="mt-10 font-serif text-3xl font-medium tracking-tight text-foreground">
@@ -32,12 +34,12 @@ const components: Components = {
     </a>
   ),
   ul: ({ children }) => (
-    <ul className="mt-4 flex list-disc flex-col gap-2 pl-6 marker:text-muted-foreground">
+    <ul className="mt-4 list-disc space-y-2 pl-6 marker:text-muted-foreground">
       {children}
     </ul>
   ),
   ol: ({ children }) => (
-    <ol className="mt-4 flex list-decimal flex-col gap-2 pl-6 marker:text-muted-foreground">
+    <ol className="mt-4 list-decimal space-y-2 pl-6 marker:font-semibold marker:text-primary">
       {children}
     </ol>
   ),
@@ -52,18 +54,31 @@ const components: Components = {
     </blockquote>
   ),
   table: ({ children }) => (
-    <div className="mt-6 overflow-x-auto rounded-xl border border-border">
-      <table className="w-full min-w-[32rem] border-collapse text-left text-[15px]">
+    <div className="mt-6 sm:overflow-x-auto sm:rounded-xl sm:border sm:border-border">
+      <table className="block w-full text-left text-[15px] sm:table sm:min-w-[32rem] sm:border-collapse">
         {children}
       </table>
     </div>
   ),
-  thead: ({ children }) => <thead className="bg-muted">{children}</thead>,
+  thead: ({ children }) => (
+    <thead className="hidden bg-muted sm:table-header-group">{children}</thead>
+  ),
+  tbody: ({ children }) => (
+    <tbody className="flex flex-col gap-3 sm:table-row-group">{children}</tbody>
+  ),
+  tr: ({ children }) => (
+    <tr className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:table-row sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0">
+      {children}
+    </tr>
+  ),
   th: ({ children }) => (
     <th className="px-4 py-3 font-semibold text-foreground">{children}</th>
   ),
-  td: ({ children }) => (
-    <td className="border-t border-border px-4 py-3 align-top text-foreground">
+  td: ({ node: _node, children, ...props }) => (
+    <td
+      {...props}
+      className="block leading-relaxed text-foreground before:mb-0.5 before:block before:text-xs before:font-semibold before:uppercase before:tracking-[0.12em] before:text-muted-foreground before:content-[attr(data-label)] first:font-semibold first:before:hidden sm:table-cell sm:border-t sm:border-border sm:px-4 sm:py-3 sm:align-top sm:first:font-normal sm:before:hidden"
+    >
       {children}
     </td>
   ),
@@ -78,7 +93,11 @@ const components: Components = {
 export default function MarkdownContent({ content }: { content: string }) {
   return (
     <div className="min-w-0 [&>*:first-child]:mt-0">
-      <Markdown remarkPlugins={[remarkGfm]} components={components}>
+      <Markdown
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeTableLabels]}
+        components={components}
+      >
         {content}
       </Markdown>
     </div>

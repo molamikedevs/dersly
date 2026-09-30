@@ -9,6 +9,7 @@ export default function HomeworkMenu({ data }: { data: HomeWorkRecord }) {
     <RowMenu
       label={data.title}
       editTitle="Edit homework"
+      editClassName="sm:max-w-2xl"
       editForm={(close) => (
         <AddHomeworkForm
           classId={data.classId}

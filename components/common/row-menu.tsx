@@ -28,12 +28,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { toast } from '@/components/ui/toast';
+import { cn } from '@/lib/utils';
 import type { ActionResponse } from '@/types/global';
 
 type Props = {
   label: string;
   editTitle: string;
   editForm: (close: () => void) => ReactNode;
+  editClassName?: string;
   onDelete: () => Promise<ActionResponse<unknown>>;
   deleteTitle: string;
   deleteDescription: string;
@@ -48,6 +50,7 @@ export default function RowMenu({
   label,
   editTitle,
   editForm,
+  editClassName = 'sm:max-w-lg',
   onDelete,
   deleteTitle,
   deleteDescription,
@@ -123,7 +126,9 @@ export default function RowMenu({
       </DropdownMenu>
 
       <Dialog open={editing} onOpenChange={setEditing}>
-        <DialogContent className="max-h-[85svh] overflow-y-auto sm:max-w-lg">
+        <DialogContent
+          className={cn('max-h-[85svh] overflow-y-auto', editClassName)}
+        >
           <DialogHeader>
             <DialogTitle>{editTitle}</DialogTitle>
           </DialogHeader>

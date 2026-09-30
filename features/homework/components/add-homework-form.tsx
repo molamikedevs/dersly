@@ -1,8 +1,8 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FileText, Loader2, Upload, X } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/toast';
 import { createHomework, updateHomework } from '@/features/homework/actions';
 import MarkdownContent from '@/features/homework/components/markdown-content';
-import { cn, formatSize } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import {
   HomeworkSchema,
   type HomeworkValues,
@@ -35,7 +35,6 @@ export default function AddHomeworkForm({
   homework?: HomeWorkRecord;
   onSuccess?: () => void;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
   const [view, setView] = useState<(typeof VIEWS)[number]>('write');
   const isEdit = Boolean(homework);
 
@@ -124,12 +123,7 @@ export default function AddHomeworkForm({
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <FieldLabel htmlFor="homework-content">
-                  Guide{' '}
-                  <span className="font-normal text-muted-foreground">
-                    optional
-                  </span>
-                </FieldLabel>
+                <FieldLabel htmlFor="homework-content">Guide</FieldLabel>
 
                 <div
                   role="group"
@@ -159,7 +153,7 @@ export default function AddHomeworkForm({
                 <Textarea
                   {...field}
                   id="homework-content"
-                  rows={12}
+                  rows={14}
                   className="font-mono text-sm"
                   placeholder={
                     '## Key vocabulary\n\n| Word | Meaning |\n| --- | --- |\n| tall | higher than most people |'
@@ -167,7 +161,7 @@ export default function AddHomeworkForm({
                   aria-invalid={fieldState.invalid}
                 />
               ) : (
-                <div className="max-h-[50svh] overflow-y-auto rounded-xl border border-border p-4">
+                <div className="max-h-[55svh] overflow-y-auto rounded-xl border border-border p-4">
                   {content ? (
                     <MarkdownContent content={content} />
                   ) : (
@@ -181,99 +175,6 @@ export default function AddHomeworkForm({
               <FieldDescription>
                 Markdown: ## for headings, **bold**, tables, and &gt; for tip
                 boxes.
-              </FieldDescription>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-
-        <Controller
-          name="file"
-          control={form.control}
-          render={({ field: { onChange, value }, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="homework-file">
-                File{' '}
-                <span className="font-normal text-muted-foreground">
-                  optional
-                </span>
-              </FieldLabel>
-
-              <input
-                ref={inputRef}
-                id="homework-file"
-                type="file"
-                className="sr-only"
-                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                onChange={(event) => onChange(event.target.files?.[0])}
-              />
-
-              {value instanceof File ? (
-                <div className="flex items-center gap-3 rounded-md bg-muted p-3">
-                  <span
-                    aria-hidden
-                    className="flex size-9 shrink-0 items-center justify-center rounded-md bg-background"
-                  >
-                    <FileText className="size-4 text-muted-foreground" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-foreground">
-                      {value.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {formatSize(value.size)}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    aria-label="Remove file"
-                    className="-mr-1 flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    onClick={() => {
-                      onChange(undefined);
-                      if (inputRef.current) inputRef.current.value = '';
-                    }}
-                  >
-                    <X className="size-4" aria-hidden />
-                  </button>
-                </div>
-              ) : homework?.attachmentPath ? (
-                <div className="flex items-center gap-3 rounded-md bg-muted p-3">
-                  <span
-                    aria-hidden
-                    className="flex size-9 shrink-0 items-center justify-center rounded-md bg-background"
-                  >
-                    <FileText className="size-4 text-muted-foreground" />
-                  </span>
-                  <p className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
-                    Current file attached
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => inputRef.current?.click()}
-                    className="shrink-0 rounded-md px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  >
-                    Replace
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => inputRef.current?.click()}
-                  className="flex w-full flex-col items-center justify-center rounded-md bg-muted px-4 py-7 text-center transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  <Upload
-                    className="size-5 text-muted-foreground"
-                    aria-hidden
-                  />
-                  <span className="mt-2 text-sm font-medium text-foreground">
-                    Choose a file
-                  </span>
-                </button>
-              )}
-
-              <FieldDescription>
-                A printable version, if you have one. PDF, Word or image. Up to
-                10MB.
               </FieldDescription>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
