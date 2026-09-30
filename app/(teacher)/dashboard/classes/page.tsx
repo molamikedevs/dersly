@@ -6,6 +6,7 @@ import PageHeader from '@/components/common/page-header';
 import AddClassForm from '@/features/classes/components/add-class-form';
 import ClassMenu from '@/features/classes/components/class-menu';
 import ClassSection from '@/features/classes/components/class-section';
+import LessonTracker from '@/features/classes/components/lesson-tracker';
 import { getGroupedClasses } from '@/features/classes/queries';
 import { RouteParams } from '@/types/global';
 
@@ -66,7 +67,16 @@ export default async function Page({ searchParams }: RouteParams) {
                 title="One to one"
                 meta={`${privateClasses.length} ${privateClasses.length === 1 ? 'student' : 'students'}`}
                 classes={privateClasses}
-                rowAction={(item) => <ClassMenu data={item} />}
+                rowAction={(item) => (
+                  <div className="flex items-center gap-3">
+                    <LessonTracker
+                      name={item.name}
+                      enrollmentId={item.enrollmentId}
+                      lessonsDone={item.lessonsDone}
+                    />
+                    <ClassMenu data={item} />
+                  </div>
+                )}
               />
             )}
           </div>
