@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 
+import { LESSONS_PER_PACKAGE } from '@/features/classes/constants';
 import action from '@/lib/handlers/action';
 import handleError from '@/lib/handlers/errors';
 import { NotFoundError, throwPostgresError } from '@/lib/http-errors';
@@ -153,6 +154,34 @@ export async function getGroupedClasses(params: PaginatedSearchParams): Promise<
         }),
         isNext,
       },
+    };
+  } catch (error) {
+    return handleError(error) as ErrorResponse;
+  }
+}
+
+export async function getPaymentDue(): Promise<
+  ActionResponse<{ classId: string; enrollmentId: string }[]>
+> {
+  const validationResult = await action({ authorize: true });
+
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
+
+  try {
+    const supabase = createClient(await cookies());
+
+    const { data, error } = await supabase
+      .from('lesson_progress')
+      .select('enrollment_id, class_id')
+      .gte('lessons_done', LESSONS_PER_PACKAGE);
+
+    if (error) throwPostgresError(error, 'Lesson');
+
+    return {
+      success: true,
+      data: toCamel<{ classId: string; enrollmentId: string }[]>(data ?? []),
     };
   } catch (error) {
     return handleError(error) as ErrorResponse;
