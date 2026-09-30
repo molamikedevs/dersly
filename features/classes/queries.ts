@@ -17,6 +17,12 @@ type ClassRow = Record<string, unknown> & {
   enrollments?: { count: number }[];
 };
 
+type ProgressRow = {
+  enrollment_id: string;
+  class_id: string;
+  lessons_done: number;
+};
+
 function withCount(row: ClassRow): ClassWithCount {
   const { enrollments, ...rest } = row;
 
@@ -98,7 +104,7 @@ export const getClass = cache(
 export async function getGroupedClasses(params: PaginatedSearchParams): Promise<
   ActionResponse<{
     groups: ClassWithCount[];
-    private: ClassWithCount[];
+    private: PrivateClass[];
     isNext: boolean;
   }>
 > {
@@ -108,14 +114,49 @@ export async function getGroupedClasses(params: PaginatedSearchParams): Promise<
 
   const { classes, isNext } = result.data;
 
-  return {
-    success: true,
-    data: {
-      groups: classes.filter((item) => item.type !== 'one_to_one'),
-      private: classes.filter((item) => item.type === 'one_to_one'),
-      isNext,
-    },
-  };
+  const groups = classes.filter((item) => item.type !== 'one_to_one');
+  const privateClasses = classes.filter((item) => item.type === 'one_to_one');
+
+  if (!privateClasses.length) {
+    return { success: true, data: { groups, private: [], isNext } };
+  }
+
+  try {
+    const supabase = createClient(await cookies());
+
+    const { data, error } = await supabase
+      .from('lesson_progress')
+      .select('enrollment_id, class_id, lessons_done')
+      .in(
+        'class_id',
+        privateClasses.map((item) => item.id),
+      );
+
+    if (error) throwPostgresError(error, 'Lesson');
+
+    const progressByClass = new Map(
+      ((data ?? []) as ProgressRow[]).map((row) => [row.class_id, row]),
+    );
+
+    return {
+      success: true,
+      data: {
+        groups,
+        private: privateClasses.map((item) => {
+          const progress = progressByClass.get(item.id);
+
+          return {
+            ...item,
+            enrollmentId: progress?.enrollment_id ?? null,
+            lessonsDone: progress?.lessons_done ?? 0,
+          };
+        }),
+        isNext,
+      },
+    };
+  } catch (error) {
+    return handleError(error) as ErrorResponse;
+  }
 }
 
 export async function getStudentClasses(): Promise<

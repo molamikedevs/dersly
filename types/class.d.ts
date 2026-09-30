@@ -19,3 +19,9 @@ type ClassRecord = {
 type ClassWithCount = ClassRecord & {
   studentCount: number;
 };
+
+// enrollmentId is null until the student has joined with the invite code
+type PrivateClass = ClassWithCount & {
+  enrollmentId: string | null;
+  lessonsDone: number;
+};
