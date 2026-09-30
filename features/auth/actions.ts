@@ -7,6 +7,10 @@ import {
   RegisterSchema,
   ResetPasswordSchema,
 } from '@/lib/validation/auth.schema';
+import {
+  ChangePasswordSchema,
+  DeleteAccountSchema,
+} from '@/lib/validation/profile.schema';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -107,4 +111,81 @@ export async function updatePassword(values: unknown): Promise<ActionResult> {
   }
 
   redirect('/');
+}
+
+export async function changePassword(values: unknown): Promise<ActionResult> {
+  const parsed = ChangePasswordSchema.safeParse(values);
+  if (!parsed.success) return { error: 'Please check the form and try again.' };
+
+  const supabase = createClient(await cookies());
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) return { error: 'Please sign in again.' };
+
+  // Verify the current password before allowing a change
+  const { error: verifyError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: parsed.data.currentPassword,
+  });
+
+  if (verifyError) return { error: 'Your current password is incorrect.' };
+
+  const { error } = await supabase.auth.updateUser({
+    password: parsed.data.newPassword,
+  });
+
+  if (error) {
+    return {
+      error:
+        error.code === 'same_password'
+          ? 'Choose a password different from your current one.'
+          : 'Could not change your password. Please try again.',
+    };
+  }
+
+  return undefined;
+}
+
+export async function deleteAccount(values: unknown): Promise<ActionResult> {
+  const parsed = DeleteAccountSchema.safeParse(values);
+  if (!parsed.success) return { error: 'Type delete to confirm.' };
+
+  const supabase = createClient(await cookies());
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: 'Please sign in again.' };
+
+  // Storage files do not cascade, so remove the avatar folder first
+  const { data: files, error: listError } = await supabase.storage
+    .from('avatars')
+    .list(user.id);
+
+  if (listError)
+    return { error: 'Could not delete your account. Please try again.' };
+
+  if (files?.length) {
+    const { error: removeError } = await supabase.storage
+      .from('avatars')
+      .remove(files.map((file) => `${user.id}/${file.name}`));
+
+    if (removeError) {
+      return { error: 'Could not delete your account. Please try again.' };
+    }
+  }
+
+  const { error } = await supabase.rpc('delete_own_account');
+
+  if (error)
+    return { error: 'Could not delete your account. Please try again.' };
+
+  // The user no longer exists, so only clear the local session cookies
+  await supabase.auth.signOut({ scope: 'local' });
+
+  redirect('/login');
 }
