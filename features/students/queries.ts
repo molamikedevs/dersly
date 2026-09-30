@@ -99,7 +99,7 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
     const { data: enrolment, error: enrolmentError } = await supabase
       .from('enrollments')
       .select(
-        `lessons_completed,
+        `id,
          class:classes!enrollments_class_id_fkey(id, name, type, level, schedule, meeting_url)`,
       )
       .eq('student_id', user!.id)
@@ -116,6 +116,14 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
       : enrolment.class;
 
     if (!owner) throw new NotFoundError('Enrolment');
+
+    const { data: progress, error: progressError } = await supabase
+      .from('lesson_progress')
+      .select('lessons_done')
+      .eq('enrollment_id', enrolment.id)
+      .maybeSingle();
+
+    if (progressError) throwPostgresError(progressError, 'Lesson');
 
     const { data: homework, error: homeworkError } = await supabase
       .from('homework')
@@ -182,7 +190,7 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
           level: owner.level,
           schedule: owner.schedule,
           meetingUrl: owner.meeting_url,
-          lessonsCompleted: enrolment.lessons_completed,
+          lessonsDone: progress?.lessons_done ?? 0,
         },
         current,
         materials: toCamel(materials ?? []),
