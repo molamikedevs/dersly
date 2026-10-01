@@ -1,9 +1,6 @@
-import { KeyRound } from 'lucide-react';
-
-import FormDialog from '@/components/common/form-dialog';
 import ThemeSwitch from '@/components/theme/theme-switch';
 import SignOutButton from '@/features/auth/components/signout-button';
-import ChangePasswordForm from '@/features/profile/components/change-password-form';
+import ChangePasswordDialog from '@/features/profile/components/change-password-dialog';
 import DeleteAccountDialog from '@/features/profile/components/delete-account-dialog';
 
 function SettingsRow({
@@ -43,14 +40,7 @@ export default function AccountSettings({
             title="Password"
             description="Change the password you sign in with."
           >
-            <FormDialog
-              triggerLabel="Change"
-              title="Change password"
-              triggerVariant="outline"
-              triggerIcon={<KeyRound className="size-4" aria-hidden />}
-            >
-              <ChangePasswordForm />
-            </FormDialog>
+            <ChangePasswordDialog />
           </SettingsRow>
 
           <SettingsRow

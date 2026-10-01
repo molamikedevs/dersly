@@ -5,6 +5,8 @@ import HomeWorkCard from '@/features/homework/components/homework-card';
 import AddHomeWorkForm from './add-homework-form';
 import HomeworkMenu from './homework-menu';
 
+export const HOMEWORK_DIALOG_WIDTH = 'sm:max-w-3xl lg:max-w-4xl';
+
 type Props = {
   classId: string;
   homeWork: HomeWorkRecord[];
@@ -23,7 +25,7 @@ export default function HomeWorkSection({ classId, homeWork }: Props) {
         <FormDialog
           triggerLabel="New homework"
           title="New homework"
-          contentClassName="sm:max-w-2xl"
+          contentClassName={HOMEWORK_DIALOG_WIDTH}
         >
           <AddHomeWorkForm classId={classId} />
         </FormDialog>

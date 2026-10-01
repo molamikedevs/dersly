@@ -36,9 +36,9 @@ export default async function Students({ searchParams }: RouteParams) {
       <PageHeader
         title="Students"
         subText={
-          students.length === 1
+          data?.total === 1
             ? '1 enrolment across your classes'
-            : `${students.length} enrolments across your classes`
+            : `${data?.total ?? 0} enrolments across your classes`
         }
       />
 

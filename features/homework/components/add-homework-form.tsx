@@ -73,7 +73,7 @@ export default function AddHomeworkForm({
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
-      <FieldGroup className="gap-4">
+      <FieldGroup className="gap-5">
         <Controller
           name="title"
           control={form.control}
@@ -83,7 +83,7 @@ export default function AddHomeworkForm({
               <Input
                 {...field}
                 id="homework-title"
-                className="h-11"
+                className="h-11 rounded-xl text-[15px]"
                 autoComplete="off"
                 placeholder="People I Know"
                 aria-invalid={fieldState.invalid}
@@ -108,6 +108,7 @@ export default function AddHomeworkForm({
                 {...field}
                 id="homework-instructions"
                 rows={2}
+                className="text-[15px]"
                 placeholder="What should students do before the next lesson?"
                 aria-invalid={fieldState.invalid}
               />
@@ -153,15 +154,14 @@ export default function AddHomeworkForm({
                 <Textarea
                   {...field}
                   id="homework-content"
-                  rows={14}
-                  className="font-mono text-sm"
+                  className="h-[50svh] min-h-64 resize-y font-mono text-sm leading-relaxed"
                   placeholder={
                     '## Key vocabulary\n\n| Word | Meaning |\n| --- | --- |\n| tall | higher than most people |'
                   }
                   aria-invalid={fieldState.invalid}
                 />
               ) : (
-                <div className="max-h-[55svh] overflow-y-auto rounded-xl border border-border p-4">
+                <div className="h-[50svh] min-h-64 overflow-y-auto rounded-xl border border-border p-4 sm:p-6">
                   {content ? (
                     <MarkdownContent content={content} />
                   ) : (
@@ -181,7 +181,11 @@ export default function AddHomeworkForm({
           )}
         />
 
-        <Button type="submit" className="h-11 w-full" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          className="mt-1 h-12 w-full rounded-xl text-[15px] font-semibold"
+          disabled={isSubmitting}
+        >
           {isSubmitting && (
             <Loader2 className="size-4 animate-spin" aria-hidden />
           )}

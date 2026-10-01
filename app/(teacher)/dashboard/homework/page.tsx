@@ -1,8 +1,9 @@
-import { ChevronRight, ClipboardList, FileText, Paperclip } from 'lucide-react';
+import { ChevronRight, ClipboardList, Paperclip } from 'lucide-react';
 import Link from 'next/link';
 
 import DataRenderer from '@/components/common/data-renderer';
 import PageHeader from '@/components/common/page-header';
+import RowIcon from '@/features/homework/components/row-icon';
 import { getGroupedHomework } from '@/features/homework/queries';
 import { formatDueDate } from '@/lib/utils';
 import { RouteParams } from '@/types/global';
@@ -59,24 +60,14 @@ export default async function HomeWork({ searchParams }: RouteParams) {
                   {items.map((work) => (
                     <li key={work.id}>
                       <Link
-                        href={`/dashboard/classes/${id}`}
+                        href={
+                          work.content
+                            ? `/dashboard/homework/${work.id}`
+                            : `/dashboard/classes/${id}`
+                        }
                         className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:px-6"
                       >
-                        {work.attachmentPath ? (
-                          <span
-                            aria-hidden
-                            className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-warning-subtle text-warning-subtle-foreground"
-                          >
-                            <FileText className="size-4" />
-                          </span>
-                        ) : (
-                          <span
-                            aria-hidden
-                            className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground"
-                          >
-                            <ClipboardList className="size-4" />
-                          </span>
-                        )}
+                        <RowIcon work={work} />
 
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-2">
@@ -92,19 +83,26 @@ export default async function HomeWork({ searchParams }: RouteParams) {
 
                           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
                             <span>{formatDueDate(work.dueDate)}</span>
-                            {work.attachmentPath && (
+                            {work.content ? (
                               <>
                                 <span aria-hidden>&middot;</span>
-                                <span className="inline-flex min-w-0 items-center gap-1.5">
-                                  <Paperclip
-                                    className="size-3.5 shrink-0"
-                                    aria-hidden
-                                  />
-                                  <span className="truncate">
-                                    {work.attachmentName ?? 'Attachment'}
-                                  </span>
-                                </span>
+                                <span>Guide</span>
                               </>
+                            ) : (
+                              work.attachmentPath && (
+                                <>
+                                  <span aria-hidden>&middot;</span>
+                                  <span className="inline-flex min-w-0 items-center gap-1.5">
+                                    <Paperclip
+                                      className="size-3.5 shrink-0"
+                                      aria-hidden
+                                    />
+                                    <span className="truncate">
+                                      {work.attachmentName ?? 'Attachment'}
+                                    </span>
+                                  </span>
+                                </>
+                              )
                             )}
                           </div>
                         </div>
