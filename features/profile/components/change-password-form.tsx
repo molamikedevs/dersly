@@ -37,6 +37,12 @@ const FIELDS = [
   },
 ] as const;
 
+type FieldName = (typeof FIELDS)[number]['name'];
+
+function isFieldName(value: string | undefined): value is FieldName {
+  return FIELDS.some(({ name }) => name === value);
+}
+
 export default function ChangePasswordForm({
   onSuccess,
 }: {
@@ -57,10 +63,17 @@ export default function ChangePasswordForm({
     const result = await changePassword(data);
 
     if (result?.error) {
-      toast.add({
-        title: 'Could not change password',
-        description: result.error,
-      });
+      // Field errors show inline, inside the dialog, where the user is looking
+      if (isFieldName(result.field)) {
+        form.setError(
+          result.field,
+          { message: result.error },
+          { shouldFocus: true },
+        );
+        return;
+      }
+
+      form.setError('root', { message: result.error });
       return;
     }
 
@@ -68,6 +81,8 @@ export default function ChangePasswordForm({
     form.reset();
     onSuccess?.();
   }
+
+  const rootError = form.formState.errors.root?.message;
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
@@ -95,6 +110,15 @@ export default function ChangePasswordForm({
             )}
           />
         ))}
+
+        {rootError && (
+          <p
+            role="alert"
+            className="rounded-xl bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive"
+          >
+            {rootError}
+          </p>
+        )}
 
         <Button
           type="submit"

@@ -14,7 +14,8 @@ import {
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-type ActionResult = { error: string } | undefined;
+// field names the form input the error belongs to, so it can show inline
+type ActionResult = { error: string; field?: string } | undefined;
 
 export async function signIn(values: unknown): Promise<ActionResult> {
   const parsed = LogInSchema.safeParse(values);
@@ -131,19 +132,24 @@ export async function changePassword(values: unknown): Promise<ActionResult> {
     password: parsed.data.currentPassword,
   });
 
-  if (verifyError) return { error: 'Your current password is incorrect.' };
+  if (verifyError) {
+    return {
+      error: 'Your current password is incorrect.',
+      field: 'currentPassword',
+    };
+  }
 
   const { error } = await supabase.auth.updateUser({
     password: parsed.data.newPassword,
   });
 
   if (error) {
-    return {
-      error:
-        error.code === 'same_password'
-          ? 'Choose a password different from your current one.'
-          : 'Could not change your password. Please try again.',
-    };
+    return error.code === 'same_password'
+      ? {
+          error: 'Choose a password different from your current one.',
+          field: 'newPassword',
+        }
+      : { error: 'Could not change your password. Please try again.' };
   }
 
   return undefined;
@@ -166,8 +172,9 @@ export async function deleteAccount(values: unknown): Promise<ActionResult> {
     .from('avatars')
     .list(user.id);
 
-  if (listError)
+  if (listError) {
     return { error: 'Could not delete your account. Please try again.' };
+  }
 
   if (files?.length) {
     const { error: removeError } = await supabase.storage
@@ -181,8 +188,9 @@ export async function deleteAccount(values: unknown): Promise<ActionResult> {
 
   const { error } = await supabase.rpc('delete_own_account');
 
-  if (error)
+  if (error) {
     return { error: 'Could not delete your account. Please try again.' };
+  }
 
   // The user no longer exists, so only clear the local session cookies
   await supabase.auth.signOut({ scope: 'local' });

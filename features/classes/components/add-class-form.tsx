@@ -36,11 +36,11 @@ export default function AddClassForm({
   const form = useForm<ClassValues>({
     resolver: zodResolver(ClassSchema),
     defaultValues: {
-      name: '',
-      type: 'one_to_one',
-      level: undefined,
-      schedule: '',
-      meetingUrl: '',
+      name: classRecord?.name ?? '',
+      type: classRecord?.type ?? 'one_to_one',
+      level: classRecord?.level ?? undefined,
+      schedule: classRecord?.schedule ?? '',
+      meetingUrl: classRecord?.meetingUrl ?? '',
     },
   });
 
