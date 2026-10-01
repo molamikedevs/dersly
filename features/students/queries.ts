@@ -16,7 +16,9 @@ import {
 async function fetchStudents(
   params: PaginatedSearchParams,
   classId?: string,
-): Promise<ActionResponse<{ students: StudentRecord[]; isNext: boolean }>> {
+): Promise<
+  ActionResponse<{ students: StudentRecord[]; isNext: boolean; total: number }>
+> {
   const validationResult = await action({
     params,
     schema: PaginatedSearchParamsSchema,
@@ -56,6 +58,7 @@ async function fetchStudents(
       success: true,
       data: {
         students: toCamel<StudentRecord[]>(data ?? []),
+        total: count ?? 0,
         isNext: (count ?? 0) > to + 1,
       },
     };
