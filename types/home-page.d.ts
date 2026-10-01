@@ -27,6 +27,7 @@ type StudentHome = {
   materials: {
     id: string;
     title: string;
+    kind: 'guide' | 'link' | 'article';
     level: string | null;
     url: string | null;
   }[];

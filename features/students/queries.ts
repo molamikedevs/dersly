@@ -16,9 +16,7 @@ import {
 async function fetchStudents(
   params: PaginatedSearchParams,
   classId?: string,
-): Promise<
-  ActionResponse<{ students: StudentRecord[]; isNext: boolean; total: number }>
-> {
+): Promise<ActionResponse<{ students: StudentRecord[]; isNext: boolean }>> {
   const validationResult = await action({
     params,
     schema: PaginatedSearchParamsSchema,
@@ -58,7 +56,6 @@ async function fetchStudents(
       success: true,
       data: {
         students: toCamel<StudentRecord[]>(data ?? []),
-        total: count ?? 0,
         isNext: (count ?? 0) > to + 1,
       },
     };
@@ -165,10 +162,12 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
       }
     }
 
+    // Reading links have their own list on Home, so they are excluded here
     const { data: materials, error: materialsError } = await supabase
       .from('materials')
-      .select('id, title, level, url')
+      .select('id, title, kind, level, url')
       .is('class_id', null)
+      .neq('kind', 'article')
       .order('uploaded_at', { ascending: false })
       .limit(5);
 

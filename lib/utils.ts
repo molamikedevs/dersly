@@ -121,7 +121,7 @@ export function formatLastSeen(value: string | null) {
   return rtf.format(-Math.round(days / 30), 'month');
 }
 
-const MATERIAL_KINDS = ['link', 'file', 'article'] as const;
+const MATERIAL_KINDS = ['link', 'guide', 'article'] as const;
 export type MaterialKind = (typeof MATERIAL_KINDS)[number];
 
 export function toMaterialKind(value: unknown): MaterialKind {

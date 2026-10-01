@@ -10,6 +10,7 @@ export default function MaterialMenu({ data }: { data: MaterialRecord }) {
     <RowMenu
       label={data.title}
       editTitle="Edit material"
+      editClassName="sm:max-w-3xl lg:max-w-4xl"
       editForm={(close) => (
         <AddMaterialForm material={data} onSuccess={close} />
       )}

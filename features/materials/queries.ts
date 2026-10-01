@@ -1,10 +1,10 @@
 import { cookies } from 'next/headers';
+import { cache } from 'react';
 
 import action from '@/lib/handlers/action';
 import handleError from '@/lib/handlers/errors';
 import { NotFoundError, throwPostgresError } from '@/lib/http-errors';
 import { createClient } from '@/lib/supabase/server';
-import { signStoragePath } from '@/lib/supabase/sign';
 import { MaterialKind, toCamel } from '@/lib/utils';
 import { PaginatedSearchParamsSchema } from '@/lib/validation/global.schema';
 import type {
@@ -13,7 +13,6 @@ import type {
   PaginatedSearchParams,
 } from '@/types/global';
 import type { MaterialRecord } from '@/types/materials';
-import { cache } from 'react';
 
 const SORTABLE = ['uploaded_at', 'title'] as const;
 
@@ -64,21 +63,10 @@ export async function getMaterials(
 
     if (error) throwPostgresError(error, 'Material');
 
-    const materials = toCamel<MaterialRecord[]>(data ?? []);
-
-    await Promise.all(
-      materials.map(async (item) => {
-        if (!item.filePath) return;
-        const urls = await signStoragePath(supabase, item.filePath);
-        item.signedUrl = urls.signedUrl;
-        item.downloadUrl = urls.downloadUrl;
-      }),
-    );
-
     return {
       success: true,
       data: {
-        materials,
+        materials: toCamel<MaterialRecord[]>(data ?? []),
         isNext: (count ?? 0) > to + 1,
       },
     };
@@ -107,15 +95,7 @@ export const getMaterial = cache(
       if (error) throwPostgresError(error, 'Material');
       if (!data) throw new NotFoundError('Material');
 
-      const material = toCamel<MaterialRecord>(data);
-
-      if (material.filePath) {
-        const urls = await signStoragePath(supabase, material.filePath);
-        material.signedUrl = urls.signedUrl;
-        material.downloadUrl = urls.downloadUrl;
-      }
-
-      return { success: true, data: material };
+      return { success: true, data: toCamel<MaterialRecord>(data) };
     } catch (error) {
       return handleError(error) as ErrorResponse;
     }

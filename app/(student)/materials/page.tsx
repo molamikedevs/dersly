@@ -1,13 +1,11 @@
 import { FolderOpen } from 'lucide-react';
+import { Suspense } from 'react';
 
-import DataRenderer from '@/components/common/data-renderer';
 import Filter from '@/components/common/filter';
 import PageHeader from '@/components/common/page-header';
-import Pagination from '@/components/common/pagination';
-import MaterialCard from '@/features/materials/components/material-card';
+import MaterialList from '@/features/materials/components/material-list';
+import MaterialListSkeleton from '@/features/materials/components/material-list-skeleton';
 import MaterialTabs from '@/features/materials/components/material-tabs';
-import ReadingRow from '@/features/materials/components/reading-row';
-import { getMaterials } from '@/features/materials/queries';
 import { toMaterialKind } from '@/lib/utils';
 import type { RouteParams } from '@/types/global';
 
@@ -17,7 +15,7 @@ export const metadata = {
 
 const EMPTY_LABEL = {
   link: 'No videos yet',
-  file: 'No documents yet',
+  guide: 'No guides yet',
   article: 'Nothing to read yet',
 } as const;
 
@@ -26,24 +24,14 @@ export default async function Materials({ searchParams }: RouteParams) {
 
   const activeKind = toMaterialKind(kind);
   const activeFilter = typeof filter === 'string' ? filter : undefined;
-
-  const { data, success, error } = await getMaterials(
-    {
-      page: Number(page) || 1,
-      pageSize: Number(pageSize) || 8,
-      filter: activeFilter,
-    },
-    activeKind,
-  );
-
-  const { materials } = data || {};
+  const currentPage = Number(page) || 1;
 
   return (
     <div className="flex w-full min-w-0 flex-col gap-8 pb-16">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <PageHeader
           title="Materials"
-          subText="Reading, listening and reference material for all students."
+          subText="Guides, videos and reading for all students."
         />
 
         <Filter
@@ -59,42 +47,32 @@ export default async function Materials({ searchParams }: RouteParams) {
 
       <MaterialTabs />
 
-      <DataRenderer
-        success={success}
-        error={error}
-        data={materials}
-        empty={
-          activeFilter
-            ? {
-                icon: FolderOpen,
-                title: 'Nothing at this level',
-                message:
-                  'Try another level, or clear the filter to see everything.',
-              }
-            : {
-                icon: FolderOpen,
-                title: EMPTY_LABEL[activeKind],
-                message: 'New material will appear here when it is added.',
-              }
-        }
-        render={(materials) =>
-          activeKind === 'article' ? (
-            <ul className="flex flex-col gap-3">
-              {materials.map((item) => (
-                <ReadingRow key={item.id} data={item} />
-              ))}
-            </ul>
-          ) : (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {materials.map((item) => (
-                <MaterialCard key={item.id} data={item} />
-              ))}
-            </div>
-          )
-        }
-      />
-
-      <Pagination isNext={data?.isNext ?? false} />
+      <Suspense
+        key={`${activeKind}-${currentPage}-${activeFilter ?? 'all'}`}
+        fallback={<MaterialListSkeleton kind={activeKind} wide />}
+      >
+        <MaterialList
+          kind={activeKind}
+          page={currentPage}
+          pageSize={Number(pageSize) || 8}
+          filter={activeFilter}
+          wide
+          empty={
+            activeFilter
+              ? {
+                  icon: FolderOpen,
+                  title: 'Nothing at this level',
+                  message:
+                    'Try another level, or clear the filter to see everything.',
+                }
+              : {
+                  icon: FolderOpen,
+                  title: EMPTY_LABEL[activeKind],
+                  message: 'New material will appear here when it is added.',
+                }
+          }
+        />
+      </Suspense>
     </div>
   );
 }
