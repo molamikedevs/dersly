@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 
 const TABS = [
   { label: 'Videos', value: 'link' },
-  { label: 'Documents', value: 'file' },
+  { label: 'Guides', value: 'guide' },
   { label: 'Reading', value: 'article' },
 ];
 
@@ -36,7 +36,7 @@ export default function MaterialTabs({ className }: { className?: string }) {
             href={hrefFor(value)}
             aria-current={active ? 'page' : undefined}
             className={cn(
-              'rounded-lg px-4 py-2 text-sm transition-colors',
+              'flex min-h-11 items-center rounded-lg px-4 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
               active
                 ? 'bg-card font-semibold text-foreground shadow-sm'
                 : 'font-medium text-muted-foreground hover:text-foreground',

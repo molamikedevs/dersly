@@ -1,81 +1,76 @@
 import { FolderOpen } from 'lucide-react';
+import { Suspense } from 'react';
 
-import DataRenderer from '@/components/common/data-renderer';
 import FormDialog from '@/components/common/form-dialog';
 import PageHeader from '@/components/common/page-header';
-import Pagination from '@/components/common/pagination';
 import AddMaterialForm from '@/features/materials/components/add-material-form';
-import MaterialCard from '@/features/materials/components/material-card';
+import MaterialList from '@/features/materials/components/material-list';
+import MaterialListSkeleton from '@/features/materials/components/material-list-skeleton';
 import MaterialTabs from '@/features/materials/components/material-tabs';
-import ReadingRow from '@/features/materials/components/reading-row';
-import { getMaterials } from '@/features/materials/queries';
 import { toMaterialKind } from '@/lib/utils';
 import type { RouteParams } from '@/types/global';
 
 export const metadata = { title: 'Materials' };
 
+const DIALOG_WIDTH = 'sm:max-w-3xl lg:max-w-4xl';
+
+const EMPTY_MESSAGE = {
+  link: 'Add a video link and every student will be able to watch it.',
+  guide: 'Write a guide and every student will be able to read it here.',
+  article: 'Add a reading link and students will see it on their home page.',
+} as const;
+
 export default async function Materials({ searchParams }: RouteParams) {
   const { page, pageSize, kind } = await searchParams;
   const activeKind = toMaterialKind(kind);
-
-  const { data, success, error } = await getMaterials(
-    { page: Number(page) || 1, pageSize: Number(pageSize) || 8 },
-    activeKind,
-  );
-
-  const { materials } = data || {};
+  const currentPage = Number(page) || 1;
 
   return (
     <div className="flex w-full max-w-6xl min-w-0 flex-col gap-8 pb-16">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <PageHeader
           title="Materials"
-          subText="Reading, listening and reference material for all students."
+          subText="Guides, videos and reading for all students."
         />
 
-        <FormDialog triggerLabel="Add material" title="New material">
+        <FormDialog
+          triggerLabel="Add material"
+          title="New material"
+          contentClassName={DIALOG_WIDTH}
+        >
           <AddMaterialForm />
         </FormDialog>
       </div>
 
       <MaterialTabs />
-      <DataRenderer
-        success={success}
-        error={error}
-        data={materials}
-        empty={{
-          icon: FolderOpen,
-          title: 'Nothing here yet',
-          message:
-            activeKind === 'article'
-              ? 'Add a reading link and students will see it on their home page.'
-              : 'Add material here and every student will be able to see it.',
-          action: (
-            <div className="mt-6">
-              <FormDialog triggerLabel="Add material" title="New material">
-                <AddMaterialForm />
-              </FormDialog>
-            </div>
-          ),
-        }}
-        render={(materials) =>
-          activeKind === 'article' ? (
-            <ul className="flex flex-col divide-y divide-border rounded-2xl border border-border bg-card px-5">
-              {materials.map((item) => (
-                <ReadingRow key={item.id} data={item} editable />
-              ))}
-            </ul>
-          ) : (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {materials.map((item) => (
-                <MaterialCard key={item.id} data={item} editable />
-              ))}
-            </div>
-          )
-        }
-      />
 
-      <Pagination isNext={data?.isNext ?? false} />
+      <Suspense
+        key={`${activeKind}-${currentPage}`}
+        fallback={<MaterialListSkeleton kind={activeKind} />}
+      >
+        <MaterialList
+          kind={activeKind}
+          page={currentPage}
+          pageSize={Number(pageSize) || 8}
+          editable
+          empty={{
+            icon: FolderOpen,
+            title: 'Nothing here yet',
+            message: EMPTY_MESSAGE[activeKind],
+            action: (
+              <div className="mt-6">
+                <FormDialog
+                  triggerLabel="Add material"
+                  title="New material"
+                  contentClassName={DIALOG_WIDTH}
+                >
+                  <AddMaterialForm />
+                </FormDialog>
+              </div>
+            ),
+          }}
+        />
+      </Suspense>
     </div>
   );
 }

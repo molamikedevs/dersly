@@ -19,7 +19,7 @@ export default async function Page({ params }: RouteParams) {
   return (
     <MaterialDetail
       data={data}
-      backHref={`/materials?kind=${data.kind}`}
+      backHref={`/dashboard/materials?kind=${data.kind}`}
       backLabel="Back to materials"
     />
   );

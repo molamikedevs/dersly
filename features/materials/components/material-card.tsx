@@ -1,4 +1,4 @@
-import { ExternalLink, Link2, Play } from 'lucide-react';
+import { BookOpen, ExternalLink, Link2, Play } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -13,10 +13,12 @@ export default function MaterialCard({
   data: MaterialRecord;
   editable?: boolean;
 }) {
-  const { id, title, description, url, level } = data;
+  const { id, title, description, url, level, kind } = data;
 
+  const isGuide = kind === 'guide';
   const videoId = url ? youTubeId(url) : null;
   const site = url ? hostname(url) : null;
+  const href = editable ? `/dashboard/materials/${id}` : `/materials/${id}`;
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-colors hover:border-input-border">
@@ -45,15 +47,23 @@ export default function MaterialCard({
           {!videoId && (
             <span
               aria-hidden
-              className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-warning-subtle text-warning-subtle-foreground"
+              className={
+                isGuide
+                  ? 'flex size-10 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-foreground'
+                  : 'flex size-10 shrink-0 items-center justify-center rounded-lg bg-warning-subtle text-warning-subtle-foreground'
+              }
             >
-              <Link2 className="size-4" />
+              {isGuide ? (
+                <BookOpen className="size-4" />
+              ) : (
+                <Link2 className="size-4" />
+              )}
             </span>
           )}
 
           <h3 className="min-w-0 flex-1 text-base font-semibold leading-snug text-foreground line-clamp-2">
             <Link
-              href={`/materials/${id}`}
+              href={href}
               className="after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-ring"
             >
               {title}
@@ -75,7 +85,8 @@ export default function MaterialCard({
 
         <div className="mt-auto flex items-center gap-x-2 pt-2 text-[13px] text-muted-foreground">
           {level && <span className="capitalize">{level}</span>}
-          {level && site && <span aria-hidden>&middot;</span>}
+          {level && (site || isGuide) && <span aria-hidden>&middot;</span>}
+          {isGuide && <span>Guide</span>}
           {site && <span className="truncate">{site}</span>}
 
           {url && !videoId && (

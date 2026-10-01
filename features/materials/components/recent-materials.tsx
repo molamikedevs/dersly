@@ -1,15 +1,15 @@
-import { FileText, Play } from 'lucide-react';
+import { BookOpen, Link2, Play } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { youTubeId } from '@/lib/utils';
 
-type Item = {
-  id: string;
-  title: string;
-  level: string | null;
-  url: string | null;
-};
+type Item = StudentHome['materials'][number];
+
+function labelFor(kind: Item['kind'], isVideo: boolean) {
+  if (kind === 'guide') return 'Guide';
+  return isVideo ? 'Video' : 'Link';
+}
 
 export default function RecentMaterials({ items }: { items: Item[] }) {
   if (items.length === 0) return null;
@@ -29,8 +29,9 @@ export default function RecentMaterials({ items }: { items: Item[] }) {
       </div>
 
       <ul className="flex flex-col rounded-2xl border border-border bg-card p-2">
-        {items.map(({ id, title, level, url }) => {
+        {items.map(({ id, title, kind, level, url }) => {
           const videoId = url ? youTubeId(url) : null;
+          const isGuide = kind === 'guide';
 
           return (
             <li key={id}>
@@ -59,9 +60,17 @@ export default function RecentMaterials({ items }: { items: Item[] }) {
                 ) : (
                   <span
                     aria-hidden
-                    className="flex aspect-video w-24 shrink-0 items-center justify-center rounded-lg bg-highlight-muted text-highlight"
+                    className={
+                      isGuide
+                        ? 'flex aspect-video w-24 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-foreground'
+                        : 'flex aspect-video w-24 shrink-0 items-center justify-center rounded-lg bg-highlight-muted text-highlight'
+                    }
                   >
-                    <FileText className="size-5" />
+                    {isGuide ? (
+                      <BookOpen className="size-5" />
+                    ) : (
+                      <Link2 className="size-5" />
+                    )}
                   </span>
                 )}
 
@@ -73,7 +82,7 @@ export default function RecentMaterials({ items }: { items: Item[] }) {
                     {level && (
                       <span className="capitalize">{level} &middot; </span>
                     )}
-                    {videoId ? 'Video' : 'Document'}
+                    {labelFor(kind, Boolean(videoId))}
                   </span>
                 </span>
               </Link>
