@@ -13,18 +13,11 @@ import {
 } from '@/lib/validation/level-test.schema';
 import type { ActionResponse, ErrorResponse } from '@/types/global';
 
-function bandFor(score: number, total: number) {
-  const ratio = score / total;
-
-  if (ratio < 0.27) return 'beginner';
-  if (ratio < 0.53) return 'elementary';
-  if (ratio < 0.8) return 'intermediate';
-  return 'advanced';
-}
+type AttemptResult = { score: number; total: number; level: string };
 
 export async function submitAttempt(
   params: AttemptValues,
-): Promise<ActionResponse<{ score: number; total: number; level: string }>> {
+): Promise<ActionResponse<AttemptResult>> {
   const validationResult = await action({
     params,
     schema: AttemptSchema,
@@ -36,54 +29,25 @@ export async function submitAttempt(
   }
 
   const { quizId, answers } = validationResult.params!;
-  const { user } = validationResult;
 
   try {
     const supabase = createClient(await cookies());
 
-    const { data: correct, error: readError } = await supabase
-      .from('options')
-      .select('id, question_id')
-      .eq('is_correct', true)
-      .in(
-        'question_id',
-        answers.map((answer) => answer.questionId),
-      );
+    // Scoring, the level band and saving the attempt all happen in SQL
+    const { data, error } = await supabase.rpc('submit_level_test', {
+      p_quiz_id: quizId,
+      p_answers: answers.map((answer) => ({
+        question_id: answer.questionId,
+        option_id: answer.optionId,
+      })),
+    });
 
-    if (readError) throwPostgresError(readError, 'Test');
-
-    const correctByQuestion = new Map(
-      (correct ?? []).map((option) => [option.question_id, option.id]),
-    );
-
-    const score = answers.reduce(
-      (total, answer) =>
-        correctByQuestion.get(answer.questionId) === answer.optionId
-          ? total + 1
-          : total,
-      0,
-    );
-
-    const total = answers.length;
-    const level = bandFor(score, total);
-
-    // The quiz_attempts_apply_level trigger copies level_result into profiles.level
-    const { error: attemptError } = await supabase
-      .from('quiz_attempts')
-      .insert({
-        quiz_id: quizId,
-        student_id: user!.id,
-        score,
-        total,
-        level_result: level,
-      });
-
-    if (attemptError) throwPostgresError(attemptError, 'Test');
+    if (error) throwPostgresError(error, 'Test');
 
     revalidatePath('/');
     revalidatePath('/profile');
 
-    return { success: true, data: { score, total, level } };
+    return { success: true, data: data as AttemptResult };
   } catch (error) {
     return handleError(error) as ErrorResponse;
   }
