@@ -13,12 +13,12 @@ import {
   PaginatedSearchParams,
 } from '@/types/global';
 
+const LESSON_NOTES_SHOWN = 5;
+
 async function fetchStudents(
   params: PaginatedSearchParams,
   classId?: string,
-): Promise<
-  ActionResponse<{ students: StudentRecord[]; isNext: boolean; total: number }>
-> {
+): Promise<ActionResponse<{ students: StudentRecord[]; isNext: boolean }>> {
   const validationResult = await action({
     params,
     schema: PaginatedSearchParamsSchema,
@@ -58,7 +58,6 @@ async function fetchStudents(
       success: true,
       data: {
         students: toCamel<StudentRecord[]>(data ?? []),
-        total: count ?? 0,
         isNext: (count ?? 0) > to + 1,
       },
     };
@@ -127,6 +126,17 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
       .maybeSingle();
 
     if (progressError) throwPostgresError(progressError, 'Lesson');
+
+    // The latest lessons that have a note, newest first
+    const { data: notes, error: notesError } = await supabase
+      .from('lessons')
+      .select('id, taught_at, note')
+      .eq('enrollment_id', enrolment.id)
+      .not('note', 'is', null)
+      .order('taught_at', { ascending: false })
+      .limit(LESSON_NOTES_SHOWN);
+
+    if (notesError) throwPostgresError(notesError, 'Lesson');
 
     const { data: homework, error: homeworkError } = await supabase
       .from('homework')
@@ -200,6 +210,7 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
           meetingUrl: owner.meeting_url,
           lessonsDone: progress?.lessons_done ?? 0,
         },
+        lessonNotes: toCamel(notes ?? []),
         current,
         materials: toCamel(materials ?? []),
         reading: toCamel(reading ?? []),

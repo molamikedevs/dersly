@@ -22,21 +22,6 @@ export function initials(name?: string | null) {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-export function formatDueDate(dueDate: string | null) {
-  if (!dueDate) return 'Due before the next lesson';
-
-  const date = new Date(dueDate);
-  const days = Math.ceil((date.getTime() - Date.now()) / 86_400_000);
-
-  if (days < 0) return 'Overdue';
-  if (days === 0) return 'Due today';
-  if (days === 1) return 'Due tomorrow';
-  if (days < 7)
-    return `Due ${date.toLocaleDateString('en-GB', { weekday: 'long' })}`;
-
-  return `Due ${date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`;
-}
-
 export function formatSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
@@ -128,4 +113,30 @@ export function toMaterialKind(value: unknown): MaterialKind {
   return MATERIAL_KINDS.includes(value as MaterialKind)
     ? (value as MaterialKind)
     : 'link';
+}
+
+const APP_TIME_ZONE = 'Asia/Baku';
+
+// Built once when the module loads. Creating a formatter is the slow part,
+// so they are reused instead of rebuilt on every call.
+const DATE_FORMATS = {
+  short: new Intl.DateTimeFormat('en-GB', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    timeZone: APP_TIME_ZONE,
+  }),
+  long: new Intl.DateTimeFormat('en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    timeZone: APP_TIME_ZONE,
+  }),
+} as const;
+
+export function formatDate(
+  value: string | Date = new Date(),
+  style: keyof typeof DATE_FORMATS = 'short',
+) {
+  return DATE_FORMATS[style].format(new Date(value));
 }

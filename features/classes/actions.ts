@@ -6,13 +6,19 @@ import { NotFoundError, throwPostgresError } from '@/lib/http-errors';
 import { createClient } from '@/lib/supabase/server';
 import { generateInviteCode, toCamel } from '@/lib/utils';
 import { ClassSchema, ClassValues } from '@/lib/validation/class.schema';
-import { LessonSchema, LessonValues } from '@/lib/validation/lesson.schema';
+import {
+  LessonSchema,
+  LessonValues,
+  MarkLessonSchema,
+  MarkLessonValues,
+} from '@/lib/validation/lesson.schema';
 import { ActionResponse, ErrorResponse } from '@/types/global';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
 function revalidateLessonPaths() {
   revalidatePath('/dashboard/classes');
+  revalidatePath('/dashboard');
   revalidatePath('/');
 }
 
@@ -132,11 +138,11 @@ export async function archiveClass(id: string): Promise<ActionResponse<null>> {
 }
 
 export async function markLesson(
-  params: LessonValues,
+  params: MarkLessonValues,
 ): Promise<ActionResponse<{ lessonsDone: number }>> {
   const validationResult = await action({
     params,
-    schema: LessonSchema,
+    schema: MarkLessonSchema,
     authorize: true,
   });
 
@@ -144,13 +150,14 @@ export async function markLesson(
     return handleError(validationResult) as ErrorResponse;
   }
 
-  const { enrollmentId } = validationResult.params!;
+  const { enrollmentId, note } = validationResult.params!;
 
   try {
     const supabase = createClient(await cookies());
 
     const { data, error } = await supabase.rpc('mark_lesson', {
       p_enrollment_id: enrollmentId,
+      p_note: note || null,
     });
 
     if (error) throwPostgresError(error, 'Lesson');
