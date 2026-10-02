@@ -10,6 +10,11 @@ type StudentHome = {
     meetingUrl: string | null;
     lessonsDone: number;
   };
+  lessonNotes: {
+    id: string;
+    taughtAt: string;
+    note: string;
+  }[];
   reading: {
     id: string;
     title: string;

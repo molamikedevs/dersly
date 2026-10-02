@@ -129,3 +129,29 @@ export function toMaterialKind(value: unknown): MaterialKind {
     ? (value as MaterialKind)
     : 'link';
 }
+
+const APP_TIME_ZONE = 'Asia/Baku';
+
+// Built once when the module loads. Creating a formatter is the slow part,
+// so they are reused instead of rebuilt on every call.
+const DATE_FORMATS = {
+  short: new Intl.DateTimeFormat('en-GB', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    timeZone: APP_TIME_ZONE,
+  }),
+  long: new Intl.DateTimeFormat('en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    timeZone: APP_TIME_ZONE,
+  }),
+} as const;
+
+export function formatDate(
+  value: string | Date = new Date(),
+  style: keyof typeof DATE_FORMATS = 'short',
+) {
+  return DATE_FORMATS[style].format(new Date(value));
+}
