@@ -46,15 +46,19 @@ export async function signUp(values: unknown): Promise<ActionResult> {
   const { fullname, email, password, code } = parsed.data;
   const supabase = createClient(await cookies());
 
-  const { data: classRow } = await supabase
-    .from('classes')
-    .select('id')
-    .ilike('invite_code', code)
-    .eq('is_active', true)
-    .eq('enrollment_open', true)
-    .maybeSingle();
+  // Returns only true or false, so no class data is exposed before login
+  const { data: isValid, error: codeError } = await supabase.rpc(
+    'is_invite_code_valid',
+    { p_code: code },
+  );
 
-  if (!classRow) return { error: 'That class code is not valid.' };
+  if (codeError) {
+    return { error: 'Could not check your class code. Please try again.' };
+  }
+
+  if (!isValid) {
+    return { error: 'That class code is not valid.', field: 'code' };
+  }
 
   const { data, error } = await supabase.auth.signUp({
     email,
