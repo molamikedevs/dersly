@@ -22,6 +22,21 @@ export function initials(name?: string | null) {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
+export function formatDueDate(dueDate: string | null) {
+  if (!dueDate) return 'Due before the next lesson';
+
+  const date = new Date(dueDate);
+  const days = Math.ceil((date.getTime() - Date.now()) / 86_400_000);
+
+  if (days < 0) return 'Overdue';
+  if (days === 0) return 'Due today';
+  if (days === 1) return 'Due tomorrow';
+  if (days < 7)
+    return `Due ${date.toLocaleDateString('en-GB', { weekday: 'long' })}`;
+
+  return `Due ${date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`;
+}
+
 export function formatSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
