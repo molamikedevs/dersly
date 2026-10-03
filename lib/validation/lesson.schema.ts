@@ -8,7 +8,7 @@ export const MarkLessonSchema = LessonSchema.extend({
   note: z
     .string()
     .trim()
-    .max(1000, { message: 'Keep the note under 1000 characters.' })
+    .max(2000, { message: 'Keep the note under 2000 characters.' })
     .optional(),
 });
 
