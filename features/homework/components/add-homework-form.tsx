@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
-import { Controller, useForm, useWatch } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -17,14 +17,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/toast';
 import { createHomework, updateHomework } from '@/features/homework/actions';
-import MarkdownContent from '@/features/homework/components/markdown-content';
-import { cn } from '@/lib/utils';
+import MarkdownEditor, {
+  type MarkdownView,
+} from '@/features/homework/components/markdown-editor';
 import {
   HomeworkSchema,
   type HomeworkValues,
 } from '@/lib/validation/homework.schema';
-
-const VIEWS = ['write', 'preview'] as const;
 
 export default function AddHomeworkForm({
   classId,
@@ -35,7 +34,7 @@ export default function AddHomeworkForm({
   homework?: HomeWorkRecord;
   onSuccess?: () => void;
 }) {
-  const [view, setView] = useState<(typeof VIEWS)[number]>('write');
+  const [view, setView] = useState<MarkdownView>('write');
   const isEdit = Boolean(homework);
 
   const form = useForm<HomeworkValues>({
@@ -49,7 +48,6 @@ export default function AddHomeworkForm({
     },
   });
 
-  const content = useWatch({ control: form.control, name: 'content' });
   const { isSubmitting } = form.formState;
 
   async function onSubmit(data: HomeworkValues) {
@@ -122,62 +120,19 @@ export default function AddHomeworkForm({
           name="content"
           control={form.control}
           render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <FieldLabel htmlFor="homework-content">Guide</FieldLabel>
-
-                <div
-                  role="group"
-                  aria-label="Guide view"
-                  className="flex rounded-lg bg-muted p-1"
-                >
-                  {VIEWS.map((value) => (
-                    <button
-                      key={value}
-                      type="button"
-                      aria-pressed={view === value}
-                      onClick={() => setView(value)}
-                      className={cn(
-                        'h-9 rounded-md px-3 text-sm font-semibold capitalize transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                        view === value
-                          ? 'bg-card text-foreground shadow-sm'
-                          : 'text-muted-foreground hover:text-foreground',
-                      )}
-                    >
-                      {value}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {view === 'write' ? (
-                <Textarea
-                  {...field}
-                  id="homework-content"
-                  className="h-[50svh] min-h-64 resize-y font-mono text-sm leading-relaxed"
-                  placeholder={
-                    '## Key vocabulary\n\n| Word | Meaning |\n| --- | --- |\n| tall | higher than most people |'
-                  }
-                  aria-invalid={fieldState.invalid}
-                />
-              ) : (
-                <div className="h-[50svh] min-h-64 overflow-y-auto rounded-xl border border-border p-4 sm:p-6">
-                  {content ? (
-                    <MarkdownContent content={content} />
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      Nothing to preview yet.
-                    </p>
-                  )}
-                </div>
-              )}
-
-              <FieldDescription>
-                Markdown: ## for headings, **bold**, tables, and &gt; for tip
-                boxes.
-              </FieldDescription>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
+            <MarkdownEditor
+              id="homework-content"
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              view={view}
+              onViewChange={setView}
+              placeholder={
+                '## Key vocabulary\n\n| Word | Meaning |\n| --- | --- |\n| tall | higher than most people |'
+              }
+              invalid={fieldState.invalid}
+              error={fieldState.error}
+            />
           )}
         />
 

@@ -2,7 +2,6 @@ import Markdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 import rehypeTableLabels from '@/features/homework/constant/index';
-
 const components: Components = {
   h1: ({ children }) => (
     <h2 className="mt-10 font-serif text-3xl font-medium tracking-tight text-foreground">
@@ -32,6 +31,16 @@ const components: Components = {
     >
       {children}
     </a>
+  ),
+  img: ({ src, alt }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt={alt ?? ''}
+      loading="lazy"
+      decoding="async"
+      className="block h-auto max-h-96 w-auto max-w-full rounded-xl border border-border [td_&]:max-h-28"
+    />
   ),
   ul: ({ children }) => (
     <ul className="mt-4 list-disc space-y-2 pl-6 marker:text-muted-foreground">
@@ -74,7 +83,7 @@ const components: Components = {
   th: ({ children }) => (
     <th className="px-4 py-3 font-semibold text-foreground">{children}</th>
   ),
-  td: ({ node: _node, children, ...props }) => (
+  td: ({ children, ...props }) => (
     <td
       {...props}
       className="block leading-relaxed text-foreground before:mb-0.5 before:block before:text-xs before:font-semibold before:uppercase before:tracking-[0.12em] before:text-muted-foreground before:content-[attr(data-label)] first:font-semibold first:before:hidden sm:table-cell sm:border-t sm:border-border sm:px-4 sm:py-3 sm:align-top sm:first:font-normal sm:before:hidden"
