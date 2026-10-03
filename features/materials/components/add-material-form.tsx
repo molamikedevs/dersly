@@ -21,9 +21,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/toast';
-import MarkdownContent from '@/features/homework/components/markdown-content';
+import MarkdownEditor, {
+  type MarkdownView,
+} from '@/features/homework/components/markdown-editor';
 import { cn } from '@/lib/utils';
 import {
   MaterialSchema,
@@ -38,8 +39,6 @@ const KINDS = [
   { value: 'article' as const, label: 'Reading', icon: Link2 },
 ];
 
-const VIEWS = ['write', 'preview'] as const;
-
 export default function AddMaterialForm({
   onSuccess,
   material,
@@ -47,7 +46,7 @@ export default function AddMaterialForm({
   onSuccess?: () => void;
   material?: MaterialRecord;
 }) {
-  const [view, setView] = useState<(typeof VIEWS)[number]>('write');
+  const [view, setView] = useState<MarkdownView>('write');
   const isEdit = Boolean(material);
 
   const form = useForm<MaterialValues>({
@@ -63,7 +62,6 @@ export default function AddMaterialForm({
   });
 
   const kind = useWatch({ control: form.control, name: 'kind' });
-  const content = useWatch({ control: form.control, name: 'content' });
   const { isSubmitting } = form.formState;
 
   async function onSubmit(data: MaterialValues) {
@@ -153,64 +151,19 @@ export default function AddMaterialForm({
             name="content"
             control={form.control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <FieldLabel htmlFor="material-content">Guide</FieldLabel>
-
-                  <div
-                    role="group"
-                    aria-label="Guide view"
-                    className="flex rounded-lg bg-muted p-1"
-                  >
-                    {VIEWS.map((value) => (
-                      <button
-                        key={value}
-                        type="button"
-                        aria-pressed={view === value}
-                        onClick={() => setView(value)}
-                        className={cn(
-                          'h-9 rounded-md px-3 text-sm font-semibold capitalize transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                          view === value
-                            ? 'bg-card text-foreground shadow-sm'
-                            : 'text-muted-foreground hover:text-foreground',
-                        )}
-                      >
-                        {value}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {view === 'write' ? (
-                  <Textarea
-                    {...field}
-                    id="material-content"
-                    className="h-[50svh] min-h-64 resize-y font-mono text-sm leading-relaxed"
-                    placeholder={
-                      '## Irregular verbs\n\n| Base | Past | Past participle |\n| --- | --- | --- |\n| go | went | gone |'
-                    }
-                    aria-invalid={fieldState.invalid}
-                  />
-                ) : (
-                  <div className="h-[50svh] min-h-64 overflow-y-auto rounded-xl border border-border p-4 sm:p-6">
-                    {content ? (
-                      <MarkdownContent content={content} />
-                    ) : (
-                      <p className="text-sm text-muted-foreground">
-                        Nothing to preview yet.
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                <FieldDescription>
-                  Markdown: ## for headings, **bold**, tables, and &gt; for tip
-                  boxes.
-                </FieldDescription>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
+              <MarkdownEditor
+                id="material-content"
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                view={view}
+                onViewChange={setView}
+                placeholder={
+                  '## Irregular verbs\n\n| Base | Past | Past participle |\n| --- | --- | --- |\n| go | went | gone |'
+                }
+                invalid={fieldState.invalid}
+                error={fieldState.error}
+              />
             )}
           />
         ) : (
