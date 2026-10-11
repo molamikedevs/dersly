@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2, RotateCcw, Wallet } from 'lucide-react';
+import { Copy, Loader2, RotateCcw, Wallet } from 'lucide-react';
 import { useState } from 'react';
 
 import RowMenu from '@/components/common/row-menu';
@@ -34,6 +34,18 @@ export default function ClassMenu({
 
   const enrollmentId = 'enrollmentId' in data ? data.enrollmentId : null;
   const lessonsDone = 'lessonsDone' in data ? data.lessonsDone : 0;
+
+  async function handleCopyCode() {
+    try {
+      await navigator.clipboard.writeText(data.inviteCode);
+      toast.add({ title: 'Invite code copied', description: data.inviteCode });
+    } catch {
+      toast.add({
+        title: 'Could not copy the code',
+        description: `Type it by hand: ${data.inviteCode}`,
+      });
+    }
+  }
 
   async function handleUndo() {
     if (!enrollmentId) return;
@@ -73,25 +85,36 @@ export default function ClassMenu({
     setConfirmingPayment(false);
   }
 
-  const lessonItems = enrollmentId ? (
+  const extraItems = (
     <>
-      <DropdownMenuItem
-        disabled={lessonsDone === 0}
-        onClick={() => handleUndo()}
-      >
-        <RotateCcw className="size-4" aria-hidden />
-        Undo last lesson
-      </DropdownMenuItem>
+      {data.enrollmentOpen && (
+        <DropdownMenuItem onClick={() => handleCopyCode()}>
+          <Copy className="size-4" aria-hidden />
+          Copy invite code
+        </DropdownMenuItem>
+      )}
 
-      <DropdownMenuItem
-        disabled={lessonsDone === 0}
-        onClick={() => setTimeout(() => setConfirmingPayment(true), 0)}
-      >
-        <Wallet className="size-4" aria-hidden />
-        Payment received
-      </DropdownMenuItem>
+      {enrollmentId && (
+        <>
+          <DropdownMenuItem
+            disabled={lessonsDone === 0}
+            onClick={() => handleUndo()}
+          >
+            <RotateCcw className="size-4" aria-hidden />
+            Undo last lesson
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            disabled={lessonsDone === 0}
+            onClick={() => setTimeout(() => setConfirmingPayment(true), 0)}
+          >
+            <Wallet className="size-4" aria-hidden />
+            Payment received
+          </DropdownMenuItem>
+        </>
+      )}
     </>
-  ) : null;
+  );
 
   return (
     <>
@@ -108,14 +131,14 @@ export default function ClassMenu({
         deleteErrorToast="Could not archive class"
         deleteLabel="Archive"
         deletePendingLabel="Archiving"
-        extraItems={lessonItems}
+        extraItems={extraItems}
       />
 
       <AlertDialog open={confirmingPayment} onOpenChange={setConfirmingPayment}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Payment received?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogDescription className="break-words">
               {`${data.name}'s counter goes back to 0 and a new package of ${LESSONS_PER_PACKAGE} lessons starts. Past lessons are kept.`}
             </AlertDialogDescription>
           </AlertDialogHeader>

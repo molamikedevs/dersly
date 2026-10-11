@@ -14,6 +14,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/toast';
 import { markLesson } from '@/features/classes/actions';
+import InviteCode from '@/features/classes/components/invite-code';
 import { LESSONS_PER_PACKAGE } from '@/features/classes/constants';
 import { cn } from '@/lib/utils';
 
@@ -23,12 +24,14 @@ type Props = {
   name: string;
   enrollmentId: string | null;
   lessonsDone: number;
+  inviteCode?: string | null;
 };
 
 export default function LessonTracker({
   name,
   enrollmentId,
   lessonsDone,
+  inviteCode,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState('');
@@ -37,12 +40,16 @@ export default function LessonTracker({
 
   if (!enrollmentId) {
     return (
-      <span className="text-sm text-muted-foreground">Not joined yet</span>
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 sm:w-72">
+        <p className="text-sm text-muted-foreground">Not joined yet</p>
+        {inviteCode && <InviteCode code={inviteCode} />}
+      </div>
     );
   }
 
   const id = enrollmentId;
-  const isComplete = lessonsDone >= LESSONS_PER_PACKAGE;
+  const done = Math.min(Math.max(lessonsDone, 0), LESSONS_PER_PACKAGE);
+  const isComplete = done >= LESSONS_PER_PACKAGE;
   const noteId = `lesson-note-${id}`;
 
   function handleOpenChange(next: boolean) {
@@ -76,28 +83,52 @@ export default function LessonTracker({
 
   return (
     <>
-      <div className="flex items-center gap-3">
-        <span
-          className={cn(
-            'min-w-12 text-center text-sm font-semibold tabular-nums',
-            isComplete ? 'text-warning' : 'text-foreground',
-          )}
-          aria-label={`${lessonsDone} of ${LESSONS_PER_PACKAGE} lessons done`}
-        >
-          {lessonsDone} / {LESSONS_PER_PACKAGE}
-        </span>
+      {/* The strip keeps a 5rem floor. Below that the button wraps under it,
+          which is what happens at 200% text size on a small phone. */}
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 sm:w-72">
+        <div className="min-w-20 flex-1">
+          <div aria-hidden className="flex max-w-31 gap-1">
+            {Array.from({ length: LESSONS_PER_PACKAGE }, (_, index) => (
+              <span
+                key={index}
+                className={cn(
+                  'h-2 flex-1 rounded-full transition-colors duration-300 ease-out',
+                  index >= done
+                    ? 'bg-border'
+                    : isComplete
+                      ? 'bg-warning'
+                      : 'bg-primary',
+                )}
+              />
+            ))}
+          </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => setOpen(true)}
-          disabled={isComplete}
-          aria-label={`Lesson done for ${name}`}
-          className="h-11 gap-2 rounded-xl px-4 text-sm font-semibold"
-        >
-          <Check className="size-4" aria-hidden />
-          Lesson done
-        </Button>
+          <p
+            className={cn(
+              'mt-1.5 text-sm tabular-nums',
+              isComplete
+                ? 'font-semibold text-warning-subtle-foreground'
+                : 'text-muted-foreground',
+            )}
+          >
+            <span className="sr-only">Lessons done: </span>
+            {done} of {LESSONS_PER_PACKAGE}
+            {isComplete && ', payment due'}
+          </p>
+        </div>
+
+        {!isComplete && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setOpen(true)}
+            aria-label={`Lesson done for ${name}`}
+            className="h-11 shrink-0 touch-manipulation gap-2 rounded-xl px-4 text-sm font-semibold active:scale-[0.97]"
+          >
+            <Check className="size-4" aria-hidden />
+            Lesson done
+          </Button>
+        )}
       </div>
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -106,8 +137,8 @@ export default function LessonTracker({
             <DialogTitle className="font-serif text-2xl font-medium tracking-tight">
               Lesson done
             </DialogTitle>
-            <DialogDescription className="text-[15px] text-muted-foreground">
-              {name}, lesson {lessonsDone + 1} of {LESSONS_PER_PACKAGE}
+            <DialogDescription className="text-[15px] break-words text-muted-foreground">
+              {name}, lesson {done + 1} of {LESSONS_PER_PACKAGE}
             </DialogDescription>
           </DialogHeader>
 
@@ -127,7 +158,7 @@ export default function LessonTracker({
               onChange={(event) => setNote(event.target.value)}
               rows={5}
               maxLength={NOTE_LIMIT}
-              className="text-[15px]"
+              className="text-base md:text-[15px]"
               placeholder="Mistakes to fix, new words, what to practise before next time."
               aria-describedby={`${noteId}-hint`}
             />
@@ -142,7 +173,7 @@ export default function LessonTracker({
           {error && (
             <p
               role="alert"
-              className="rounded-xl bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive"
+              className="rounded-xl bg-destructive-subtle px-4 py-3 text-sm font-medium text-destructive-subtle-foreground"
             >
               {error}
             </p>

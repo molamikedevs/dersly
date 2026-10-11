@@ -1,8 +1,8 @@
 import { Skeleton } from '@/components/ui/skeleton';
 
 const SECTIONS = [
-  { title: 'w-44', rows: ['w-36', 'w-44'] },
-  { title: 'w-32', rows: ['w-28', 'w-40', 'w-32'] },
+  { title: 'w-36', rows: ['w-32', 'w-44', 'w-36'], tracker: true },
+  { title: 'w-44', rows: ['w-40', 'w-28'], tracker: false },
 ];
 
 export default function Loading() {
@@ -23,26 +23,39 @@ export default function Loading() {
         <Skeleton className="h-11 w-32 rounded-xl" />
       </div>
 
-      {SECTIONS.map(({ title, rows }, section) => (
-        <div key={section} className="flex flex-col gap-4">
-          <div className="flex items-center gap-3">
+      {SECTIONS.map(({ title, rows, tracker }, section) => (
+        <div key={section} className="flex flex-col gap-3">
+          <div className="flex items-end justify-between gap-4">
             <Skeleton className={`h-7 ${title}`} />
-            <Skeleton className="h-5 w-16 rounded-full" />
+            <Skeleton className="h-4 w-20" />
           </div>
 
           <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
             {rows.map((width, index) => (
               <div
                 key={index}
-                className="flex items-center gap-4 px-5 py-4 sm:px-6"
+                className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-3 py-4 pr-2 pl-5 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:gap-x-4 sm:pr-3 sm:pl-6"
               >
-                <Skeleton className="size-10 shrink-0 rounded-full sm:size-11" />
-                <div className="flex min-w-0 flex-1 flex-col gap-2">
-                  <Skeleton className={`h-5 ${width}`} />
-                  <Skeleton className="h-4 w-52 max-w-full" />
+                <div className="flex min-w-0 flex-col gap-2 pt-2.5 sm:pt-0">
+                  <Skeleton className={`h-5 max-w-full ${width}`} />
+                  <Skeleton className="h-4 w-40 max-w-full" />
                 </div>
-                <Skeleton className="hidden h-11 w-32 shrink-0 rounded-xl sm:block" />
-                <Skeleton className="size-9 shrink-0 rounded-lg" />
+
+                <Skeleton className="size-9 rounded-lg sm:order-last" />
+
+                <div className="col-span-2 pr-3 sm:col-span-1 sm:pr-0">
+                  {tracker ? (
+                    <div className="flex items-center justify-between gap-4 sm:w-72">
+                      <div className="flex flex-col gap-2">
+                        <Skeleton className="h-2 w-31 rounded-full" />
+                        <Skeleton className="h-4 w-12" />
+                      </div>
+                      <Skeleton className="h-11 w-32 rounded-xl" />
+                    </div>
+                  ) : (
+                    <Skeleton className="h-4 w-24 sm:ml-auto" />
+                  )}
+                </div>
               </div>
             ))}
           </div>

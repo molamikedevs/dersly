@@ -160,6 +160,42 @@ export async function getGroupedClasses(params: PaginatedSearchParams): Promise<
   }
 }
 
+export async function getLessonProgress(
+  classId: string,
+): Promise<
+  ActionResponse<{ enrollmentId: string; lessonsDone: number } | null>
+> {
+  const validationResult = await action({ authorize: true });
+
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
+
+  try {
+    const supabase = createClient(await cookies());
+
+    const { data, error } = await supabase
+      .from('lesson_progress')
+      .select('enrollment_id, class_id, lessons_done')
+      .eq('class_id', classId)
+      .limit(1)
+      .maybeSingle();
+
+    if (error) throwPostgresError(error, 'Lesson');
+
+    const row = data as ProgressRow | null;
+
+    return {
+      success: true,
+      data: row
+        ? { enrollmentId: row.enrollment_id, lessonsDone: row.lessons_done }
+        : null,
+    };
+  } catch (error) {
+    return handleError(error) as ErrorResponse;
+  }
+}
+
 export async function getPaymentDue(): Promise<
   ActionResponse<{ classId: string; enrollmentId: string }[]>
 > {

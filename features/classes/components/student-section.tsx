@@ -1,75 +1,81 @@
-import { Users } from 'lucide-react';
-
-import InitialsAvatar from '@/components/common/initials-avatar';
+import Pagination from '@/components/common/pagination';
 import InviteCode from '@/features/classes/components/invite-code';
 
 type Props = {
   students: StudentRecord[];
+  total: number;
+  isNext: boolean;
   inviteCode: string;
 };
 
-export default function StudentsSection({ students, inviteCode }: Props) {
+const joinedDate = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  timeZone: 'Asia/Baku',
+});
+
+export default function StudentsSection({
+  students,
+  total,
+  isNext,
+  inviteCode,
+}: Props) {
   return (
-    <section className="flex flex-col gap-5">
-      <div className="flex items-center gap-3">
+    <section className="flex flex-col gap-3">
+      <div className="flex items-baseline justify-between gap-4">
         <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-[28px]">
           Students
         </h2>
-        {students.length > 0 && (
-          <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
-            {students.length}
-          </span>
+        {total > 0 && (
+          <p className="shrink-0 text-sm text-muted-foreground tabular-nums">
+            {total}
+          </p>
         )}
       </div>
 
-      {students.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-input-border px-6 py-14 text-center">
-          <span
-            aria-hidden
-            className="flex size-12 items-center justify-center rounded-xl bg-muted text-muted-foreground"
-          >
-            <Users className="size-5" />
-          </span>
-          <p className="mt-4 text-base font-semibold text-foreground">
-            No students yet
-          </p>
-          <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-            Give this code to your students so they can join.
-          </p>
-          <div className="mt-6">
-            <InviteCode code={inviteCode} />
+      {total === 0 ? (
+        <div className="flex flex-col items-start gap-4 rounded-2xl border border-dashed border-input-border p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div className="min-w-0">
+            <p className="text-base font-semibold text-foreground">
+              No students yet
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Give this code to your students so they can join.
+            </p>
           </div>
+          <InviteCode code={inviteCode} />
         </div>
+      ) : students.length === 0 ? (
+        <p className="rounded-2xl border border-dashed border-input-border p-5 text-sm text-muted-foreground sm:p-6">
+          No students on this page.
+        </p>
       ) : (
         <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
           {students.map(({ student, joinedAt }) => (
             <li
               key={student.id}
-              className="flex min-h-16 items-center gap-3.5 px-5 py-3 sm:px-6"
+              className="flex flex-col gap-0.5 px-5 py-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6 sm:px-6"
             >
-              <InitialsAvatar
-                name={student.fullName}
-                className="size-9 shrink-0"
-              />
-              <span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-foreground">
+              <p className="min-w-0 text-[15px] font-semibold break-words text-foreground">
                 {student.fullName}
-              </span>
-              {student.level && (
-                <span className="shrink-0 rounded-full bg-accent px-2.5 py-0.5 text-xs font-semibold capitalize text-accent-foreground">
-                  {student.level}
-                </span>
-              )}
-              <span className="hidden shrink-0 text-sm text-muted-foreground sm:block">
-                Joined{' '}
-                {new Date(joinedAt).toLocaleDateString('en-GB', {
-                  day: 'numeric',
-                  month: 'short',
-                })}
-              </span>
+                {student.level && (
+                  <>
+                    {' '}
+                    <span className="text-sm font-normal text-muted-foreground">
+                      {student.level}
+                    </span>
+                  </>
+                )}
+              </p>
+              <p className="shrink-0 text-sm text-muted-foreground">
+                Joined {joinedDate.format(new Date(joinedAt))}
+              </p>
             </li>
           ))}
         </ul>
       )}
+
+      {total > 0 && <Pagination isNext={isNext} />}
     </section>
   );
 }

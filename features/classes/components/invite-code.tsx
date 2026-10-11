@@ -3,6 +3,12 @@
 import { Check, Copy } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+import { cn } from '@/lib/utils';
+
+const ICON =
+  'col-start-1 row-start-1 size-4 transition-[opacity,scale,filter] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)]';
+const ICON_HIDDEN = 'scale-50 opacity-0 blur-[2px]';
+
 export default function InviteCode({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
 
@@ -22,27 +28,30 @@ export default function InviteCode({ code }: { code: string }) {
   }
 
   return (
-    <div className="flex h-11 items-stretch overflow-hidden rounded-xl border border-border bg-muted">
-      <span className="invite-code flex items-center px-3.5 text-sm font-semibold text-foreground">
+    <button
+      type="button"
+      onClick={handleCopy}
+      aria-label={`Copy invite code ${code}`}
+      className="inline-flex h-11 w-fit shrink-0 touch-manipulation items-center gap-2.5 rounded-xl border border-border bg-muted pr-3 pl-3.5 text-muted-foreground transition-[scale,background-color] duration-150 ease-out select-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-[0.97]"
+    >
+      <span className="invite-code text-sm font-semibold text-foreground">
         {code}
       </span>
 
-      <button
-        type="button"
-        onClick={handleCopy}
-        aria-label={`Copy invite code ${code}`}
-        className="flex w-11 items-center justify-center border-l border-border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
-      >
-        {copied ? (
-          <Check className="size-4 text-success" aria-hidden />
-        ) : (
-          <Copy className="size-4" aria-hidden />
-        )}
-      </button>
+      <span aria-hidden className="grid size-4 place-items-center">
+        <Copy className={cn(ICON, copied && ICON_HIDDEN)} />
+        <Check
+          className={cn(
+            ICON,
+            'text-success-subtle-foreground',
+            !copied && ICON_HIDDEN,
+          )}
+        />
+      </span>
 
       <span className="sr-only" aria-live="polite">
         {copied ? 'Invite code copied' : ''}
       </span>
-    </div>
+    </button>
   );
 }
