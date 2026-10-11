@@ -157,21 +157,12 @@ export function bakuWeekday(now: Date = new Date()) {
   return WEEKDAYS.find((weekday) => weekday.long === weekdayName)?.value ?? 1;
 }
 
-// The next lesson as a real instant, or null when the class has no schedule.
-// A lesson still counts as "next" for graceMinutes after it starts, so a
-// student who opens the app a few minutes late sees today's lesson and not
-// next week's.
-export function getNextLesson(
-  slots: readonly ScheduleSlot[],
-  now: Date = new Date(),
-  graceMinutes = 60,
-): Date | null {
-  if (slots.length === 0) return null;
-
+// How far Baku is ahead of UTC at a given instant, with the wall clock there.
+// The offset is read from the time zone data and not hard-coded, in case it
+// ever changes.
+function bakuClock(now: Date) {
   const local = zonedParts(now);
 
-  // How far Baku is ahead of UTC right now. Read from the time zone data
-  // and not hard-coded, in case the offset ever changes.
   const offset =
     Date.UTC(
       local.year,
@@ -183,29 +174,69 @@ export function getNextLesson(
     ) -
     Math.floor(now.getTime() / 1000) * 1000;
 
+  return { local, offset };
+}
+
+// The lesson on the Baku calendar day that is `ahead` days from today, as a
+// real instant in milliseconds. Null when the class does not meet that day.
+function lessonOnDay(
+  slots: readonly ScheduleSlot[],
+  { local, offset }: ReturnType<typeof bakuClock>,
+  ahead: number,
+) {
+  // Date.UTC rolls an overflowing day into the next month or year
+  const midnight = Date.UTC(local.year, local.month - 1, local.day + ahead);
+  const weekday = new Date(midnight).getUTCDay() || 7;
+  const slot = slots.find((item) => item.day === weekday);
+
+  if (!slot) return null;
+
+  const [hours, minutes] = slot.time.split(':').map(Number);
+
+  return midnight + (hours * 60 + minutes) * 60_000 - offset;
+}
+
+// The next lesson as a real instant, or null when the class has no schedule.
+// A lesson still counts as "next" for graceMinutes after it starts, so a
+// student who opens the app a few minutes late sees today's lesson and not
+// next week's.
+export function getNextLesson(
+  slots: readonly ScheduleSlot[],
+  now: Date = new Date(),
+  graceMinutes = 60,
+): Date | null {
+  if (slots.length === 0) return null;
+
+  const clock = bakuClock(now);
   const earliest = now.getTime() - graceMinutes * 60_000;
 
   // Today plus the next seven days always contains every weekday. The scan
   // starts at yesterday so a late lesson that began before midnight still
   // counts while it is inside the grace period.
   for (let ahead = -1; ahead <= 7; ahead += 1) {
-    // Date.UTC rolls an overflowing day into the next month or year
-    const midnight = Date.UTC(local.year, local.month - 1, local.day + ahead);
-    const weekday = new Date(midnight).getUTCDay() || 7;
-    const slot = slots.find((item) => item.day === weekday);
+    const start = lessonOnDay(slots, clock, ahead);
 
-    if (!slot) continue;
-
-    const [hours, minutes] = slot.time.split(':').map(Number);
-    const start = midnight + (hours * 60 + minutes) * 60_000 - offset;
-
-    if (start >= earliest) return new Date(start);
+    if (start !== null && start >= earliest) return new Date(start);
   }
 
   return null;
 }
 
-function lessonTime(date: Date) {
+// Today's lesson as a real instant, whether it has started, finished or is
+// still to come. Null when the class does not meet today.
+export function getTodaysLesson(
+  slots: readonly ScheduleSlot[],
+  now: Date = new Date(),
+): Date | null {
+  if (slots.length === 0) return null;
+
+  const start = lessonOnDay(slots, bakuClock(now), 0);
+
+  return start === null ? null : new Date(start);
+}
+
+// "22:00", the start time on the Baku clock
+export function formatLessonTime(date: Date) {
   const { hour, minute } = zonedParts(date);
   return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 }
@@ -214,7 +245,7 @@ function lessonTime(date: Date) {
 export function formatLessonDate(date: Date) {
   const { weekdayName, day } = zonedParts(date);
 
-  return `${weekdayName} ${day} ${monthFormat.format(date)}, ${lessonTime(date)}`;
+  return `${weekdayName} ${day} ${monthFormat.format(date)}, ${formatLessonTime(date)}`;
 }
 
 // Whole calendar days from one instant to another, counted in Baku
@@ -239,7 +270,7 @@ const EVENING_STARTS_AT = 18;
 //   Monday 12 Oct, 22:00
 export function formatNextLesson(start: Date, now: Date = new Date()) {
   const days = daysApart(now, start);
-  const time = lessonTime(start);
+  const time = formatLessonTime(start);
 
   if (days === 0) {
     const evening = zonedParts(start).hour >= EVENING_STARTS_AT;
