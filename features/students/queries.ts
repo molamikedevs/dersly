@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import action from '@/lib/handlers/action';
 import handleError from '@/lib/handlers/errors';
 import { NotFoundError, throwPostgresError } from '@/lib/http-errors';
+import { formatSchedule, toSlots } from '@/lib/schedule';
 import { createClient } from '@/lib/supabase/server';
 import { signStoragePath } from '@/lib/supabase/sign';
 import { toCamel } from '@/lib/utils';
@@ -14,6 +15,13 @@ import {
 } from '@/types/global';
 
 const LESSON_NOTES_SHOWN = 5;
+
+type StudentRow = Omit<StudentRecord, 'class'> & {
+  class: Omit<StudentRecord['class'], 'schedule'> & {
+    scheduleDays: number[];
+    scheduleTimes: string[];
+  };
+};
 
 async function fetchStudents(
   params: PaginatedSearchParams,
@@ -43,7 +51,7 @@ async function fetchStudents(
       .select(
         `joined_at,
          student:profiles!enrollments_student_id_fkey(id, full_name, email, level, last_seen_at),
-         class:classes!enrollments_class_id_fkey(id, name, type, schedule)`,
+         class:classes!enrollments_class_id_fkey(id, name, type, schedule_days, schedule_times)`,
         { count: 'exact' },
       )
       .eq('status', 'active');
@@ -56,10 +64,20 @@ async function fetchStudents(
 
     if (error) throwPostgresError(error, 'Student');
 
+    const students = toCamel<StudentRow[]>(data ?? []).map(
+      ({ class: { scheduleDays, scheduleTimes, ...classRest }, ...row }) => ({
+        ...row,
+        class: {
+          ...classRest,
+          schedule: formatSchedule(toSlots(scheduleDays, scheduleTimes)),
+        },
+      }),
+    );
+
     return {
       success: true,
       data: {
-        students: toCamel<StudentRecord[]>(data ?? []),
+        students,
         total: count ?? 0,
         isNext: (count ?? 0) > to + 1,
       },
@@ -105,7 +123,7 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
       .from('enrollments')
       .select(
         `id,
-         class:classes!enrollments_class_id_fkey(id, name, type, level, schedule, meeting_url)`,
+         class:classes!enrollments_class_id_fkey(id, name, type, level, schedule_days, schedule_times, meeting_url)`,
       )
       .eq('student_id', user!.id)
       .eq('status', 'active')
@@ -209,7 +227,9 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
           className: owner.name,
           type: owner.type,
           level: owner.level,
-          schedule: owner.schedule,
+          schedule: formatSchedule(
+            toSlots(owner.schedule_days, owner.schedule_times),
+          ),
           meetingUrl: owner.meeting_url,
           lessonsDone: progress?.lessons_done ?? 0,
         },

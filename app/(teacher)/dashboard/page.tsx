@@ -5,6 +5,7 @@ import PageHeader from '@/components/common/page-header';
 import { LESSONS_PER_PACKAGE } from '@/features/classes/constants';
 import { getClasses, getPaymentDue } from '@/features/classes/queries';
 import { getAllHomework } from '@/features/homework/queries';
+import { classSlots, formatSchedule } from '@/lib/schedule';
 
 export const metadata = {
   title: 'Dashboard',
@@ -27,6 +28,7 @@ export default async function Dashboard() {
 
   const latestByClass = classes.map((item) => ({
     class: item,
+    schedule: formatSchedule(classSlots(item)),
     current: homework.find((work) => work.classId === item.id) ?? null,
   }));
 
@@ -100,7 +102,7 @@ export default async function Dashboard() {
         </div>
 
         <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {latestByClass.map(({ class: item, current }) => (
+          {latestByClass.map(({ class: item, schedule, current }) => (
             <li key={item.id} className="min-w-0">
               <Link
                 href={`/dashboard/classes/${item.id}`}
@@ -111,9 +113,9 @@ export default async function Dashboard() {
                     <p className="truncate font-serif text-xl font-medium tracking-tight text-foreground">
                       {item.name}
                     </p>
-                    {item.schedule && (
+                    {schedule && (
                       <p className="mt-1 truncate text-sm text-muted-foreground">
-                        {item.schedule}
+                        {schedule}
                       </p>
                     )}
                   </div>

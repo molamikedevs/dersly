@@ -1,10 +1,13 @@
 import { Video } from 'lucide-react';
 import Link from 'next/link';
 
+import { classSlots, formatSchedule } from '@/lib/schedule';
+
 type Props<T extends ClassWithCount> = {
   title: string;
   meta: string;
   classes: T[];
+  rowSchedule?: (item: T) => string | null;
   rowAside?: (item: T) => React.ReactNode;
   rowMenu?: (item: T) => React.ReactNode;
 };
@@ -13,6 +16,7 @@ export default function ClassSection<T extends ClassWithCount>({
   title,
   meta,
   classes,
+  rowSchedule,
   rowAside,
   rowMenu,
 }: Props<T>) {
@@ -29,7 +33,10 @@ export default function ClassSection<T extends ClassWithCount>({
 
       <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
         {classes.map((item) => {
-          const { id, name, level, schedule, meetingUrl } = item;
+          const { id, name, level, meetingUrl } = item;
+          const schedule = rowSchedule
+            ? rowSchedule(item)
+            : formatSchedule(classSlots(item));
 
           return (
             <li

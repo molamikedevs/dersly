@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, type FieldErrors } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -22,8 +22,12 @@ import {
 } from '@/components/ui/select';
 import { toast } from '@/components/ui/toast';
 import { createClass, updateClass } from '@/features/classes/actions';
+import { WEEKDAYS, classSlots, type ScheduleSlot } from '@/lib/schedule';
+import { cn } from '@/lib/utils';
 import { ClassSchema, ClassValues } from '@/lib/validation/class.schema';
 import { LEVELS, TYPES } from '../constants/index';
+
+const timeInputId = (day: number) => `class-time-${day}`;
 
 export default function AddClassForm({
   onSuccess,
@@ -39,12 +43,12 @@ export default function AddClassForm({
       name: classRecord?.name ?? '',
       type: classRecord?.type ?? 'one_to_one',
       level: classRecord?.level ?? undefined,
-      schedule: classRecord?.schedule ?? '',
+      schedule: classRecord ? classSlots(classRecord) : [],
       meetingUrl: classRecord?.meetingUrl ?? '',
     },
   });
 
-  const { isSubmitting } = form.formState;
+  const { isSubmitting, errors } = form.formState;
 
   async function onSubmit(data: ClassValues) {
     const result = isEdit
@@ -64,6 +68,15 @@ export default function AddClassForm({
     onSuccess?.();
   }
 
+  function onInvalid(invalid: FieldErrors<ClassValues>) {
+    if (invalid.name || !Array.isArray(invalid.schedule)) return;
+
+    const index = invalid.schedule.findIndex(Boolean);
+    const slot = form.getValues('schedule')[index];
+
+    if (slot) document.getElementById(timeInputId(slot.day))?.focus();
+  }
+
   const submitLabel = isSubmitting
     ? isEdit
       ? 'Saving'
@@ -74,7 +87,7 @@ export default function AddClassForm({
 
   return (
     <form
-      onSubmit={form.handleSubmit(onSubmit)}
+      onSubmit={form.handleSubmit(onSubmit, onInvalid)}
       noValidate
       className="bg-inherit"
     >
@@ -92,6 +105,7 @@ export default function AddClassForm({
                 autoComplete="off"
                 autoCapitalize="words"
                 enterKeyHint="next"
+                maxLength={60}
                 placeholder="Conversation Club"
                 aria-invalid={fieldState.invalid}
                 aria-describedby="class-name-hint"
@@ -180,21 +194,123 @@ export default function AddClassForm({
         <Controller
           name="schedule"
           control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="class-schedule">Schedule</FieldLabel>
-              <Input
-                {...field}
-                id="class-schedule"
-                className="h-11 rounded-xl text-base md:text-[15px]"
-                autoComplete="off"
-                enterKeyHint="next"
-                placeholder="Mon & Thu, 18:00"
-                aria-invalid={fieldState.invalid}
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
+          render={({ field }) => {
+            const slots: ScheduleSlot[] = field.value;
+            const slotErrors = Array.isArray(errors.schedule)
+              ? errors.schedule
+              : [];
+
+            // A new day copies the time of the last day picked, so the
+            // usual case, the same time on every day, is typed once.
+            function toggleDay(day: number) {
+              const picked = slots.some((slot) => slot.day === day);
+
+              field.onChange(
+                picked
+                  ? slots.filter((slot) => slot.day !== day)
+                  : [...slots, { day, time: slots.at(-1)?.time ?? '' }].sort(
+                      (a, b) => a.day - b.day,
+                    ),
+              );
+            }
+
+            function setTime(day: number, time: string) {
+              field.onChange(
+                slots.map((slot) =>
+                  slot.day === day ? { ...slot, time } : slot,
+                ),
+              );
+            }
+
+            return (
+              <Field data-invalid={Boolean(errors.schedule)}>
+                <FieldLabel id="class-days-label">
+                  Lesson days{' '}
+                  <span className="font-normal text-muted-foreground">
+                    optional
+                  </span>
+                </FieldLabel>
+
+                <div
+                  role="group"
+                  aria-labelledby="class-days-label"
+                  className="grid grid-cols-7 gap-1.5"
+                >
+                  {WEEKDAYS.map(({ value, short, long }) => {
+                    const picked = slots.some((slot) => slot.day === value);
+
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        aria-pressed={picked}
+                        aria-label={long}
+                        onClick={() => toggleDay(value)}
+                        className={cn(
+                          'h-11 touch-manipulation rounded-xl border text-sm font-semibold transition-[scale,background-color,color,border-color] duration-150 ease-out select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none active:scale-[0.96]',
+                          picked
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-input-border bg-transparent text-foreground hover:bg-muted',
+                        )}
+                      >
+                        {short}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {slots.length > 0 && (
+                  <ul className="flex flex-col gap-2">
+                    {slots.map((slot, index) => {
+                      const id = timeInputId(slot.day);
+                      const message = slotErrors[index]?.time?.message;
+
+                      return (
+                        <li
+                          key={slot.day}
+                          className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1"
+                        >
+                          <label
+                            htmlFor={id}
+                            className="text-[15px] font-medium text-foreground"
+                          >
+                            {WEEKDAYS[slot.day - 1].long}
+                          </label>
+                          <Input
+                            id={id}
+                            type="time"
+                            value={slot.time}
+                            onChange={(event) =>
+                              setTime(slot.day, event.target.value)
+                            }
+                            onBlur={field.onBlur}
+                            className="h-11 w-32 rounded-xl text-base md:text-[15px]"
+                            aria-invalid={Boolean(message)}
+                            aria-describedby={
+                              message ? `${id}-error` : 'class-days-hint'
+                            }
+                          />
+                          {message && (
+                            <p
+                              id={`${id}-error`}
+                              role="alert"
+                              className="col-span-2 text-sm font-medium text-destructive-subtle-foreground"
+                            >
+                              {message}
+                            </p>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+
+                <FieldDescription id="class-days-hint">
+                  Start times are in Baku time.
+                </FieldDescription>
+              </Field>
+            );
+          }}
         />
 
         <Controller
@@ -219,6 +335,7 @@ export default function AddClassForm({
                 autoCorrect="off"
                 spellCheck={false}
                 enterKeyHint="done"
+                maxLength={500}
                 placeholder="https://meet.google.com/abc-defg-hij"
                 aria-invalid={fieldState.invalid}
               />
