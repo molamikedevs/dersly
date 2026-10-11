@@ -106,6 +106,38 @@ export async function getGroupedHomework(
   return { success: true, data: { groups, isNext } };
 }
 
+// The ids of the classes that have at least one published homework. Overview
+// only needs to know which classes have nothing, so this reads one column and
+// signs no files.
+export async function getClassIdsWithHomework(): Promise<
+  ActionResponse<string[]>
+> {
+  const validationResult = await action({ authorize: true });
+
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
+
+  try {
+    const supabase = createClient(await cookies());
+
+    const { data, error } = await supabase
+      .from('homework')
+      .select('class_id')
+      .eq('is_published', true);
+
+    if (error) throwPostgresError(error, 'Homework');
+
+    const ids = new Set<string>(
+      (data ?? []).map((row: { class_id: string }) => row.class_id),
+    );
+
+    return { success: true, data: [...ids] };
+  } catch (error) {
+    return handleError(error) as ErrorResponse;
+  }
+}
+
 export const getHomework = cache(
   async (id: string): Promise<ActionResponse<HomeWorkRecord>> => {
     const validationResult = await action({
