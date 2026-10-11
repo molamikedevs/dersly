@@ -6,9 +6,12 @@ import { youTubeId } from '@/lib/utils';
 
 type Item = StudentHome['materials'][number];
 
-function labelFor(kind: Item['kind'], isVideo: boolean) {
-  if (kind === 'guide') return 'Guide';
-  return isVideo ? 'Video' : 'Link';
+// "Elementary video", or just "Video" when the material has no level
+function describe(kind: Item['kind'], isVideo: boolean, level: string | null) {
+  const label = kind === 'guide' ? 'guide' : isVideo ? 'video' : 'link';
+  const text = level ? `${level} ${label}` : label;
+
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 export default function RecentMaterials({ items }: { items: Item[] }) {
@@ -16,13 +19,13 @@ export default function RecentMaterials({ items }: { items: Item[] }) {
 
   return (
     <section className="flex flex-col gap-4">
-      <div className="flex items-baseline justify-between gap-3">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-[28px]">
           Recent materials
         </h2>
         <Link
           href="/materials"
-          className="text-sm font-semibold text-primary hover:underline"
+          className="-my-3 inline-flex shrink-0 touch-manipulation items-center text-sm font-semibold text-primary underline-offset-4 tap-row hover:underline"
         >
           See all
         </Link>
@@ -31,13 +34,13 @@ export default function RecentMaterials({ items }: { items: Item[] }) {
       <ul className="flex flex-col rounded-2xl border border-border bg-card p-2">
         {items.map(({ id, title, kind, level, url }) => {
           const videoId = url ? youTubeId(url) : null;
-          const isGuide = kind === 'guide';
+          const Icon = kind === 'guide' ? BookOpen : Link2;
 
           return (
             <li key={id}>
               <Link
                 href={`/materials/${id}`}
-                className="flex items-center gap-3.5 rounded-xl p-3 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex touch-manipulation items-center gap-3.5 rounded-xl p-3 transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:bg-muted"
               >
                 {videoId ? (
                   <span className="relative block aspect-video w-24 shrink-0 overflow-hidden rounded-lg bg-muted">
@@ -60,29 +63,18 @@ export default function RecentMaterials({ items }: { items: Item[] }) {
                 ) : (
                   <span
                     aria-hidden
-                    className={
-                      isGuide
-                        ? 'flex aspect-video w-24 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-foreground'
-                        : 'flex aspect-video w-24 shrink-0 items-center justify-center rounded-lg bg-highlight-muted text-highlight'
-                    }
+                    className="flex aspect-video w-24 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground"
                   >
-                    {isGuide ? (
-                      <BookOpen className="size-5" />
-                    ) : (
-                      <Link2 className="size-5" />
-                    )}
+                    <Icon className="size-5" />
                   </span>
                 )}
 
                 <span className="min-w-0 flex-1">
-                  <span className="line-clamp-2 text-[15px] font-semibold leading-snug text-foreground">
+                  <span className="line-clamp-2 text-[15px] leading-snug font-semibold break-words text-foreground">
                     {title}
                   </span>
                   <span className="mt-1 block truncate text-[13px] text-muted-foreground">
-                    {level && (
-                      <span className="capitalize">{level} &middot; </span>
-                    )}
-                    {labelFor(kind, Boolean(videoId))}
+                    {describe(kind, Boolean(videoId), level)}
                   </span>
                 </span>
               </Link>

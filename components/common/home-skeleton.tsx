@@ -11,16 +11,20 @@ export default function HomeSkeleton() {
       </span>
 
       <div className="flex flex-col gap-3">
-        <Skeleton className="h-3 w-40" />
         <Skeleton className="h-10 w-72 max-w-full sm:h-12 sm:w-96" />
+        <Skeleton className="h-4 w-44" />
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
         <div className="flex min-w-0 flex-col gap-8">
-          <div className="flex flex-col gap-3 rounded-3xl bg-primary p-6 sm:p-9">
-            <Skeleton className="h-3 w-28 bg-primary-foreground/15" />
-            <Skeleton className="h-10 w-64 max-w-full bg-primary-foreground/15 sm:h-14 sm:w-80" />
-            <Skeleton className="h-4 w-48 bg-primary-foreground/15" />
+          <div className="flex flex-col gap-6 rounded-3xl bg-primary p-6 sm:p-9">
+            <div className="flex flex-col gap-3">
+              <Skeleton className="h-4 w-24 bg-primary-foreground/15" />
+              <Skeleton className="h-10 w-64 max-w-full bg-primary-foreground/15 sm:h-14 sm:w-96" />
+              <Skeleton className="h-5 w-48 bg-primary-foreground/15" />
+              <Skeleton className="h-4 w-56 max-w-full bg-primary-foreground/15" />
+            </div>
+            <Skeleton className="h-12 w-full rounded-xl bg-primary-foreground/15 sm:w-40" />
           </div>
 
           <div className="flex flex-col gap-4">
@@ -31,17 +35,34 @@ export default function HomeSkeleton() {
 
             <div className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-5 sm:p-7">
               <div className="flex flex-col gap-2.5">
-                <Skeleton className="h-6 w-52" />
+                <Skeleton className="h-6 w-52 max-w-full" />
                 <Skeleton className="h-4 w-full" />
                 <Skeleton className="h-4 w-3/5" />
               </div>
 
-              <div className="flex items-center gap-3 rounded-xl bg-muted p-3 sm:gap-4">
-                <Skeleton className="size-11 shrink-0 rounded-lg" />
-                <Skeleton className="h-4 flex-1" />
-                <Skeleton className="h-11 w-20 shrink-0 rounded-lg" />
-                <Skeleton className="size-11 shrink-0 rounded-lg" />
+              <div className="flex flex-wrap items-center gap-3 rounded-xl bg-muted p-3 sm:px-4">
+                <Skeleton className="size-5 shrink-0 rounded" />
+                <Skeleton className="h-4 flex-1 basis-40" />
+                <div className="ml-auto flex flex-wrap justify-end gap-2">
+                  <Skeleton className="h-11 w-20 rounded-lg" />
+                  <Skeleton className="size-11 rounded-lg" />
+                </div>
               </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <Skeleton className="h-7 w-36" />
+            <div className="flex flex-col divide-y divide-border rounded-2xl border border-border bg-card">
+              {[0, 1, 2].map((index) => (
+                <div
+                  key={index}
+                  className="flex min-h-14 items-center justify-between gap-4 px-5 sm:px-6"
+                >
+                  <Skeleton className="h-4 w-40" />
+                  <Skeleton className="size-4 rounded" />
+                </div>
+              ))}
             </div>
           </div>
         </div>

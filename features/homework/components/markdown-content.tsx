@@ -83,15 +83,21 @@ const components: Components = {
   th: ({ children }) => (
     <th className="px-4 py-3 font-semibold text-foreground">{children}</th>
   ),
-  td: ({ children, ...props }) => (
+  td: ({ children, style, ...props }) => (
     <td
-      {...props}
-      className="block leading-relaxed text-foreground before:mb-0.5 before:block before:text-xs before:font-semibold before:uppercase before:tracking-[0.12em] before:text-muted-foreground before:content-[attr(data-label)] first:font-semibold first:before:hidden sm:table-cell sm:border-t sm:border-border sm:px-4 sm:py-3 sm:align-top sm:first:font-normal sm:before:hidden"
+      data-label={(props as { 'data-label'?: string })['data-label']}
+      style={style}
+      className="block leading-relaxed text-foreground before:mb-0.5 before:block before:text-xs before:font-semibold before:tracking-[0.12em] before:text-muted-foreground before:uppercase before:content-[attr(data-label)] first:font-semibold first:before:hidden sm:table-cell sm:border-t sm:border-border sm:px-4 sm:py-3 sm:align-top sm:before:hidden sm:first:font-normal"
     >
       {children}
     </td>
   ),
   hr: () => <hr className="my-10 border-border" />,
+  pre: ({ children }) => (
+    <pre className="mt-4 rounded-xl bg-muted px-4 py-3 font-sans text-[15px] leading-relaxed wrap-break-word whitespace-pre-wrap text-foreground [&_code]:bg-transparent [&_code]:p-0 [&_code]:font-sans [&_code]:text-[1em]">
+      {children}
+    </pre>
+  ),
   code: ({ children }) => (
     <code className="rounded bg-muted px-1.5 py-0.5 text-[0.9em]">
       {children}
@@ -101,7 +107,7 @@ const components: Components = {
 
 export default function MarkdownContent({ content }: { content: string }) {
   return (
-    <div className="min-w-0 [&>*:first-child]:mt-0">
+    <div className="min-w-0 wrap-break-word [&>*:first-child]:mt-0">
       <Markdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeTableLabels]}

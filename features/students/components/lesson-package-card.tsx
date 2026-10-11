@@ -6,45 +6,41 @@ export default function LessonPackageCard({
 }: {
   lessonsDone: number;
 }) {
-  if (lessonsDone >= LESSONS_PER_PACKAGE) {
+  const done = Math.min(Math.max(lessonsDone, 0), LESSONS_PER_PACKAGE);
+
+  if (done >= LESSONS_PER_PACKAGE) {
     return (
-      <section
-        role="status"
-        className="flex flex-col gap-1 rounded-2xl border border-warning/40 bg-warning/10 px-6 py-5"
-      >
-        <h2 className="font-serif text-xl font-medium tracking-tight text-foreground">
+      <section className="flex flex-col gap-1 rounded-2xl bg-warning-subtle px-6 py-5 text-warning-subtle-foreground">
+        <h2 className="font-serif text-xl font-medium tracking-tight">
           Package complete
         </h2>
-        <p className="text-sm text-foreground">
+        <p className="text-[15px]">
           You have finished all {LESSONS_PER_PACKAGE} lessons. Payment is due.
         </p>
       </section>
     );
   }
 
-  const label =
-    lessonsDone === 0
-      ? 'New package'
-      : `Lesson ${lessonsDone} of ${LESSONS_PER_PACKAGE}`;
-
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card px-6 py-5">
-      <div className="flex items-baseline justify-between gap-4">
-        <span className="text-sm font-medium text-muted-foreground">
+    <section className="flex flex-col gap-3 rounded-2xl border border-border bg-card px-6 py-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h2 className="text-sm font-medium text-muted-foreground">
           Your lessons
-        </span>
-        <span className="font-serif text-2xl font-medium tracking-tight text-foreground">
-          {label}
-        </span>
+        </h2>
+        <p className="text-[15px] font-semibold text-foreground tabular-nums">
+          {done === 0
+            ? `New package, ${LESSONS_PER_PACKAGE} lessons`
+            : `${done} of ${LESSONS_PER_PACKAGE} done`}
+        </p>
       </div>
 
-      <div className="flex items-center gap-2" aria-hidden>
+      <div aria-hidden className="flex gap-1.5">
         {Array.from({ length: LESSONS_PER_PACKAGE }, (_, index) => (
           <span
             key={index}
             className={cn(
-              'size-2.5 rounded-full',
-              index < lessonsDone ? 'bg-primary' : 'bg-muted',
+              'h-2 flex-1 rounded-full',
+              index < done ? 'bg-primary' : 'bg-border',
             )}
           />
         ))}

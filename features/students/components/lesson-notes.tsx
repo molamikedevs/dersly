@@ -17,8 +17,8 @@ export default function LessonNotes({ notes }: Props) {
         {notes.map(({ id, taughtAt, note }, index) => (
           <li key={id}>
             <details name="lesson-notes" open={index === 0} className="group">
-              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 px-6 py-4 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring [&::-webkit-details-marker]:hidden">
-                <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <summary className="flex min-h-14 cursor-pointer touch-manipulation list-none items-center justify-between gap-4 px-5 py-4 outline-none select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset active:bg-muted sm:px-6 [&::-webkit-details-marker]:hidden">
+                <span className="flex min-w-0 flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
                   <time
                     dateTime={taughtAt}
                     className="text-[15px] font-semibold text-foreground"
@@ -26,17 +26,17 @@ export default function LessonNotes({ notes }: Props) {
                     {formatDate(taughtAt, 'long')}
                   </time>
                   {index === 0 && (
-                    <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                    <span className="text-sm text-muted-foreground">
                       Latest
                     </span>
                   )}
                 </span>
                 <ChevronDown
-                  className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
+                  className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 ease-out group-open:rotate-180"
                   aria-hidden
                 />
               </summary>
-              <div className="px-6 pb-5">
+              <div className="min-w-0 px-5 pb-5 break-words sm:px-6">
                 <LessonNoteBody note={note} />
               </div>
             </details>

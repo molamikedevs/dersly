@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import action from '@/lib/handlers/action';
 import handleError from '@/lib/handlers/errors';
 import { NotFoundError, throwPostgresError } from '@/lib/http-errors';
-import { formatSchedule, toSlots } from '@/lib/schedule';
+import { formatSchedule, getNextLesson, toSlots } from '@/lib/schedule';
 import { createClient } from '@/lib/supabase/server';
 import { signStoragePath } from '@/lib/supabase/sign';
 import { toCamel } from '@/lib/utils';
@@ -140,6 +140,8 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
 
     if (!owner) throw new NotFoundError('Enrolment');
 
+    const slots = toSlots(owner.schedule_days, owner.schedule_times);
+
     const { data: progress, error: progressError } = await supabase
       .from('lesson_progress')
       .select('lessons_done')
@@ -220,16 +222,15 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
     return {
       success: true,
       data: {
-        firstName: profile.full_name.split(' ')[0],
+        firstName: profile.full_name.trim().split(/\s+/)[0] ?? '',
         studentLevel: profile.level,
         enrolment: {
           classId: owner.id,
           className: owner.name,
           type: owner.type,
           level: owner.level,
-          schedule: formatSchedule(
-            toSlots(owner.schedule_days, owner.schedule_times),
-          ),
+          schedule: formatSchedule(slots),
+          nextLessonAt: getNextLesson(slots)?.toISOString() ?? null,
           meetingUrl: owner.meeting_url,
           lessonsDone: progress?.lessons_done ?? 0,
         },

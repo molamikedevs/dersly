@@ -1,10 +1,5 @@
-// Lesson schedules. A class has at most one lesson per weekday, each with its
-// own start time. Everything here is Baku time, whatever time zone the server
-// or the browser is in.
-
 export const SCHEDULE_TIME_ZONE = 'Asia/Baku';
 
-// ISO weekdays: 1 is Monday, 7 is Sunday. The week starts on Monday here.
 export const WEEKDAYS = [
   { value: 1, short: 'Mon', long: 'Monday' },
   { value: 2, short: 'Tue', long: 'Tuesday' },
@@ -15,14 +10,10 @@ export const WEEKDAYS = [
   { value: 7, short: 'Sun', long: 'Sunday' },
 ] as const;
 
-// time is 'HH:MM', 24 hour
 export type ScheduleSlot = { day: number; time: string };
 
 const TIME = /^([01]\d|2[0-3]):[0-5]\d/;
 
-// Builds slots from the two database columns. The database returns times as
-// 'HH:MM:SS'. Anything invalid is dropped, a repeated day keeps its first
-// time, and the result is sorted Monday to Sunday.
 export function toSlots(
   days: readonly number[] | null | undefined,
   times: readonly string[] | null | undefined,
@@ -165,8 +156,10 @@ export function getNextLesson(
 
   const earliest = now.getTime() - graceMinutes * 60_000;
 
-  // Today plus the next seven days always contains every weekday
-  for (let ahead = 0; ahead <= 7; ahead += 1) {
+  // Today plus the next seven days always contains every weekday. The scan
+  // starts at yesterday so a late lesson that began before midnight still
+  // counts while it is inside the grace period.
+  for (let ahead = -1; ahead <= 7; ahead += 1) {
     // Date.UTC rolls an overflowing day into the next month or year
     const midnight = Date.UTC(local.year, local.month - 1, local.day + ahead);
     const weekday = new Date(midnight).getUTCDay() || 7;
@@ -183,10 +176,39 @@ export function getNextLesson(
   return null;
 }
 
+function lessonTime(date: Date) {
+  const { hour, minute } = zonedParts(date);
+  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+}
+
 // "Monday 12 Oct, 22:00"
 export function formatLessonDate(date: Date) {
-  const { weekdayName, day, hour, minute } = zonedParts(date);
-  const time = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+  const { weekdayName, day } = zonedParts(date);
 
-  return `${weekdayName} ${day} ${monthFormat.format(date)}, ${time}`;
+  return `${weekdayName} ${day} ${monthFormat.format(date)}, ${lessonTime(date)}`;
+}
+
+// Whole calendar days from one instant to another, counted in Baku
+function daysApart(from: Date, to: Date) {
+  const start = zonedParts(from);
+  const end = zonedParts(to);
+
+  return Math.round(
+    (Date.UTC(end.year, end.month - 1, end.day) -
+      Date.UTC(start.year, start.month - 1, start.day)) /
+      86_400_000,
+  );
+}
+
+// How the student home names the next lesson:
+//   Today, 22:00
+//   Tomorrow, 22:00
+//   Monday 12 Oct, 22:00
+export function formatNextLesson(start: Date, now: Date = new Date()) {
+  const days = daysApart(now, start);
+
+  if (days === 0) return `Today, ${lessonTime(start)}`;
+  if (days === 1) return `Tomorrow, ${lessonTime(start)}`;
+
+  return formatLessonDate(start);
 }
