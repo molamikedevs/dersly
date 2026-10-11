@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 
+import ScrollToTop from '@/components/common/scroll-to-top';
 import { TeacherSidebar } from '@/components/ui/layout/navigation/teacher-sidebar';
 import TeacherTabBar from '@/components/ui/layout/navigation/teacher-tab-bar';
 import TeacherTopBar from '@/components/ui/layout/navigation/teacher-top-bar';
@@ -28,6 +29,7 @@ export default async function TeacherLayout({
   return (
     <SidebarProvider className="pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]">
       <SkipLink />
+      <ScrollToTop />
       <TeacherSidebar
         name={profile.full_name}
         email={profile.email}
