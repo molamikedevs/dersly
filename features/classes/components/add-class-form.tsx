@@ -22,7 +22,12 @@ import {
 } from '@/components/ui/select';
 import { toast } from '@/components/ui/toast';
 import { createClass, updateClass } from '@/features/classes/actions';
-import { WEEKDAYS, classSlots, type ScheduleSlot } from '@/lib/schedule';
+import {
+  WEEKDAYS,
+  classSlots,
+  parseTime,
+  type ScheduleSlot,
+} from '@/lib/schedule';
 import { cn } from '@/lib/utils';
 import { ClassSchema, ClassValues } from '@/lib/validation/class.schema';
 import { LEVELS, TYPES } from '../constants/index';
@@ -68,6 +73,8 @@ export default function AddClassForm({
     onSuccess?.();
   }
 
+  // The time inputs are not registered with the form one by one, so it cannot
+  // focus them itself. Name comes first on screen and is focused by the form.
   function onInvalid(invalid: FieldErrors<ClassValues>) {
     if (invalid.name || !Array.isArray(invalid.schedule)) return;
 
@@ -276,15 +283,29 @@ export default function AddClassForm({
                           >
                             {WEEKDAYS[slot.day - 1].long}
                           </label>
+                          {/* A plain text field, not type="time". The browser's
+                              time field follows the computer's clock setting,
+                              and on a 12-hour clock it throws away "22:00"
+                              unless AM or PM is also typed. */}
                           <Input
                             id={id}
-                            type="time"
+                            type="text"
+                            inputMode="numeric"
                             value={slot.time}
                             onChange={(event) =>
                               setTime(slot.day, event.target.value)
                             }
-                            onBlur={field.onBlur}
-                            className="h-11 w-32 rounded-xl text-base md:text-[15px]"
+                            onBlur={(event) => {
+                              // "2100" and "21.00" become "21:00" on leaving
+                              const parsed = parseTime(event.target.value);
+                              if (parsed) setTime(slot.day, parsed);
+                              field.onBlur();
+                            }}
+                            placeholder="21:00"
+                            maxLength={5}
+                            autoComplete="off"
+                            enterKeyHint="done"
+                            className="h-11 w-24 rounded-xl text-center text-base tabular-nums md:text-[15px]"
                             aria-invalid={Boolean(message)}
                             aria-describedby={
                               message ? `${id}-error` : 'class-days-hint'
@@ -306,7 +327,7 @@ export default function AddClassForm({
                 )}
 
                 <FieldDescription id="class-days-hint">
-                  Start times are in Baku time.
+                  24-hour Baku time. Type 21:00 or 2100.
                 </FieldDescription>
               </Field>
             );
