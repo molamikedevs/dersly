@@ -27,7 +27,7 @@ export function TeacherSidebar({
   avatarUrl,
 }: TeacherSidebarProps) {
   const pathname = usePathname();
-  const { open, setOpen, isMobile, setOpenMobile } = useSidebar();
+  const { open, setOpen, isMobile } = useSidebar();
   const hoverOpened = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -39,7 +39,7 @@ export function TeacherSidebar({
   );
 
   function handleEnter() {
-    if (isMobile || open || hoverOpened.current) return;
+    if (open || hoverOpened.current) return;
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches)
       return;
     if (timer.current) clearTimeout(timer.current);
@@ -48,12 +48,16 @@ export function TeacherSidebar({
   }
 
   function handleLeave() {
-    if (isMobile || !hoverOpened.current) return;
+    if (!hoverOpened.current) return;
     timer.current = setTimeout(() => {
       hoverOpened.current = false;
       setOpen(false);
     }, 200);
   }
+
+  // Phones use the bottom tab bar. Rendering nothing here also keeps the
+  // sidebar from mounting its slide-in drawer.
+  if (isMobile) return null;
 
   return (
     <Sidebar
@@ -61,6 +65,7 @@ export function TeacherSidebar({
       variant="floating"
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
+      className="data-[side=left]:left-[env(safe-area-inset-left)]"
     >
       <SidebarHeader className="h-16 justify-center px-4 group-data-[collapsible=icon]:px-2">
         <Logo href="/dashboard" />
@@ -75,12 +80,8 @@ export function TeacherSidebar({
                 <li key={href}>
                   <Link
                     onClick={() => {
-                      if (isMobile) {
-                        setOpenMobile(false);
-                      } else {
-                        hoverOpened.current = false;
-                        setOpen(false);
-                      }
+                      hoverOpened.current = false;
+                      setOpen(false);
                     }}
                     href={href}
                     title={label}
