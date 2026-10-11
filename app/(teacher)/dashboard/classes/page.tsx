@@ -9,14 +9,48 @@ import ClassSection from '@/features/classes/components/class-section';
 import LessonTracker from '@/features/classes/components/lesson-tracker';
 import { studentCountLabel } from '@/features/classes/constants/index';
 import { getGroupedClasses } from '@/features/classes/queries';
+import { SCHEDULE_TIME_ZONE, bakuWeekday, classSlots } from '@/lib/schedule';
 import { RouteParams } from '@/types/global';
 
 export const metadata = { title: 'Classes' };
+
+type AnyClass = ClassWithCount | PrivateClass;
+
+const todayLabel = new Intl.DateTimeFormat('en-GB', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'short',
+  timeZone: SCHEDULE_TIME_ZONE,
+});
 
 function byLessonsDone(a: PrivateClass, b: PrivateClass) {
   const joined =
     Number(Boolean(b.enrollmentId)) - Number(Boolean(a.enrollmentId));
   return joined || b.lessonsDone - a.lessonsDone;
+}
+
+function isPrivate(item: AnyClass): item is PrivateClass {
+  return 'lessonsDone' in item;
+}
+
+// One-to-one rows show the lesson strip, group rows show the student count
+function rowAside(item: AnyClass) {
+  if (isPrivate(item)) {
+    return (
+      <LessonTracker
+        name={item.name}
+        enrollmentId={item.enrollmentId}
+        lessonsDone={item.lessonsDone}
+        inviteCode={item.enrollmentOpen ? item.inviteCode : null}
+      />
+    );
+  }
+
+  return (
+    <p className="text-sm text-muted-foreground tabular-nums sm:text-right">
+      {studentCountLabel(item.studentCount)}
+    </p>
+  );
 }
 
 export default async function Page({ searchParams }: RouteParams) {
@@ -29,6 +63,20 @@ export default async function Page({ searchParams }: RouteParams) {
 
   const { groups = [], private: privateClasses = [] } = data || {};
   const oneToOne = [...privateClasses].sort(byLessonsDone);
+  const all: AnyClass[] = [...oneToOne, ...groups];
+
+  // Classes with a lesson today in Baku, earliest first
+  const weekday = bakuWeekday();
+  const todayTime = new Map<string, string>();
+
+  for (const item of all) {
+    const slot = classSlots(item).find((entry) => entry.day === weekday);
+    if (slot) todayTime.set(item.id, slot.time);
+  }
+
+  const today = all
+    .filter((item) => todayTime.has(item.id))
+    .sort((a, b) => todayTime.get(a.id)!.localeCompare(todayTime.get(b.id)!));
 
   return (
     <div className="flex w-full max-w-6xl min-w-0 flex-col gap-10 pb-16">
@@ -46,7 +94,7 @@ export default async function Page({ searchParams }: RouteParams) {
       <DataRenderer
         success={success}
         error={error}
-        data={[...oneToOne, ...groups]}
+        data={all}
         empty={{
           icon: BookOpen,
           title: 'No classes yet',
@@ -62,19 +110,22 @@ export default async function Page({ searchParams }: RouteParams) {
         }}
         render={() => (
           <div className="flex flex-col gap-10">
+            {today.length > 0 && (
+              <ClassSection
+                title="Today"
+                meta={todayLabel.format(new Date())}
+                classes={today}
+                rowSchedule={(item) => `Today, ${todayTime.get(item.id)}`}
+                rowAside={rowAside}
+                rowMenu={(item) => <ClassMenu data={item} />}
+              />
+            )}
             {oneToOne.length > 0 && (
               <ClassSection
                 title="One to one"
                 meta={`${oneToOne.length} ${oneToOne.length === 1 ? 'student' : 'students'}`}
                 classes={oneToOne}
-                rowAside={(item) => (
-                  <LessonTracker
-                    name={item.name}
-                    enrollmentId={item.enrollmentId}
-                    lessonsDone={item.lessonsDone}
-                    inviteCode={item.enrollmentOpen ? item.inviteCode : null}
-                  />
-                )}
+                rowAside={rowAside}
                 rowMenu={(item) => <ClassMenu data={item} />}
               />
             )}
@@ -83,11 +134,7 @@ export default async function Page({ searchParams }: RouteParams) {
                 title="Groups & clubs"
                 meta={`${groups.length} ${groups.length === 1 ? 'class' : 'classes'}`}
                 classes={groups}
-                rowAside={(item) => (
-                  <p className="text-sm text-muted-foreground tabular-nums sm:text-right">
-                    {studentCountLabel(item.studentCount)}
-                  </p>
-                )}
+                rowAside={rowAside}
                 rowMenu={(item) => <ClassMenu data={item} />}
               />
             )}

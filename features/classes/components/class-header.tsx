@@ -2,10 +2,10 @@ import { Video } from 'lucide-react';
 
 import InviteCodeDialog from '@/features/classes/components/invite-code-dialog';
 import { studentCountLabel } from '@/features/classes/constants/index';
+import { classSlots, formatSchedule } from '@/lib/schedule';
 
 type Props = {
   data: ClassWithCount;
-  // Slot under the facts. The one-to-one page puts the lesson strip here.
   children?: React.ReactNode;
 };
 
@@ -14,12 +14,13 @@ export default function ClassHeader({ data, children }: Props) {
     name,
     type,
     level,
-    schedule,
     meetingUrl,
     inviteCode,
     enrollmentOpen,
     studentCount,
   } = data;
+
+  const schedule = formatSchedule(classSlots(data));
 
   // One plain sentence. It wraps like text, so no separator can be orphaned.
   const facts = [

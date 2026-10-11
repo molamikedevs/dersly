@@ -3,6 +3,7 @@
 import action from '@/lib/handlers/action';
 import handleError from '@/lib/handlers/errors';
 import { NotFoundError, throwPostgresError } from '@/lib/http-errors';
+import { toScheduleColumns } from '@/lib/schedule';
 import { createClient } from '@/lib/supabase/server';
 import { generateInviteCode, toCamel } from '@/lib/utils';
 import { ClassSchema, ClassValues } from '@/lib/validation/class.schema';
@@ -16,9 +17,13 @@ import { ActionResponse, ErrorResponse } from '@/types/global';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
-function revalidateLessonPaths() {
-  revalidatePath('/dashboard/classes');
+function revalidateClassPaths() {
+  revalidatePath('/dashboard/classes', 'layout');
   revalidatePath('/dashboard');
+}
+
+function revalidateLessonPaths() {
+  revalidateClassPaths();
   revalidatePath('/');
 }
 
@@ -48,7 +53,7 @@ export async function createClass(
         name,
         type,
         level: level ?? null,
-        schedule: schedule || null,
+        ...toScheduleColumns(schedule),
         meeting_url: meetingUrl || null,
         invite_code: generateInviteCode(),
         handles_payment: type === 'one_to_one',
@@ -58,7 +63,7 @@ export async function createClass(
 
     if (error) throwPostgresError(error, 'Class');
 
-    revalidatePath('/dashboard/classes');
+    revalidateClassPaths();
 
     return { success: true, data: toCamel<ClassRecord>(data) };
   } catch (error) {
@@ -91,7 +96,7 @@ export async function updateClass(
         name,
         type,
         level: level ?? null,
-        schedule: schedule || null,
+        ...toScheduleColumns(schedule),
         meeting_url: meetingUrl || null,
         handles_payment: type === 'one_to_one',
       })
@@ -101,8 +106,9 @@ export async function updateClass(
 
     if (error) throwPostgresError(error, 'Class');
 
-    revalidatePath('/dashboard/classes');
-    revalidatePath(`/dashboard/classes/${id}`);
+    revalidateClassPaths();
+    // Students see the schedule and the lesson link on their home page
+    revalidatePath('/');
 
     return { success: true, data: toCamel<ClassRecord>(data) };
   } catch (error) {
@@ -129,7 +135,7 @@ export async function archiveClass(id: string): Promise<ActionResponse<null>> {
     if (error) throwPostgresError(error, 'Class');
     if (!data?.length) throw new NotFoundError('Class');
 
-    revalidatePath('/dashboard/classes');
+    revalidateClassPaths();
 
     return { success: true, data: null };
   } catch (error) {

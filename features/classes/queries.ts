@@ -4,6 +4,7 @@ import { LESSONS_PER_PACKAGE } from '@/features/classes/constants';
 import action from '@/lib/handlers/action';
 import handleError from '@/lib/handlers/errors';
 import { NotFoundError, throwPostgresError } from '@/lib/http-errors';
+import { formatSchedule, toSlots } from '@/lib/schedule';
 import { createClient } from '@/lib/supabase/server';
 import { toCamel } from '@/lib/utils';
 import { PaginatedSearchParamsSchema } from '@/lib/validation/global.schema';
@@ -249,7 +250,7 @@ export async function getStudentClasses(): Promise<
     const { data, error } = await supabase
       .from('enrollments')
       .select(
-        'class:classes!enrollments_class_id_fkey(id, name, schedule, meeting_url, type)',
+        'class:classes!enrollments_class_id_fkey(id, name, schedule_days, schedule_times, meeting_url, type)',
       )
       .eq('student_id', user!.id)
       .eq('status', 'active');
@@ -263,11 +264,16 @@ export async function getStudentClasses(): Promise<
         toCamel<{
           id: string;
           name: string;
-          schedule: string | null;
+          scheduleDays: number[];
+          scheduleTimes: string[];
           type: ClassType;
           meetingUrl: string | null;
         }>(item),
-      );
+      )
+      .map(({ scheduleDays, scheduleTimes, ...rest }) => ({
+        ...rest,
+        schedule: formatSchedule(toSlots(scheduleDays, scheduleTimes)),
+      }));
 
     return { success: true, data: classes };
   } catch (error) {

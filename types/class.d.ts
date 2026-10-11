@@ -12,7 +12,10 @@ type ClassRecord = {
   handlesPayment: boolean;
   isActive: boolean;
   enrollmentOpen: boolean;
-  schedule: string | null;
+  // ISO weekdays, 1 Monday to 7 Sunday, sorted
+  scheduleDays: number[];
+  // Start time for the day at the same position, 'HH:MM:SS' in Baku time
+  scheduleTimes: string[];
   createdAt: string;
 };
 
