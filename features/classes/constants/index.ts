@@ -12,3 +12,9 @@ export const LEVELS = [
 ] as const;
 
 export const LESSONS_PER_PACKAGE = 8;
+
+export function studentCountLabel(count: number) {
+  if (count <= 0) return 'No students yet';
+  if (count === 1) return '1 student';
+  return `${count} students`;
+}

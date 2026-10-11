@@ -7,10 +7,17 @@ import AddClassForm from '@/features/classes/components/add-class-form';
 import ClassMenu from '@/features/classes/components/class-menu';
 import ClassSection from '@/features/classes/components/class-section';
 import LessonTracker from '@/features/classes/components/lesson-tracker';
+import { studentCountLabel } from '@/features/classes/constants/index';
 import { getGroupedClasses } from '@/features/classes/queries';
 import { RouteParams } from '@/types/global';
 
 export const metadata = { title: 'Classes' };
+
+function byLessonsDone(a: PrivateClass, b: PrivateClass) {
+  const joined =
+    Number(Boolean(b.enrollmentId)) - Number(Boolean(a.enrollmentId));
+  return joined || b.lessonsDone - a.lessonsDone;
+}
 
 export default async function Page({ searchParams }: RouteParams) {
   const { page, pageSize } = await searchParams;
@@ -21,6 +28,7 @@ export default async function Page({ searchParams }: RouteParams) {
   });
 
   const { groups = [], private: privateClasses = [] } = data || {};
+  const oneToOne = [...privateClasses].sort(byLessonsDone);
 
   return (
     <div className="flex w-full max-w-6xl min-w-0 flex-col gap-10 pb-16">
@@ -38,7 +46,7 @@ export default async function Page({ searchParams }: RouteParams) {
       <DataRenderer
         success={success}
         error={error}
-        data={[...groups, ...privateClasses]}
+        data={[...oneToOne, ...groups]}
         empty={{
           icon: BookOpen,
           title: 'No classes yet',
@@ -54,29 +62,33 @@ export default async function Page({ searchParams }: RouteParams) {
         }}
         render={() => (
           <div className="flex flex-col gap-10">
+            {oneToOne.length > 0 && (
+              <ClassSection
+                title="One to one"
+                meta={`${oneToOne.length} ${oneToOne.length === 1 ? 'student' : 'students'}`}
+                classes={oneToOne}
+                rowAside={(item) => (
+                  <LessonTracker
+                    name={item.name}
+                    enrollmentId={item.enrollmentId}
+                    lessonsDone={item.lessonsDone}
+                    inviteCode={item.enrollmentOpen ? item.inviteCode : null}
+                  />
+                )}
+                rowMenu={(item) => <ClassMenu data={item} />}
+              />
+            )}
             {groups.length > 0 && (
               <ClassSection
                 title="Groups & clubs"
                 meta={`${groups.length} ${groups.length === 1 ? 'class' : 'classes'}`}
                 classes={groups}
-                rowAction={(item) => <ClassMenu data={item} />}
-              />
-            )}
-            {privateClasses.length > 0 && (
-              <ClassSection
-                title="One to one"
-                meta={`${privateClasses.length} ${privateClasses.length === 1 ? 'student' : 'students'}`}
-                classes={privateClasses}
-                rowAction={(item) => (
-                  <div className="flex items-center gap-3">
-                    <LessonTracker
-                      name={item.name}
-                      enrollmentId={item.enrollmentId}
-                      lessonsDone={item.lessonsDone}
-                    />
-                    <ClassMenu data={item} />
-                  </div>
+                rowAside={(item) => (
+                  <p className="text-sm text-muted-foreground tabular-nums sm:text-right">
+                    {studentCountLabel(item.studentCount)}
+                  </p>
                 )}
+                rowMenu={(item) => <ClassMenu data={item} />}
               />
             )}
           </div>

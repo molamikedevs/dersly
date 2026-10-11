@@ -73,8 +73,12 @@ export default function AddClassForm({
       : 'Create class';
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
-      <FieldGroup className="gap-5">
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      noValidate
+      className="bg-inherit"
+    >
+      <FieldGroup className="gap-5 bg-inherit">
         <Controller
           name="name"
           control={form.control}
@@ -84,8 +88,10 @@ export default function AddClassForm({
               <Input
                 {...field}
                 id="class-name"
-                className="h-11 rounded-xl text-[15px]"
+                className="h-11 rounded-xl text-base md:text-[15px]"
                 autoComplete="off"
+                autoCapitalize="words"
+                enterKeyHint="next"
                 placeholder="Conversation Club"
                 aria-invalid={fieldState.invalid}
                 aria-describedby="class-name-hint"
@@ -180,8 +186,9 @@ export default function AddClassForm({
               <Input
                 {...field}
                 id="class-schedule"
-                className="h-11 rounded-xl text-[15px]"
+                className="h-11 rounded-xl text-base md:text-[15px]"
                 autoComplete="off"
+                enterKeyHint="next"
                 placeholder="Mon & Thu, 18:00"
                 aria-invalid={fieldState.invalid}
               />
@@ -206,8 +213,12 @@ export default function AddClassForm({
                 id="class-meeting"
                 type="url"
                 inputMode="url"
-                className="h-11 rounded-xl text-[15px]"
+                className="h-11 rounded-xl text-base md:text-[15px]"
                 autoComplete="off"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                enterKeyHint="done"
                 placeholder="https://meet.google.com/abc-defg-hij"
                 aria-invalid={fieldState.invalid}
               />
@@ -216,16 +227,22 @@ export default function AddClassForm({
           )}
         />
 
-        <Button
-          type="submit"
-          className="mt-1 h-12 w-full rounded-xl text-[15px] font-semibold"
-          disabled={isSubmitting}
-        >
-          {isSubmitting && (
-            <Loader2 className="size-4 animate-spin" aria-hidden />
-          )}
-          {submitLabel}
-        </Button>
+        {/* Stays in view while the fields scroll. Sticky offsets are measured
+            inside the scroll area's padding, so the button rests and sticks at
+            the same spot. The ::after hides the fields passing under that
+            padding. */}
+        <div className="sticky bottom-0 bg-inherit pt-2 after:absolute after:inset-x-0 after:top-full after:h-6 after:bg-inherit sm:after:h-7">
+          <Button
+            type="submit"
+            className="h-12 w-full touch-manipulation rounded-xl text-[15px] font-semibold active:scale-[0.98]"
+            disabled={isSubmitting}
+          >
+            {isSubmitting && (
+              <Loader2 className="size-4 animate-spin" aria-hidden />
+            )}
+            {submitLabel}
+          </Button>
+        </div>
       </FieldGroup>
     </form>
   );

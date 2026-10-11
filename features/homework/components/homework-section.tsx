@@ -1,4 +1,4 @@
-import { ChevronRight, ClipboardList } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 import FormDialog from '@/components/common/form-dialog';
 import HomeWorkCard from '@/features/homework/components/homework-card';
@@ -32,14 +32,8 @@ export default function HomeWorkSection({ classId, homeWork }: Props) {
       </div>
 
       {!current ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-input-border px-6 py-14 text-center">
-          <span
-            aria-hidden
-            className="flex size-12 items-center justify-center rounded-xl bg-muted text-muted-foreground"
-          >
-            <ClipboardList className="size-5" />
-          </span>
-          <p className="mt-4 text-base font-semibold text-foreground">
+        <div className="rounded-2xl border border-dashed border-input-border p-5 sm:p-6">
+          <p className="text-base font-semibold text-foreground">
             No homework yet
           </p>
           <p className="mt-1 max-w-sm text-sm text-muted-foreground">
@@ -55,7 +49,7 @@ export default function HomeWorkSection({ classId, homeWork }: Props) {
 
           {past.length > 0 && (
             <details className="group">
-              <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-lg text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden">
+              <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-lg text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none [&::-webkit-details-marker]:hidden">
                 <ChevronRight
                   className="size-4 transition-transform group-open:rotate-90"
                   aria-hidden
@@ -67,9 +61,9 @@ export default function HomeWorkSection({ classId, homeWork }: Props) {
                 {past.map((item) => (
                   <li
                     key={item.id}
-                    className="flex min-h-14 items-center gap-4 px-5 py-2 sm:px-6"
+                    className="flex min-h-14 items-center gap-4 py-2 pr-2 pl-5 sm:pr-3 sm:pl-6"
                   >
-                    <span className="min-w-0 flex-1 truncate text-[15px] font-medium text-foreground">
+                    <span className="min-w-0 flex-1 text-[15px] font-medium break-words text-foreground">
                       {item.title}
                     </span>
                     <HomeworkMenu data={item} />
