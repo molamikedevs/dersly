@@ -8,6 +8,16 @@ export const siteConfig = {
     'Dersly is where students access their lessons, assignments and materials. Read your homework, check your level and join your class from any device.',
 } as const;
 
+/**
+ * Hex copies of --background in globals.css.
+ * Meta tags and the manifest cannot read CSS variables, so update these
+ * (and public/site.webmanifest) whenever the background tokens change.
+ */
+const themeColor = {
+  light: '#f5f2ec', // oklch(0.962 0.009 85)
+  dark: '#1d0c17', // oklch(0.185 0.036 342)
+} as const;
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
@@ -66,13 +76,21 @@ export const metadata: Metadata = {
   },
 
   manifest: '/site.webmanifest',
+
+  appleWebApp: {
+    capable: true,
+    title: siteConfig.name,
+    statusBarStyle: 'default',
+  },
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#fdfdfa' },
-    { media: '(prefers-color-scheme: dark)', color: '#12110f' },
-  ],
   width: 'device-width',
   initialScale: 1,
+  viewportFit: 'cover',
+  colorScheme: 'light dark',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: themeColor.light },
+    { media: '(prefers-color-scheme: dark)', color: themeColor.dark },
+  ],
 };

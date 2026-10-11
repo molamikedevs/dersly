@@ -17,7 +17,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${figtree.variable} ${fraunces.variable} ${geistMono.variable} h-full`}
     >
-      <body className="flex min-h-full flex-col">
+      <body className="flex min-h-full flex-col pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
