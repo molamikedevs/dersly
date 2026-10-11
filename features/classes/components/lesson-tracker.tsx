@@ -11,19 +11,31 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/toast';
 import { markLesson } from '@/features/classes/actions';
 import InviteCode from '@/features/classes/components/invite-code';
 import { LESSONS_PER_PACKAGE } from '@/features/classes/constants';
+import { defaultLessonDate, lessonDateOptions } from '@/lib/lesson-date';
 import { cn } from '@/lib/utils';
 
-const NOTE_LIMIT = 1000;
+// Same limit as MarkLessonSchema and the database
+const NOTE_LIMIT = 2000;
+
+type DateOption = { value: string; label: string };
 
 type Props = {
   name: string;
   enrollmentId: string | null;
   lessonsDone: number;
+  // Shown while the student has not joined, so the code is one tap away
   inviteCode?: string | null;
 };
 
@@ -35,6 +47,9 @@ export default function LessonTracker({
 }: Props) {
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState('');
+  // Built when the dialog opens, so "today" is the day it is opened on
+  const [dateOptions, setDateOptions] = useState<DateOption[]>([]);
+  const [lessonDate, setLessonDate] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -51,13 +66,20 @@ export default function LessonTracker({
   const done = Math.min(Math.max(lessonsDone, 0), LESSONS_PER_PACKAGE);
   const isComplete = done >= LESSONS_PER_PACKAGE;
   const noteId = `lesson-note-${id}`;
+  const dateId = `lesson-date-${id}`;
 
   function handleOpenChange(next: boolean) {
     setOpen(next);
-    if (!next) {
-      setNote('');
-      setError(null);
+
+    if (next) {
+      const now = new Date();
+      setDateOptions(lessonDateOptions(now));
+      setLessonDate(defaultLessonDate(now));
+      return;
     }
+
+    setNote('');
+    setError(null);
   }
 
   function handleMark() {
@@ -67,6 +89,7 @@ export default function LessonTracker({
       const result = await markLesson({
         enrollmentId: id,
         note: note.trim() || undefined,
+        lessonDate: lessonDate || undefined,
       });
 
       if (!result.success) {
@@ -121,7 +144,7 @@ export default function LessonTracker({
           <Button
             type="button"
             variant="outline"
-            onClick={() => setOpen(true)}
+            onClick={() => handleOpenChange(true)}
             aria-label={`Lesson done for ${name}`}
             className="h-11 shrink-0 touch-manipulation gap-2 rounded-xl px-4 text-sm font-semibold active:scale-[0.97]"
           >
@@ -137,10 +160,42 @@ export default function LessonTracker({
             <DialogTitle className="font-serif text-2xl font-medium tracking-tight">
               Lesson done
             </DialogTitle>
-            <DialogDescription className="text-[15px] break-words text-muted-foreground">
+            <DialogDescription className="text-[15px] wrap-break-word text-muted-foreground">
               {name}, lesson {done + 1} of {LESSONS_PER_PACKAGE}
             </DialogDescription>
           </DialogHeader>
+
+          {/* A list of days, not a date box. A date box follows the computer's
+              own format, where 10/07 can mean 7 October or 10 July. */}
+          <div className="flex flex-col gap-2">
+            <label
+              htmlFor={dateId}
+              className="text-sm font-medium text-foreground"
+            >
+              Lesson date
+            </label>
+            <Select
+              items={dateOptions}
+              value={lessonDate}
+              onValueChange={(value) => {
+                if (typeof value === 'string') setLessonDate(value);
+              }}
+            >
+              <SelectTrigger
+                id={dateId}
+                className="h-11 w-full rounded-xl text-base md:text-[15px]"
+              >
+                <SelectValue placeholder="Choose the day" />
+              </SelectTrigger>
+              <SelectContent>
+                {dateOptions.map(({ value, label }) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
           <div className="flex flex-col gap-2">
             <label

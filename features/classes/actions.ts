@@ -17,6 +17,7 @@ import { ActionResponse, ErrorResponse } from '@/types/global';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
+// 'layout' also covers the pages under it, such as a single class page
 function revalidateClassPaths() {
   revalidatePath('/dashboard/classes', 'layout');
   revalidatePath('/dashboard');
@@ -156,14 +157,16 @@ export async function markLesson(
     return handleError(validationResult) as ErrorResponse;
   }
 
-  const { enrollmentId, note } = validationResult.params!;
+  const { enrollmentId, note, lessonDate } = validationResult.params!;
 
   try {
     const supabase = createClient(await cookies());
 
+    // Without a date the database uses today in Baku
     const { data, error } = await supabase.rpc('mark_lesson', {
       p_enrollment_id: enrollmentId,
       p_note: note || null,
+      p_lesson_date: lessonDate ?? null,
     });
 
     if (error) throwPostgresError(error, 'Lesson');
