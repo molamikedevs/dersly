@@ -1,5 +1,8 @@
 import { Video } from 'lucide-react';
 
+import { LESSONS_PER_PACKAGE } from '@/features/classes/constants';
+import { cn } from '@/lib/utils';
+
 type Props = {
   when: string | null;
   started?: boolean;
@@ -7,7 +10,14 @@ type Props = {
   level: string | null;
   schedule: string | null;
   meetingUrl: string | null;
+  lessonsDone?: number | null;
 };
+
+function packageLabel(done: number) {
+  if (done >= LESSONS_PER_PACKAGE) return 'Complete. Payment is due.';
+  if (done === 0) return `New, ${LESSONS_PER_PACKAGE} lessons`;
+  return `${done} of ${LESSONS_PER_PACKAGE} done`;
+}
 
 export default function NextLessonCard({
   when,
@@ -16,7 +26,11 @@ export default function NextLessonCard({
   level,
   schedule,
   meetingUrl,
+  lessonsDone,
 }: Props) {
+  const hasPackage = lessonsDone !== null && lessonsDone !== undefined;
+  const done = Math.min(Math.max(lessonsDone ?? 0, 0), LESSONS_PER_PACKAGE);
+
   return (
     <section
       aria-labelledby="next-lesson-heading"
@@ -35,7 +49,9 @@ export default function NextLessonCard({
         </p>
 
         <p className="flex flex-wrap items-baseline gap-x-2.5 text-base sm:text-lg">
-          <span className="min-w-0 font-semibold break-words">{className}</span>
+          <span className="min-w-0 font-semibold wrap-break-word">
+            {className}
+          </span>
           {level && (
             <span className="text-primary-foreground/85 capitalize">
               {level}
@@ -60,6 +76,31 @@ export default function NextLessonCard({
           <Video className="size-4" aria-hidden />
           Join lesson
         </a>
+      )}
+
+      {hasPackage && (
+        <div className="flex flex-col gap-2.5 border-t border-primary-foreground/20 pt-5">
+          <p className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 text-sm">
+            <span className="text-primary-foreground/85">Lesson package</span>
+            <span className="font-semibold tabular-nums">
+              {packageLabel(done)}
+            </span>
+          </p>
+
+          <div aria-hidden className="flex gap-1.5">
+            {Array.from({ length: LESSONS_PER_PACKAGE }, (_, index) => (
+              <span
+                key={index}
+                className={cn(
+                  'h-1.5 flex-1 rounded-full',
+                  index < done
+                    ? 'bg-primary-foreground'
+                    : 'bg-primary-foreground/25',
+                )}
+              />
+            ))}
+          </div>
+        </div>
       )}
     </section>
   );

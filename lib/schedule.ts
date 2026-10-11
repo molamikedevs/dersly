@@ -1,3 +1,7 @@
+// Lesson schedules. A class has at most one lesson per weekday, each with its
+// own start time. Everything here is Baku time, whatever time zone the server
+// or the browser is in.
+
 export const SCHEDULE_TIME_ZONE = 'Asia/Baku';
 
 // ISO weekdays: 1 is Monday, 7 is Sunday. The week starts on Monday here.
@@ -36,6 +40,9 @@ export function parseTime(input: string): string | null {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 }
 
+// Builds slots from the two database columns. The database returns times as
+// 'HH:MM:SS'. Anything invalid is dropped, a repeated day keeps its first
+// time, and the result is sorted Monday to Sunday.
 export function toSlots(
   days: readonly number[] | null | undefined,
   times: readonly string[] | null | undefined,
@@ -222,15 +229,24 @@ function daysApart(from: Date, to: Date) {
   );
 }
 
+// From this hour a lesson later today reads "Tonight"
+const EVENING_STARTS_AT = 18;
+
 // How the student home names the next lesson:
-//   Today, 22:00
+//   Today, 12:00
+//   Tonight, 22:00
 //   Tomorrow, 22:00
 //   Monday 12 Oct, 22:00
 export function formatNextLesson(start: Date, now: Date = new Date()) {
   const days = daysApart(now, start);
+  const time = lessonTime(start);
 
-  if (days === 0) return `Today, ${lessonTime(start)}`;
-  if (days === 1) return `Tomorrow, ${lessonTime(start)}`;
+  if (days === 0) {
+    const evening = zonedParts(start).hour >= EVENING_STARTS_AT;
+    return `${evening ? 'Tonight' : 'Today'}, ${time}`;
+  }
+
+  if (days === 1) return `Tomorrow, ${time}`;
 
   return formatLessonDate(start);
 }

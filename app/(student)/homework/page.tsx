@@ -53,22 +53,25 @@ export default async function Homework({ searchParams }: RouteParams) {
             />
 
             {past.length > 0 && (
-              <section className="flex flex-col gap-4">
+              <section className="flex flex-col gap-3">
                 <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-[28px]">
                   Earlier
                 </h2>
-                <div className="flex flex-col gap-4">
+                {/* The work has no box of its own, so a line separates one
+                    piece from the next */}
+                <div className="flex flex-col divide-y divide-border border-y border-border">
                   {past.map((item) => (
-                    <CurrentWorkCard
-                      key={item.id}
-                      title={item.title}
-                      instructions={item.instructions}
-                      attachmentName={item.attachmentName}
-                      signedUrl={item.signedUrl}
-                      downloadUrl={item.downloadUrl}
-                      asQuestions={item.classes?.type === 'conversation'}
-                      readHref={readHref(item)}
-                    />
+                    <div key={item.id} className="py-6">
+                      <CurrentWorkCard
+                        title={item.title}
+                        instructions={item.instructions}
+                        attachmentName={item.attachmentName}
+                        signedUrl={item.signedUrl}
+                        downloadUrl={item.downloadUrl}
+                        asQuestions={item.classes?.type === 'conversation'}
+                        readHref={readHref(item)}
+                      />
+                    </div>
                   ))}
                 </div>
               </section>
