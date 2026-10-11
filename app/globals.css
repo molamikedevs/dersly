@@ -1,7 +1,7 @@
 /* ==========================================================================
    Dersly design system
    Tailwind CSS v4 (CSS-first) + shadcn/ui
-   Deep green primary. Warm paper neutrals in light, green-tinted near-black
+   Deep green primary. Warm paper neutrals in light, plum-tinted near-black
    in dark. Radius 0.5rem. Figtree (sans), Fraunces (serif), Geist Mono.
    ========================================================================== */
 
@@ -109,7 +109,6 @@
 
   --background: oklch(0.962 0.009 85);
   --foreground: oklch(0.26 0.02 165);
-  --background-gradient: none;
 
   --card: oklch(0.994 0.006 90);
   --card-foreground: oklch(0.26 0.02 165);
@@ -172,41 +171,36 @@
 /* --------------------------------------------------------------------------
    Dark
 
-   Surfaces are a single green-tinted near-black family, stepping up in
-   lightness rather than switching hue: sidebar 0.152, background 0.162,
-   card 0.202, popover 0.212, muted 0.238. Depth comes from that step plus
-   a border, not from transparency. All opaque, so nothing has to be
-   reasoned about in terms of what is behind it.
+   Surfaces are a single plum-tinted near-black family (hue 342), stepping
+   up in lightness rather than switching hue: sidebar 0.165, background
+   0.185, card 0.228, popover 0.243, muted 0.265. Depth comes from that step
+   plus a border, not from transparency or a gradient. All opaque, so
+   nothing has to be reasoned about in terms of what is behind it.
+
+   Text, primary and status colours keep their green and warm hues. Mint on
+   plum is a complementary pair, which is what makes the primary stand out.
    -------------------------------------------------------------------------- */
 .dark {
   color-scheme: dark;
 
-  --background: oklch(0.162 0.016 168);
+  --background: oklch(0.185 0.036 342);
   --foreground: oklch(0.945 0.004 90);
 
-  /* One soft glow top left. The base colour does the work; this only
-     keeps the top of the page from reading as flat. */
-  --background-gradient: radial-gradient(
-    100% 60% at 15% 0%,
-    oklch(0.212 0.028 168) 0%,
-    transparent 75%
-  );
-
-  --card: oklch(0.202 0.015 168);
+  --card: oklch(0.228 0.04 342);
   --card-foreground: oklch(0.945 0.004 90);
-  --popover: oklch(0.212 0.015 168);
+  --popover: oklch(0.243 0.04 342);
   --popover-foreground: oklch(0.945 0.004 90);
 
   --primary: oklch(0.74 0.085 165);
   --primary-foreground: oklch(0.195 0.03 168);
 
-  --secondary: oklch(0.238 0.013 168);
+  --secondary: oklch(0.265 0.036 342);
   --secondary-foreground: oklch(0.945 0.004 90);
 
-  --muted: oklch(0.238 0.013 168);
+  --muted: oklch(0.265 0.036 342);
   --muted-foreground: oklch(0.705 0.011 88);
 
-  --accent: oklch(0.272 0.028 168);
+  --accent: oklch(0.305 0.05 342);
   --accent-foreground: oklch(0.885 0.045 165);
 
   --destructive: oklch(0.665 0.172 24);
@@ -225,11 +219,11 @@
   --warning-subtle: oklch(0.285 0.055 72);
   --warning-subtle-foreground: oklch(0.87 0.1 80);
 
-  /* Tinted rather than white-alpha, so edges read green on a green
+  /* Tinted rather than white-alpha, so edges read plum on a plum
      surface instead of grey. */
-  --border: oklch(0.3 0.012 168);
-  --input: oklch(0.3 0.012 168);
-  --input-border: oklch(0.508 0.012 168);
+  --border: oklch(0.33 0.038 342);
+  --input: oklch(0.33 0.038 342);
+  --input-border: oklch(0.54 0.035 342);
   --ring: oklch(0.74 0.085 165);
 
   --chart-1: oklch(0.74 0.085 165);
@@ -238,13 +232,13 @@
   --chart-4: oklch(0.775 0.135 72);
   --chart-5: oklch(0.685 0.108 152);
 
-  --sidebar: oklch(0.152 0.015 168);
+  --sidebar: oklch(0.165 0.03 342);
   --sidebar-foreground: oklch(0.945 0.004 90);
   --sidebar-primary: oklch(0.74 0.085 165);
   --sidebar-primary-foreground: oklch(0.195 0.03 168);
-  --sidebar-accent: oklch(0.272 0.028 168);
+  --sidebar-accent: oklch(0.305 0.05 342);
   --sidebar-accent-foreground: oklch(0.885 0.045 165);
-  --sidebar-border: oklch(0.3 0.012 168);
+  --sidebar-border: oklch(0.33 0.038 342);
   --sidebar-ring: oklch(0.74 0.085 165);
 }
 
@@ -275,9 +269,6 @@
   html {
     -webkit-text-size-adjust: 100%;
     background-color: var(--background);
-    background-image: var(--background-gradient);
-    background-repeat: no-repeat;
-    background-attachment: fixed;
   }
 
   body {

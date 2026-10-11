@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+
 import Logo from '@/components/ui/layout/logo';
 import { TeacherSidebar } from '@/components/ui/layout/navigation/teacher-sidebar';
 import SkipLink from '@/components/ui/layout/skip-link';
@@ -8,8 +10,8 @@ import {
 } from '@/components/ui/sidebar';
 import { requireTeacher } from '@/features/auth/guard';
 
-export const metadata = {
-  title: { default: 'Dashboard', template: '%s | Dashboard | Dersly' },
+export const metadata: Metadata = {
+  title: 'Dashboard',
 };
 
 export default async function TeacherLayout({
