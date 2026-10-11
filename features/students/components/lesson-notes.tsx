@@ -9,19 +9,22 @@ export default function LessonNotes({ notes }: Props) {
   if (notes.length === 0) return null;
 
   return (
-    <section className="flex flex-col gap-4">
-      <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-[28px]">
+    <section className="flex flex-col gap-3">
+      <h2 className="text-xl leading-snug font-bold tracking-tight text-foreground">
         Lesson notes
       </h2>
-      <ol className="flex flex-col divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
+
+      {/* A plain list with a line between notes. The newest is open, and
+          opening another closes it, because they share a name. */}
+      <ol className="flex flex-col divide-y divide-border border-y border-border">
         {notes.map(({ id, taughtAt, note }, index) => (
           <li key={id}>
             <details name="lesson-notes" open={index === 0} className="group">
-              <summary className="flex min-h-14 cursor-pointer touch-manipulation list-none items-center justify-between gap-4 px-5 py-4 outline-none select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset active:bg-muted sm:px-6 [&::-webkit-details-marker]:hidden">
+              <summary className="-mx-2 flex min-h-13 cursor-pointer touch-manipulation list-none items-center justify-between gap-4 rounded-lg px-2 py-3 outline-none select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset active:bg-accent [&::-webkit-details-marker]:hidden">
                 <span className="flex min-w-0 flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
                   <time
                     dateTime={taughtAt}
-                    className="text-[15px] font-semibold text-foreground"
+                    className="text-base font-semibold text-foreground"
                   >
                     {formatDate(taughtAt, 'long')}
                   </time>
@@ -36,7 +39,7 @@ export default function LessonNotes({ notes }: Props) {
                   aria-hidden
                 />
               </summary>
-              <div className="min-w-0 px-5 pb-5 break-words sm:px-6">
+              <div className="min-w-0 pt-1 pb-5">
                 <LessonNoteBody note={note} />
               </div>
             </details>

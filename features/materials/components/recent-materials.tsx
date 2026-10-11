@@ -1,4 +1,4 @@
-import { BookOpen, Link2, Play } from 'lucide-react';
+import { Play } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -18,9 +18,9 @@ export default function RecentMaterials({ items }: { items: Item[] }) {
   if (items.length === 0) return null;
 
   return (
-    <section className="flex flex-col gap-4">
+    <section className="flex flex-col gap-3">
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-[28px]">
+        <h2 className="text-xl leading-snug font-bold tracking-tight text-foreground">
           Recent materials
         </h2>
         <Link
@@ -31,52 +31,46 @@ export default function RecentMaterials({ items }: { items: Item[] }) {
         </Link>
       </div>
 
-      <ul className="flex flex-col rounded-2xl border border-border bg-card p-2">
+      {/* Every title starts on the same left edge. Only a video has a
+          picture, and it sits at the end of its row. */}
+      <ul className="flex flex-col divide-y divide-border border-y border-border">
         {items.map(({ id, title, kind, level, url }) => {
           const videoId = url ? youTubeId(url) : null;
-          const Icon = kind === 'guide' ? BookOpen : Link2;
 
           return (
             <li key={id}>
               <Link
                 href={`/materials/${id}`}
-                className="flex touch-manipulation items-center gap-3.5 rounded-xl p-3 transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:bg-muted"
+                className="-mx-2 flex min-h-14 touch-manipulation items-center gap-4 rounded-lg px-2 py-3 transition-colors hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:bg-accent"
               >
-                {videoId ? (
-                  <span className="relative block aspect-video w-24 shrink-0 overflow-hidden rounded-lg bg-muted">
+                <span className="min-w-0 flex-1">
+                  <span className="line-clamp-2 text-base leading-snug font-semibold wrap-break-word text-foreground">
+                    {title}
+                  </span>
+                  <span className="mt-0.5 block truncate text-sm text-muted-foreground">
+                    {describe(kind, Boolean(videoId), level)}
+                  </span>
+                </span>
+
+                {videoId && (
+                  <span className="relative block aspect-video w-20 shrink-0 overflow-hidden rounded-lg bg-muted">
                     <Image
                       src={`https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`}
                       alt=""
                       fill
-                      sizes="96px"
+                      sizes="80px"
                       className="object-cover"
                     />
                     <span
                       aria-hidden
                       className="absolute inset-0 flex items-center justify-center"
                     >
-                      <span className="flex size-7 items-center justify-center rounded-full bg-card/95">
-                        <Play className="size-3 fill-foreground text-foreground" />
+                      <span className="flex size-6 items-center justify-center rounded-full bg-card/95">
+                        <Play className="size-2.5 fill-foreground text-foreground" />
                       </span>
                     </span>
                   </span>
-                ) : (
-                  <span
-                    aria-hidden
-                    className="flex aspect-video w-24 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground"
-                  >
-                    <Icon className="size-5" />
-                  </span>
                 )}
-
-                <span className="min-w-0 flex-1">
-                  <span className="line-clamp-2 text-[15px] leading-snug font-semibold break-words text-foreground">
-                    {title}
-                  </span>
-                  <span className="mt-1 block truncate text-[13px] text-muted-foreground">
-                    {describe(kind, Boolean(videoId), level)}
-                  </span>
-                </span>
               </Link>
             </li>
           );
