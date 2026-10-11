@@ -1,6 +1,6 @@
 import * as z from 'zod';
 
-const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
+import { parseTime } from '@/lib/schedule';
 
 export const ClassSchema = z.object({
   name: z
@@ -21,7 +21,14 @@ export const ClassSchema = z.object({
     .array(
       z.object({
         day: z.number().int().min(1).max(7),
-        time: z.string().regex(TIME, { message: 'Set a start time.' }),
+        time: z
+          .string()
+          .trim()
+          .min(1, { message: 'Set a start time.' })
+          .refine((value) => parseTime(value) !== null, {
+            message: 'Use 24-hour time, like 21:00.',
+          })
+          .transform((value) => parseTime(value) ?? value),
       }),
     )
     .max(7)

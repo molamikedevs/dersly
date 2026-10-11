@@ -1,5 +1,6 @@
 export const SCHEDULE_TIME_ZONE = 'Asia/Baku';
 
+// ISO weekdays: 1 is Monday, 7 is Sunday. The week starts on Monday here.
 export const WEEKDAYS = [
   { value: 1, short: 'Mon', long: 'Monday' },
   { value: 2, short: 'Tue', long: 'Tuesday' },
@@ -10,9 +11,30 @@ export const WEEKDAYS = [
   { value: 7, short: 'Sun', long: 'Sunday' },
 ] as const;
 
+// time is 'HH:MM', 24 hour
 export type ScheduleSlot = { day: number; time: string };
 
 const TIME = /^([01]\d|2[0-3]):[0-5]\d/;
+
+// Reads a start time the way a person types it and returns 'HH:MM', or null
+// when it is not a time of day. Accepts 21:00, 21.00, 21;00, 2100, 9:30 and 9.
+// 24-hour only, which is how lesson times are written everywhere in the app.
+export function parseTime(input: string): string | null {
+  const text = input.trim();
+  const match =
+    /^(\d{1,2})\s*[:;.,\s]\s*(\d{2})$/.exec(text) ??
+    /^(\d{1,2})(\d{2})$/.exec(text) ??
+    /^(\d{1,2})$/.exec(text);
+
+  if (!match) return null;
+
+  const hours = Number(match[1]);
+  const minutes = Number(match[2] ?? 0);
+
+  if (hours > 23 || minutes > 59) return null;
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+}
 
 export function toSlots(
   days: readonly number[] | null | undefined,
