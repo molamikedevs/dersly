@@ -13,7 +13,8 @@ type StudentHome = {
   };
   lessonNotes: {
     id: string;
-    taughtAt: string;
+    // The day the lesson happened, 'YYYY-MM-DD'
+    lessonDate: string;
     note: string;
   }[];
   reading: {

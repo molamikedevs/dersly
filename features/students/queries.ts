@@ -150,12 +150,15 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
 
     if (progressError) throwPostgresError(progressError, 'Lesson');
 
-    // The latest lessons that have a note, newest first
+    // The latest lessons that have a note, newest lesson first. lesson_date
+    // is the day the lesson happened. taught_at, the moment it was recorded,
+    // only settles the order of two lessons on the same day.
     const { data: notes, error: notesError } = await supabase
       .from('lessons')
-      .select('id, taught_at, note')
+      .select('id, lesson_date, note')
       .eq('enrollment_id', enrolment.id)
       .not('note', 'is', null)
+      .order('lesson_date', { ascending: false })
       .order('taught_at', { ascending: false })
       .limit(LESSON_NOTES_SHOWN);
 
@@ -222,7 +225,8 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
     return {
       success: true,
       data: {
-        firstName: profile.full_name.trim().split(/\s+/)[0] ?? '',
+        // Empty when the name is blank, and the page then greets without it
+        firstName: profile.full_name.trim().split(/\s+/)[0],
         studentLevel: profile.level,
         enrolment: {
           classId: owner.id,
@@ -230,6 +234,7 @@ export async function getStudentHome(): Promise<ActionResponse<StudentHome>> {
           type: owner.type,
           level: owner.level,
           schedule: formatSchedule(slots),
+          // The next real lesson as an ISO instant, null without a schedule
           nextLessonAt: getNextLesson(slots)?.toISOString() ?? null,
           meetingUrl: owner.meeting_url,
           lessonsDone: progress?.lessons_done ?? 0,

@@ -17,16 +17,16 @@ export default function LessonNotes({ notes }: Props) {
       {/* A plain list with a line between notes. The newest is open, and
           opening another closes it, because they share a name. */}
       <ol className="flex flex-col divide-y divide-border border-y border-border">
-        {notes.map(({ id, taughtAt, note }, index) => (
+        {notes.map(({ id, lessonDate, note }, index) => (
           <li key={id}>
             <details name="lesson-notes" open={index === 0} className="group">
               <summary className="-mx-2 flex min-h-13 cursor-pointer touch-manipulation list-none items-center justify-between gap-4 rounded-lg px-2 py-3 outline-none select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset active:bg-accent [&::-webkit-details-marker]:hidden">
                 <span className="flex min-w-0 flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
                   <time
-                    dateTime={taughtAt}
+                    dateTime={lessonDate}
                     className="text-base font-semibold text-foreground"
                   >
-                    {formatDate(taughtAt, 'long')}
+                    {formatDate(lessonDate, 'long')}
                   </time>
                   {index === 0 && (
                     <span className="text-sm text-muted-foreground">
