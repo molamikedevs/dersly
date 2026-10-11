@@ -1,17 +1,21 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 
-import Logo from '@/components/ui/layout/logo';
 import { TeacherSidebar } from '@/components/ui/layout/navigation/teacher-sidebar';
+import TeacherTabBar from '@/components/ui/layout/navigation/teacher-tab-bar';
+import TeacherTopBar from '@/components/ui/layout/navigation/teacher-top-bar';
 import SkipLink from '@/components/ui/layout/skip-link';
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from '@/components/ui/sidebar';
+import { SidebarProvider } from '@/components/ui/sidebar';
 import { requireTeacher } from '@/features/auth/guard';
 
 export const metadata: Metadata = {
   title: 'Dashboard',
+};
+
+// Lets the page reach the screen edges, which is what makes
+// env(safe-area-inset-*) report the real insets when Dersly is opened from
+// the home screen. Every edge is padded back in below and in the two bars.
+export const viewport: Viewport = {
+  viewportFit: 'cover',
 };
 
 export default async function TeacherLayout({
@@ -22,7 +26,7 @@ export default async function TeacherLayout({
   const profile = await requireTeacher();
 
   return (
-    <SidebarProvider>
+    <SidebarProvider className="pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]">
       <SkipLink />
       <TeacherSidebar
         name={profile.full_name}
@@ -30,19 +34,24 @@ export default async function TeacherLayout({
         avatarUrl={profile.avatarUrl}
       />
 
-      <SidebarInset className="bg-transparent">
-        <header className="sticky top-0 z-20 flex h-16 items-center gap-2 border-b border-border bg-background/85 px-2 backdrop-blur-md md:hidden">
-          <SidebarTrigger className="tap-target rounded-lg" />
-          <Logo href="/dashboard" />
-        </header>
+      <div className="relative flex w-full min-w-0 flex-1 flex-col">
+        <TeacherTopBar
+          name={profile.full_name}
+          email={profile.email}
+          avatarUrl={profile.avatarUrl}
+        />
 
+        {/* On phones the bottom padding is the tab bar (3.5rem), the home
+            indicator and 2rem of air, so the last row always clears the bar. */}
         <main
           id="main"
-          className="flex-1 px-4 pb-16 pt-8 sm:px-6 md:px-10 md:pt-14"
+          className="flex-1 px-4 pt-8 pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:px-6 md:px-10 md:pt-14 md:pb-16"
         >
           <div className="mx-auto w-full max-w-6xl">{children}</div>
         </main>
-      </SidebarInset>
+      </div>
+
+      <TeacherTabBar />
     </SidebarProvider>
   );
 }
