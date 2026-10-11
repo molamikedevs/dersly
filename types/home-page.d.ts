@@ -7,6 +7,7 @@ type StudentHome = {
     type: ClassType;
     level: string | null;
     schedule: string | null;
+    nextLessonAt: string | null;
     meetingUrl: string | null;
     lessonsDone: number;
   };
