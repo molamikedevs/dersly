@@ -14,7 +14,8 @@ export const metadata: Metadata = {
 
 // Lets the page reach the screen edges, which is what makes
 // env(safe-area-inset-*) report the real insets when Dersly is opened from
-// the home screen. Every edge is padded back in below and in the two bars.
+// the home screen. The root layout pads the sides, the two bars and the page
+// padding add the top and bottom back.
 export const viewport: Viewport = {
   viewportFit: 'cover',
 };
@@ -27,7 +28,7 @@ export default async function TeacherLayout({
   const profile = await requireTeacher();
 
   return (
-    <SidebarProvider className="pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]">
+    <SidebarProvider>
       <SkipLink />
       <ScrollToTop />
       <TeacherSidebar
