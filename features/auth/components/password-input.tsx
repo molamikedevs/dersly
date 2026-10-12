@@ -26,13 +26,16 @@ export default function PasswordInput({
         className={cn('pr-12', className)}
       />
 
+      {/* Reachable by keyboard, so everyone can check what they typed.
+          Pressing it with a mouse or finger keeps the cursor in the field. */}
       <button
         type="button"
+        onPointerDown={(event) => event.preventDefault()}
         onClick={() => setVisible((v) => !v)}
         aria-pressed={visible}
+        aria-controls={props.id}
         aria-label={visible ? 'Hide password' : 'Show password'}
-        tabIndex={-1}
-        className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-md text-muted-foreground transition-colors hover:text-foreground"
+        className="absolute inset-y-0 right-0 flex w-12 touch-manipulation items-center justify-center rounded-r-xl text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset"
       >
         {visible ? (
           <EyeOff className="size-4" aria-hidden />

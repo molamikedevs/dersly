@@ -269,6 +269,14 @@
   html {
     -webkit-text-size-adjust: 100%;
     background-color: var(--background);
+    /* Scrollbars in the site colours instead of the browser's grey. The
+       property is inherited, so dialogs and every scrolling box follow. */
+    scrollbar-color: color-mix(
+        in oklch,
+        var(--muted-foreground) 45%,
+        transparent
+      )
+      transparent;
   }
 
   body {
