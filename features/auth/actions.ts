@@ -14,12 +14,31 @@ import {
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-// field names the form input the error belongs to, so it can show inline
-type ActionResult = { error: string; field?: string } | undefined;
+// field: the input the error belongs to, so the form shows it there.
+// expired: the reset link no longer works, so the form shows that screen.
+export type ActionResult =
+  | { error: string; field?: string; expired?: boolean }
+  | undefined;
+
+const NETWORK_ERROR =
+  'Could not reach Dersly. Check your internet connection and try again.';
+
+const TOO_MANY_TRIES =
+  'Too many tries in a short time. Wait a few minutes, then try again.';
+
+type AuthFailure = { code?: string; status?: number; name?: string };
+
+function isNetworkFailure(error: AuthFailure) {
+  return error.name === 'AuthRetryableFetchError' || error.status === 0;
+}
+
+function isRateLimited(error: AuthFailure) {
+  return error.status === 429 || Boolean(error.code?.startsWith('over_'));
+}
 
 export async function signIn(values: unknown): Promise<ActionResult> {
   const parsed = LogInSchema.safeParse(values);
-  if (!parsed.success) return { error: 'Please check the form and try again.' };
+  if (!parsed.success) return { error: 'Check the highlighted fields.' };
 
   const supabase = createClient(await cookies());
 
@@ -28,7 +47,20 @@ export async function signIn(values: unknown): Promise<ActionResult> {
     password: parsed.data.password,
   });
 
-  if (error) return { error: 'Wrong email or password.' };
+  if (error) {
+    if (isNetworkFailure(error)) return { error: NETWORK_ERROR };
+    if (isRateLimited(error)) return { error: TOO_MANY_TRIES };
+
+    if (error.code === 'email_not_confirmed') {
+      return {
+        error:
+          'Confirm your email first. Open the link we sent when you signed up.',
+      };
+    }
+
+    // Never say which of the two was wrong
+    return { error: 'Email or password is incorrect.' };
+  }
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -41,7 +73,7 @@ export async function signIn(values: unknown): Promise<ActionResult> {
 
 export async function signUp(values: unknown): Promise<ActionResult> {
   const parsed = RegisterSchema.safeParse(values);
-  if (!parsed.success) return { error: 'Please check the form and try again.' };
+  if (!parsed.success) return { error: 'Check the highlighted fields.' };
 
   const { fullname, email, password, code } = parsed.data;
   const supabase = createClient(await cookies());
@@ -53,11 +85,15 @@ export async function signUp(values: unknown): Promise<ActionResult> {
   );
 
   if (codeError) {
-    return { error: 'Could not check your class code. Please try again.' };
+    return { error: 'Could not check your class code. Try again.' };
   }
 
   if (!isValid) {
-    return { error: 'That class code is not valid.', field: 'code' };
+    return {
+      error:
+        'This class code does not work. Check it with your teacher, it may have changed.',
+      field: 'code',
+    };
   }
 
   const { data, error } = await supabase.auth.signUp({
@@ -67,15 +103,27 @@ export async function signUp(values: unknown): Promise<ActionResult> {
   });
 
   if (error) {
-    return {
-      error:
-        error.code === 'user_already_exists'
-          ? 'An account with this email already exists.'
-          : 'Could not create your account. Please try again.',
-    };
+    if (isNetworkFailure(error)) return { error: NETWORK_ERROR };
+    if (isRateLimited(error)) return { error: TOO_MANY_TRIES };
+
+    if (error.code === 'user_already_exists') {
+      return {
+        error: 'There is already an account with this email. Log in instead.',
+        field: 'email',
+      };
+    }
+
+    if (error.code === 'weak_password') {
+      return {
+        error: 'Choose a stronger password, one that is harder to guess.',
+        field: 'password',
+      };
+    }
+
+    return { error: 'Could not create your account. Try again.' };
   }
 
-  if (!data.user) return { error: 'Could not create your account.' };
+  if (!data.user) return { error: 'Could not create your account. Try again.' };
 
   redirect('/');
 }
@@ -90,10 +138,12 @@ export async function requestPasswordReset(
   values: unknown,
 ): Promise<ActionResult> {
   const parsed = ForgotPasswordSchema.safeParse(values);
-  if (!parsed.success) return { error: 'Enter a valid email address.' };
+  if (!parsed.success) return { error: 'Check the highlighted fields.' };
 
   const supabase = createClient(await cookies());
 
+  // The result is ignored on purpose: the answer is the same whether or not
+  // the email has an account, so nobody can use this page to find students.
   await supabase.auth.resetPasswordForEmail(parsed.data.email, {
     redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?next=/reset-password`,
   });
@@ -103,16 +153,50 @@ export async function requestPasswordReset(
 
 export async function updatePassword(values: unknown): Promise<ActionResult> {
   const parsed = ResetPasswordSchema.safeParse(values);
-  if (!parsed.success) return { error: 'Please check the form and try again.' };
+  if (!parsed.success) return { error: 'Check the highlighted fields.' };
 
   const supabase = createClient(await cookies());
+
+  // The reset link signs the person in. Without that session the link has
+  // expired or was already used.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: 'This reset link has expired.', expired: true };
+  }
 
   const { error } = await supabase.auth.updateUser({
     password: parsed.data.password,
   });
 
   if (error) {
-    return { error: 'Could not update your password. Try the link again.' };
+    if (isNetworkFailure(error)) return { error: NETWORK_ERROR };
+
+    if (error.code === 'same_password') {
+      return {
+        error: 'Choose a password different from your old one.',
+        field: 'password',
+      };
+    }
+
+    if (error.code === 'weak_password') {
+      return {
+        error: 'Choose a stronger password, one that is harder to guess.',
+        field: 'password',
+      };
+    }
+
+    if (
+      error.code === 'session_not_found' ||
+      error.code === 'session_expired' ||
+      error.status === 401
+    ) {
+      return { error: 'This reset link has expired.', expired: true };
+    }
+
+    return { error: 'Could not save your new password. Try again.' };
   }
 
   redirect('/');
