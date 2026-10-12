@@ -29,8 +29,7 @@ export async function createHomework(
     return handleError(validationResult) as ErrorResponse;
   }
 
-  const { classId, title, instructions, content, file } =
-    validationResult.params!;
+  const { classId, title, content, file } = validationResult.params!;
 
   try {
     const attachmentPath = file
@@ -44,7 +43,6 @@ export async function createHomework(
       .insert({
         class_id: classId,
         title,
-        instructions: instructions || null,
         content: content || null,
         attachment_path: attachmentPath,
         attachment_name: file?.name ?? null,
@@ -78,8 +76,7 @@ export async function updateHomework(
     return handleError(validationResult) as ErrorResponse;
   }
 
-  const { classId, title, instructions, content, file } =
-    validationResult.params!;
+  const { classId, title, content, file } = validationResult.params!;
 
   try {
     const supabase = createClient(await cookies());
@@ -97,11 +94,12 @@ export async function updateHomework(
     const attachmentPath = newPath ?? existing.attachment_path;
     const attachmentName = file?.name ?? existing.attachment_name;
 
+    // Instructions are no longer edited here. Leaving the column out keeps
+    // what older homework already has.
     const { data, error } = await supabase
       .from('homework')
       .update({
         title,
-        instructions: instructions || null,
         content: content || null,
         attachment_path: attachmentPath,
         attachment_name: attachmentName,

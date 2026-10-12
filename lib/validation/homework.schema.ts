@@ -10,26 +10,36 @@ const ACCEPTED_TYPES = [
   'image/png',
 ];
 
+export const TITLE_MAX = 80;
+export const GUIDE_MAX = 20000;
+
+// One line, one space between words, the same letters however they were typed
+function singleLine(value: string) {
+  return value.normalize('NFC').replace(/\s+/g, ' ').trim();
+}
+
 export const HomeworkSchema = z
   .object({
     classId: z.uuid({ message: 'Choose a class.' }),
 
     title: z
       .string()
-      .trim()
-      .min(2, { message: 'Give the homework a title.' })
-      .max(80, { message: 'Title cannot exceed 80 characters.' }),
-
-    instructions: z
-      .string()
-      .trim()
-      .max(500, { message: 'Keep the instructions short.' })
-      .optional(),
+      .transform(singleLine)
+      .pipe(
+        z
+          .string()
+          .min(2, { message: 'Give the homework a title.' })
+          .max(TITLE_MAX, {
+            message: `Keep the title under ${TITLE_MAX} characters.`,
+          }),
+      ),
 
     content: z
       .string()
       .trim()
-      .max(20000, { message: 'The guide is too long.' })
+      .max(GUIDE_MAX, {
+        message: `The guide is too long. Keep it under ${GUIDE_MAX.toLocaleString('en')} characters.`,
+      })
       .optional(),
 
     existingPath: z.string().optional(),
@@ -45,16 +55,9 @@ export const HomeworkSchema = z
       })
       .optional(),
   })
-  .refine(
-    (data) =>
-      !!data.content ||
-      !!data.file ||
-      !!data.existingPath ||
-      !!data.instructions,
-    {
-      message: 'Write a guide or instructions.',
-      path: ['content'],
-    },
-  );
+  .refine((data) => !!data.content || !!data.file || !!data.existingPath, {
+    message: 'Write the guide before posting.',
+    path: ['content'],
+  });
 
 export type HomeworkValues = z.infer<typeof HomeworkSchema>;
