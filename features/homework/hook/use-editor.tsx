@@ -1,19 +1,30 @@
 'use client';
 
-import { useRef, useState, type ChangeEvent } from 'react';
+import { useCallback, useRef, useState, type ChangeEvent } from 'react';
 
 import { uploadLessonImage } from '@/features/homework/upload-lesson-image';
 import { toAltText, toVocabularyTable } from '../lib/index';
 
 interface Props {
   onChange: (value: string) => void;
+  // The form's own ref, so a failed submit can move focus to the guide
+  inputRef?: (node: HTMLTextAreaElement | null) => void;
 }
 
-export function useEditor({ onChange }: Props) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+export function useEditor({ onChange, inputRef }: Props) {
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+
+  // One ref for the textarea, shared with the form
+  const bindTextarea = useCallback(
+    (node: HTMLTextAreaElement | null) => {
+      textareaRef.current = node;
+      inputRef?.(node);
+    },
+    [inputRef],
+  );
 
   function insert(snippet: string) {
     const textarea = textareaRef.current;
@@ -57,12 +68,12 @@ export function useEditor({ onChange }: Props) {
       setUploadError(
         caught instanceof Error
           ? caught.message
-          : 'Could not upload the picture.',
+          : 'Could not upload the picture. Try again.',
       );
     } finally {
       setIsUploading(false);
     }
   }
 
-  return { fileInputRef, uploadError, isUploading, textareaRef, handleFiles };
+  return { fileInputRef, uploadError, isUploading, bindTextarea, handleFiles };
 }
