@@ -23,3 +23,18 @@ type HomeWorkGroup = {
   name: string;
   items: HomeWorkRecord[];
 };
+
+// The class comes back with its lesson times, so each piece of work can say
+// which lesson it is for
+type HomeworkRow = HomeWorkRecord & {
+  classes?:
+    | (NonNullable<HomeWorkRecord['classes']> & {
+        scheduleDays: number[] | null;
+        scheduleTimes: string[] | null;
+      })
+    | null;
+};
+
+type HomeworkItem = HomeWorkRecord & {
+  lessonAt: string | null;
+};

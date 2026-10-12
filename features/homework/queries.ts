@@ -5,6 +5,7 @@ import * as z from 'zod';
 import action from '@/lib/handlers/action';
 import handleError from '@/lib/handlers/errors';
 import { NotFoundError, throwPostgresError } from '@/lib/http-errors';
+import { getNextLesson, toSlots } from '@/lib/schedule';
 import { createClient } from '@/lib/supabase/server';
 import { signStoragePath } from '@/lib/supabase/sign';
 import { toCamel } from '@/lib/utils';
@@ -18,7 +19,7 @@ import {
 async function fetchHomework(
   params: PaginatedSearchParams,
   classId?: string,
-): Promise<ActionResponse<{ homework: HomeWorkRecord[]; isNext: boolean }>> {
+): Promise<ActionResponse<{ homework: HomeworkItem[]; isNext: boolean }>> {
   const validationResult = await action({
     params,
     schema: PaginatedSearchParamsSchema,
@@ -38,7 +39,9 @@ async function fetchHomework(
 
     let request = supabase
       .from('homework')
-      .select('*, classes(id, name, type)', { count: 'exact' });
+      .select('*, classes(id, name, type, schedule_days, schedule_times)', {
+        count: 'exact',
+      });
 
     if (classId) request = request.eq('class_id', classId);
 
@@ -48,7 +51,17 @@ async function fetchHomework(
 
     if (error) throwPostgresError(error, 'Homework');
 
-    const homework = toCamel<HomeWorkRecord[]>(data ?? []);
+    const homework: HomeworkItem[] = toCamel<HomeworkRow[]>(data ?? []).map(
+      (item) => {
+        const slots = toSlots(
+          item.classes?.scheduleDays,
+          item.classes?.scheduleTimes,
+        );
+        const lesson = getNextLesson(slots, new Date(item.createdAt), 0);
+
+        return { ...item, lessonAt: lesson?.toISOString() ?? null };
+      },
+    );
 
     await Promise.all(
       homework.map(async (item) => {
