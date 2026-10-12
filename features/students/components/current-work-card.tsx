@@ -10,8 +10,13 @@ type Props = {
   downloadUrl?: string | null;
   asQuestions?: boolean;
   readHref?: string;
+  forLesson?: string | null;
+  posted?: string | null;
+  readStyle?: 'primary' | 'quiet';
 };
 
+// One piece of homework, set straight on the page with no box around it, so
+// the text gets the full width of a phone.
 export default function CurrentWorkCard({
   title,
   titleDisplay = 'heading',
@@ -21,6 +26,9 @@ export default function CurrentWorkCard({
   downloadUrl,
   asQuestions = false,
   readHref,
+  forLesson,
+  posted,
+  readStyle = 'primary',
 }: Props) {
   const lines =
     asQuestions && instructions
@@ -33,10 +41,11 @@ export default function CurrentWorkCard({
   const showAsList = lines.length > 1;
   const showText = Boolean(instructions) && !showAsList;
   const fileName = attachmentName ?? 'Attachment';
+  const hasDetails = Boolean(forLesson || posted);
 
   return (
     <div className="flex min-w-0 flex-col gap-4">
-      {(titleDisplay !== 'hidden' || showText) && (
+      {(titleDisplay !== 'hidden' || showText || hasDetails) && (
         <div className="flex min-w-0 flex-col gap-1.5">
           {titleDisplay === 'heading' && (
             <h3 className="text-xl leading-snug font-bold tracking-tight wrap-break-word text-foreground">
@@ -47,6 +56,20 @@ export default function CurrentWorkCard({
           {titleDisplay === 'plain' && (
             <p className="text-base leading-snug font-semibold wrap-break-word text-foreground">
               {title}
+            </p>
+          )}
+
+          {/* What the work is for comes first, when it was posted second */}
+          {hasDetails && (
+            <p className="flex flex-col text-sm leading-relaxed">
+              {forLesson && (
+                <span className="font-medium wrap-break-word text-foreground">
+                  {forLesson}
+                </span>
+              )}
+              {posted && (
+                <span className="text-muted-foreground">{posted}</span>
+              )}
             </p>
           )}
 
@@ -77,7 +100,11 @@ export default function CurrentWorkCard({
       {readHref ? (
         <Link
           href={readHref}
-          className="inline-flex h-12 w-full touch-manipulation items-center justify-center gap-2 rounded-xl bg-primary px-6 text-[15px] font-semibold text-primary-foreground transition-[scale,background-color] duration-150 ease-out select-none hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none active:scale-[0.97] sm:w-auto sm:self-start"
+          className={
+            readStyle === 'primary'
+              ? 'inline-flex h-12 w-full touch-manipulation items-center justify-center gap-2 rounded-xl bg-primary px-6 text-[15px] font-semibold text-primary-foreground transition-[scale,background-color] duration-150 ease-out select-none hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none active:scale-[0.97] sm:w-auto sm:self-start'
+              : 'inline-flex h-11 touch-manipulation items-center justify-center gap-2 self-start rounded-xl border border-input-border bg-card px-4 text-sm font-semibold text-foreground transition-[scale,background-color] duration-150 ease-out select-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-[0.97]'
+          }
         >
           <BookOpen className="size-4" aria-hidden />
           Read guide
