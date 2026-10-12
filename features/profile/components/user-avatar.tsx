@@ -3,6 +3,7 @@
 import { User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import type { MouseEvent } from 'react';
 
 import InitialsAvatar from '@/components/common/initials-avatar';
 import { cn } from '@/lib/utils';
@@ -12,14 +13,10 @@ type Props = {
   email?: string;
   avatarUrl?: string | null;
   href?: string;
-  /**
-   * button - circular link for the student top bar
-   * row    - full width name and email row for the teacher sidebar footer
-   * tab    - icon and label cell inside the student tab bar
-   */
   variant?: 'button' | 'row' | 'tab';
   active?: boolean;
   className?: string;
+  onClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
 };
 
 function Face({
@@ -57,6 +54,7 @@ export default function UserAvatar({
   variant = 'button',
   active = false,
   className,
+  onClick,
 }: Props) {
   if (variant === 'row') {
     return (
@@ -65,7 +63,7 @@ export default function UserAvatar({
         aria-current={active ? 'page' : undefined}
         className={cn(
           'flex w-full items-center gap-3 rounded-lg px-2 py-2 transition-colors',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
           'group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0',
           active ? 'bg-accent text-accent-foreground' : 'hover:bg-muted',
           className,
@@ -92,42 +90,49 @@ export default function UserAvatar({
   }
 
   if (variant === 'tab') {
+    // Same press feedback as the other tabs: the icon and label shrink a
+    // little under the finger, and a long press does not open a link preview.
     return (
       <Link
         href={href}
+        draggable={false}
+        onClick={onClick}
         aria-current={active ? 'page' : undefined}
         className={cn(
-          'flex h-14 flex-col items-center justify-center gap-1 px-1',
-          'transition-colors active:bg-muted',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
+          'group flex h-14 touch-manipulation items-center justify-center px-0.5 select-none',
+          '[-webkit-touch-callout:none]',
+          'transition-colors duration-150 ease-out',
+          'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset',
           active ? 'text-primary' : 'text-muted-foreground',
           className,
         )}
       >
-        {avatarUrl ? (
-          <Face
-            name={name}
-            avatarUrl={avatarUrl}
-            size={20}
-            className={cn(
-              'size-5 ring-offset-2 ring-offset-card',
-              active && 'ring-2 ring-primary',
-            )}
-          />
-        ) : (
-          <User
-            className="size-5 shrink-0"
-            aria-hidden
-            strokeWidth={active ? 2.25 : 1.75}
-          />
-        )}
-        <span
-          className={cn(
-            'max-w-full truncate text-[11px] leading-tight',
-            active ? 'font-semibold' : 'font-medium',
+        <span className="flex w-full min-w-0 flex-col items-center gap-1 transition-transform duration-150 ease-out group-active:scale-[0.92]">
+          {avatarUrl ? (
+            <Face
+              name={name}
+              avatarUrl={avatarUrl}
+              size={20}
+              className={cn(
+                'size-5 ring-offset-2 ring-offset-card',
+                active && 'ring-2 ring-primary',
+              )}
+            />
+          ) : (
+            <User
+              className="size-5 shrink-0"
+              aria-hidden
+              strokeWidth={active ? 2.25 : 1.75}
+            />
           )}
-        >
-          Profile
+          <span
+            className={cn(
+              'max-w-full truncate text-[11px] leading-tight',
+              active ? 'font-semibold' : 'font-medium',
+            )}
+          >
+            Profile
+          </span>
         </span>
       </Link>
     );
@@ -140,7 +145,7 @@ export default function UserAvatar({
       aria-current={active ? 'page' : undefined}
       className={cn(
         'flex size-11 shrink-0 items-center justify-center rounded-full transition-opacity hover:opacity-80',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+        'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none',
         className,
       )}
     >
