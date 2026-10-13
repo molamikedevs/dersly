@@ -6,13 +6,14 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 import InitialsAvatar from '@/components/common/initials-avatar';
-import { updateAvatar } from '@/features/profile/actions';
+import { useDerslyActions } from '@/features/app/actions-context';
 import { resizeImage } from '@/lib/resize-image';
 import { cn } from '@/lib/utils';
 
 type Props = {
   name: string;
   src?: string | null;
+  // The name and email, shown beside the photo
   children: ReactNode;
 };
 
@@ -30,6 +31,8 @@ type Status =
   | { kind: 'error'; message: string };
 
 export default function AvatarUploader({ name, src, children }: Props) {
+  // The real action in the app, a local preview in the demo
+  const { updateAvatar } = useDerslyActions();
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [saved, setSaved] = useState<string | null>(src ?? null);

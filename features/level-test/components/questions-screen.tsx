@@ -1,10 +1,11 @@
 'use client';
 
 import { AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
-import { submitAttempt } from '@/features/level-test/actions';
+import { useDerslyActions } from '@/features/app/actions-context';
+import { useAppRouter } from '@/features/app/app-mode';
 import { saveProgress, useSavedProgress } from '@/features/level-test/progress';
 import { cn } from '@/lib/utils';
 
@@ -35,7 +36,9 @@ export default function QuestionsScreen({
   questions,
   storageKey,
 }: Props) {
-  const router = useRouter();
+  // Real or demo, the action and the result page come from the app mode
+  const { submitAttempt } = useDerslyActions();
+  const router = useAppRouter();
   const searchParams = useSearchParams();
   const headingRef = useRef<HTMLHeadingElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
