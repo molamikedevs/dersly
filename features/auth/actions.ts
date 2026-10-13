@@ -58,8 +58,9 @@ export async function signIn(values: unknown): Promise<ActionResult> {
       };
     }
 
-    // Never say which of the two was wrong
-    return { error: 'Email or password is incorrect.' };
+    return {
+      error: 'No account matches this email and password.',
+    };
   }
 
   const { data: profile } = await supabase
