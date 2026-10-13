@@ -16,6 +16,12 @@ import type { ActionResponse, ErrorResponse } from '@/types/global';
 
 const AVATAR_BUCKET = 'avatars';
 
+// "avatars/<user id>/<file>" is stored on the profile. Storage wants the
+// part after the bucket name.
+function pathInBucket(fullPath: string) {
+  return fullPath.split('/').slice(1).join('/');
+}
+
 export async function updateAvatar(
   params: AvatarValues,
 ): Promise<ActionResponse<{ avatarUrl: string }>> {
@@ -30,44 +36,56 @@ export async function updateAvatar(
   }
 
   const { file } = validationResult.params!;
-  const { user } = validationResult;
+  const userId = validationResult.user!.id;
+  const supabase = createClient(await cookies());
+
+  // Set while the new file exists but the profile does not point at it yet
+  let unlinked: string | null = null;
 
   try {
-    const supabase = createClient(await cookies());
-
-    const { data: existing } = await supabase
-      .from('profiles')
-      .select('avatar_path')
-      .eq('id', user!.id)
-      .maybeSingle();
-
-    const avatarPath = await uploadFile(file, AVATAR_BUCKET, user!.id);
+    // The bucket refuses anything that is not JPG, PNG or WebP, or is over
+    // 2 MB, so the limits hold even if the browser checks are skipped
+    const avatarPath = await uploadFile(file, AVATAR_BUCKET, userId);
+    unlinked = avatarPath;
 
     const { error } = await supabase
       .from('profiles')
       .update({ avatar_path: avatarPath })
-      .eq('id', user!.id);
+      .eq('id', userId);
 
     if (error) throwPostgresError(error, 'Profile');
+    unlinked = null;
 
-    const orphan = existing?.avatar_path;
-    if (orphan && orphan !== avatarPath) {
-      const [bucket, ...rest] = orphan.split('/');
-      await supabase.storage.from(bucket).remove([rest.join('/')]);
+    // Clear everything else in this person's folder: the photo just
+    // replaced, and anything left by an upload that failed half way
+    const current = pathInBucket(avatarPath);
+    const { data: files } = await supabase.storage
+      .from(AVATAR_BUCKET)
+      .list(userId);
+
+    const stale = (files ?? [])
+      .map((item) => `${userId}/${item.name}`)
+      .filter((path) => path !== current);
+
+    if (stale.length > 0) {
+      await supabase.storage.from(AVATAR_BUCKET).remove(stale);
     }
 
-    const [, ...rest] = avatarPath.split('/');
-    const { data: publicUrl } = supabase.storage
-      .from(AVATAR_BUCKET)
-      .getPublicUrl(rest.join('/'));
+    const { data } = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(current);
 
-    console.log('avatarPath:', avatarPath);
-    console.log('publicUrl:', publicUrl.publicUrl);
+    // The photo also shows in the top bar and tab bar, on every page
+    revalidatePath('/', 'layout');
 
-    revalidatePath('/profile');
-
-    return { success: true, data: { avatarUrl: publicUrl.publicUrl } };
+    return { success: true, data: { avatarUrl: data.publicUrl } };
   } catch (error) {
+    // The upload worked but the profile was not updated: remove the file so
+    // it does not sit in storage unused
+    if (unlinked) {
+      await supabase.storage
+        .from(AVATAR_BUCKET)
+        .remove([pathInBucket(unlinked)]);
+    }
+
     return handleError(error) as ErrorResponse;
   }
 }
