@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 
-// The demo starts from the two buttons on the login page
-export default function DemoStart() {
+// /demo on its own has nothing to show. The two buttons on the login page
+// open /demo/teacher and /demo/student directly.
+export default function DemoIndex() {
   redirect('/login');
 }
