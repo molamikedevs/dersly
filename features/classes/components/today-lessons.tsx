@@ -1,6 +1,6 @@
 import { Video } from 'lucide-react';
-import Link from 'next/link';
 
+import { AppLink } from '@/features/app/app-mode';
 import {
   LESSONS_PER_PACKAGE,
   TYPES,
@@ -50,7 +50,7 @@ function UpNextBlock({ upNext, now }: { upNext: UpNext; now: Date }) {
 
   return (
     <li className="relative my-3 rounded-3xl bg-primary text-primary-foreground first:mt-0 last:mb-0">
-      <Link
+      <AppLink
         href={`/dashboard/classes/${item.id}`}
         aria-label={`Open ${item.name}`}
         className="absolute inset-0 rounded-3xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
@@ -116,7 +116,7 @@ function LessonRow({
         ruleBelow && 'border-b',
       )}
     >
-      <Link
+      <AppLink
         href={`/dashboard/classes/${item.id}`}
         aria-label={`Open ${item.name}`}
         className="absolute inset-0 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset"
@@ -204,12 +204,12 @@ export default function TodayLessons({ today, now }: Props) {
             No class has lesson times yet. Add the days and times to a class and
             its lessons show up here.
           </p>
-          <Link
+          <AppLink
             href="/dashboard/classes"
             className="inline-flex h-11 touch-manipulation items-center rounded-xl border border-input-border bg-card px-4 text-sm font-semibold text-foreground transition-[scale,background-color] duration-150 ease-out select-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-[0.97]"
           >
             Open classes
-          </Link>
+          </AppLink>
         </div>
       ) : (
         <ol className="flex flex-col">

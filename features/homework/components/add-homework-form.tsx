@@ -14,8 +14,8 @@ import {
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/toast';
+import { useDerslyActions } from '@/features/app/actions-context';
 import FormAlert from '@/features/auth/components/form-alert';
-import { createHomework, updateHomework } from '@/features/homework/actions';
 import MarkdownEditor, {
   type MarkdownView,
 } from '@/features/homework/components/markdown-editor';
@@ -37,6 +37,8 @@ export default function AddHomeworkForm({
   homework?: HomeWorkRecord;
   onSuccess?: () => void;
 }) {
+  // The real actions in the app, local ones in the demo
+  const { createHomework, updateHomework } = useDerslyActions();
   const [view, setView] = useState<MarkdownView>('write');
   const [formError, setFormError] = useState<string | null>(null);
   const isEdit = Boolean(homework);

@@ -6,6 +6,7 @@ import ScrollToTop from '@/components/common/scroll-to-top';
 import StudentTabBar from '@/components/ui/layout/navigation/student-tab-bar';
 import StudentTopBar from '@/components/ui/layout/navigation/student-top-bar';
 import SkipLink from '@/components/ui/layout/skip-link';
+import RealActionsProvider from '@/features/app/real-actions-provider';
 import { requireStudent } from '@/features/auth/guard';
 import { getStudentClasses } from '@/features/classes/queries';
 import { createClient } from '@/lib/supabase/server';
@@ -33,7 +34,7 @@ export default async function StudentLayout({
     if (error) console.error('touch_last_seen', error);
   });
   return (
-    <>
+    <RealActionsProvider>
       <SkipLink />
       <ScrollToTop />
       <StudentTopBar
@@ -56,6 +57,6 @@ export default async function StudentLayout({
         avatarUrl={profile.avatarUrl}
         classType={classType}
       />
-    </>
+    </RealActionsProvider>
   );
 }

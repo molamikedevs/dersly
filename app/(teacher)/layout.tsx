@@ -6,6 +6,7 @@ import TeacherTabBar from '@/components/ui/layout/navigation/teacher-tab-bar';
 import TeacherTopBar from '@/components/ui/layout/navigation/teacher-top-bar';
 import SkipLink from '@/components/ui/layout/skip-link';
 import { SidebarProvider } from '@/components/ui/sidebar';
+import RealActionsProvider from '@/features/app/real-actions-provider';
 import { requireTeacher } from '@/features/auth/guard';
 
 export const metadata: Metadata = {
@@ -28,33 +29,35 @@ export default async function TeacherLayout({
   const profile = await requireTeacher();
 
   return (
-    <SidebarProvider>
-      <SkipLink />
-      <ScrollToTop />
-      <TeacherSidebar
-        name={profile.full_name}
-        email={profile.email}
-        avatarUrl={profile.avatarUrl}
-      />
-
-      <div className="relative flex w-full min-w-0 flex-1 flex-col">
-        <TeacherTopBar
+    <RealActionsProvider>
+      <SidebarProvider>
+        <SkipLink />
+        <ScrollToTop />
+        <TeacherSidebar
           name={profile.full_name}
           email={profile.email}
           avatarUrl={profile.avatarUrl}
         />
 
-        {/* On phones the bottom padding is the tab bar (3.5rem), the home
-            indicator and 2rem of air, so the last row always clears the bar. */}
-        <main
-          id="main"
-          className="flex-1 px-4 pt-8 pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:px-6 md:px-10 md:pt-14 md:pb-16"
-        >
-          <div className="mx-auto w-full max-w-6xl">{children}</div>
-        </main>
-      </div>
+        <div className="relative flex w-full min-w-0 flex-1 flex-col">
+          <TeacherTopBar
+            name={profile.full_name}
+            email={profile.email}
+            avatarUrl={profile.avatarUrl}
+          />
 
-      <TeacherTabBar />
-    </SidebarProvider>
+          {/* On phones the bottom padding is the tab bar (3.5rem), the home
+            indicator and 2rem of air, so the last row always clears the bar. */}
+          <main
+            id="main"
+            className="flex-1 px-4 pt-8 pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:px-6 md:px-10 md:pt-14 md:pb-16"
+          >
+            <div className="mx-auto w-full max-w-6xl">{children}</div>
+          </main>
+        </div>
+
+        <TeacherTabBar />
+      </SidebarProvider>
+    </RealActionsProvider>
   );
 }

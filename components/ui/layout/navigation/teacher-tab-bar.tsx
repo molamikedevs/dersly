@@ -1,14 +1,17 @@
 'use client';
 
-import { TEACHER_NAV } from '@/constants/nav';
-import { cn, isActive } from '@/lib/utils';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useState, type MouseEvent } from 'react';
 
-export default function TeacherTabBar() {
-  const pathname = usePathname();
+import { TEACHER_NAV } from '@/constants/nav';
+import { AppLink, useAppPathname } from '@/features/app/app-mode';
+import { cn, isActive } from '@/lib/utils';
 
+export default function TeacherTabBar() {
+  const pathname = useAppPathname();
+
+  // The tab lights up on touch instead of waiting for the next page to load.
+  // The guess is dropped as soon as the route really changes, so the back
+  // button can never leave the wrong tab lit.
   const [tapped, setTapped] = useState<string | null>(null);
   const [lastPathname, setLastPathname] = useState(pathname);
 
@@ -54,7 +57,7 @@ export default function TeacherTabBar() {
 
           return (
             <li key={href}>
-              <Link
+              <AppLink
                 href={href}
                 draggable={false}
                 aria-current={active ? 'page' : undefined}
@@ -82,7 +85,7 @@ export default function TeacherTabBar() {
                     {label}
                   </span>
                 </span>
-              </Link>
+              </AppLink>
             </li>
           );
         })}

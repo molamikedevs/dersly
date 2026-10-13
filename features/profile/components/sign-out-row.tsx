@@ -3,7 +3,7 @@
 import { Loader2, LogOut } from 'lucide-react';
 import { useFormStatus } from 'react-dom';
 
-import { signOut } from '@/features/auth/actions';
+import { useDerslyActions } from '@/features/app/actions-context';
 
 function Submit() {
   const { pending } = useFormStatus();
@@ -27,6 +27,9 @@ function Submit() {
 // A row in the settings list, so signing out sits with the other account
 // actions instead of floating under them
 export default function SignOutRow() {
+  // Real sign-out in the app. In the demo it goes back to the login page.
+  const { signOut } = useDerslyActions();
+
   return (
     <form action={signOut}>
       <Submit />

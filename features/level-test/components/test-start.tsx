@@ -1,7 +1,6 @@
 'use client';
 
-import Link from 'next/link';
-
+import { AppLink } from '@/features/app/app-mode';
 import { saveProgress, useSavedProgress } from '@/features/level-test/progress';
 
 type Props = {
@@ -23,23 +22,23 @@ export default function TestStart({ storageKey, isRetake }: Props) {
   if (answered > 0) {
     return (
       <div className="flex flex-col gap-2">
-        <Link href="/level-test/questions" className={PRIMARY}>
+        <AppLink href="/level-test/questions" className={PRIMARY}>
           Carry on from question {answered + 1}
-        </Link>
-        <Link
+        </AppLink>
+        <AppLink
           href="/level-test/questions?q=1"
           onClick={() => saveProgress(storageKey, null)}
           className={SECONDARY}
         >
           Start again from the beginning
-        </Link>
+        </AppLink>
       </div>
     );
   }
 
   return (
-    <Link href="/level-test/questions" className={PRIMARY}>
+    <AppLink href="/level-test/questions" className={PRIMARY}>
       {isRetake ? 'Take the test again' : 'Start the test'}
-    </Link>
+    </AppLink>
   );
 }

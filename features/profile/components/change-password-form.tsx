@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/toast';
-import { changePassword } from '@/features/auth/actions';
+import { useDerslyActions } from '@/features/app/actions-context';
 import {
   ChangePasswordSchema,
   ChangePasswordValues,
@@ -48,6 +48,9 @@ export default function ChangePasswordForm({
 }: {
   onSuccess?: () => void;
 }) {
+  // The real action in the app, a local one in the demo
+  const { changePassword } = useDerslyActions();
+
   const form = useForm<ChangePasswordValues>({
     resolver: zodResolver(ChangePasswordSchema),
     defaultValues: {
@@ -95,12 +98,13 @@ export default function ChangePasswordForm({
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor={name}>{label}</FieldLabel>
+                {/* 16px on every screen, so an iPhone does not zoom in */}
                 <Input
                   {...field}
                   id={name}
                   type="password"
                   autoComplete={autoComplete}
-                  className="h-11 rounded-xl text-[15px]"
+                  className="h-11 rounded-xl text-base md:text-base"
                   aria-invalid={fieldState.invalid}
                 />
                 {fieldState.invalid && (

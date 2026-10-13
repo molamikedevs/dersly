@@ -1,6 +1,6 @@
 import { BookOpen, Download, ExternalLink, FileText } from 'lucide-react';
-import Link from 'next/link';
 
+import { AppLink } from '@/features/app/app-mode';
 import HomeworkMenu from './homework-menu';
 
 type Props = {
@@ -55,13 +55,13 @@ export default function HomeWorkCard({ data, action, readHref }: Props) {
 
       {canRead ? (
         <div className="border-t border-border bg-muted/50 px-6 py-4 sm:px-7">
-          <Link
+          <AppLink
             href={readHref!}
             className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
           >
             <BookOpen className="size-4" aria-hidden />
             Read guide
-          </Link>
+          </AppLink>
         </div>
       ) : (
         attachmentPath && (

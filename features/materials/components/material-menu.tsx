@@ -1,11 +1,14 @@
 'use client';
 
 import RowMenu from '@/components/common/row-menu';
+import { useDerslyActions } from '@/features/app/actions-context';
 import AddMaterialForm from '@/features/materials/components/add-material-form';
 import { MaterialRecord } from '@/types/materials';
-import { deleteMaterialAction } from '../actions';
 
 export default function MaterialMenu({ data }: { data: MaterialRecord }) {
+  // The real action in the app, a local one in the demo
+  const { deleteMaterial } = useDerslyActions();
+
   return (
     <RowMenu
       label={data.title}
@@ -14,7 +17,7 @@ export default function MaterialMenu({ data }: { data: MaterialRecord }) {
       editForm={(close) => (
         <AddMaterialForm material={data} onSuccess={close} />
       )}
-      onDelete={() => deleteMaterialAction(data.id)}
+      onDelete={() => deleteMaterial(data.id)}
       deleteTitle="Delete this material?"
       deleteDescription={`${data.title} will be removed for every student. This cannot be undone.`}
       deletedToast="Material deleted"

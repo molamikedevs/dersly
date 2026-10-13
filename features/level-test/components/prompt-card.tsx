@@ -1,8 +1,8 @@
-import Link from 'next/link';
+import { AppLink } from '@/features/app/app-mode';
 
 export default function PromptCard() {
   return (
-    <Link
+    <AppLink
       href="/level-test"
       className="group flex touch-manipulation flex-wrap items-center gap-x-4 gap-y-3 rounded-2xl border border-input-border p-5 select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
     >
@@ -18,6 +18,6 @@ export default function PromptCard() {
       <span className="flex h-11 shrink-0 items-center rounded-xl bg-primary px-5 text-sm font-bold text-primary-foreground transition-[scale,background-color] duration-150 ease-out group-hover:bg-primary/90 group-active:scale-[0.97]">
         Start the test
       </span>
-    </Link>
+    </AppLink>
   );
 }

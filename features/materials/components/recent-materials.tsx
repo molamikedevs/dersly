@@ -1,7 +1,7 @@
 import { Play } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 
+import { AppLink } from '@/features/app/app-mode';
 import { youTubeId } from '@/lib/utils';
 
 type Item = StudentHome['materials'][number];
@@ -23,12 +23,12 @@ export default function RecentMaterials({ items }: { items: Item[] }) {
         <h2 className="text-xl leading-snug font-bold tracking-tight text-foreground">
           Recent materials
         </h2>
-        <Link
+        <AppLink
           href="/materials"
           className="-my-3 inline-flex shrink-0 touch-manipulation items-center text-sm font-semibold text-primary underline-offset-4 tap-row hover:underline"
         >
           See all
-        </Link>
+        </AppLink>
       </div>
 
       {/* Every title starts on the same left edge. Only a video has a
@@ -39,7 +39,7 @@ export default function RecentMaterials({ items }: { items: Item[] }) {
 
           return (
             <li key={id}>
-              <Link
+              <AppLink
                 href={`/materials/${id}`}
                 className="-mx-2 flex min-h-14 touch-manipulation items-center gap-4 rounded-lg px-2 py-3 transition-colors hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:bg-accent"
               >
@@ -71,7 +71,7 @@ export default function RecentMaterials({ items }: { items: Item[] }) {
                     </span>
                   </span>
                 )}
-              </Link>
+              </AppLink>
             </li>
           );
         })}

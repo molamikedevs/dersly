@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { deleteAccount } from '@/features/auth/actions';
+import { useDerslyActions } from '@/features/app/actions-context';
 import FormAlert from '@/features/auth/components/form-alert';
 
 const CONFIRM_WORD = 'delete';
@@ -27,6 +27,8 @@ const REMOVED = [
 ];
 
 export default function DeleteAccountDialog() {
+  // The real action in the app, a polite refusal in the demo
+  const { deleteAccount } = useDerslyActions();
   const [open, setOpen] = useState(false);
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState<string | null>(null);

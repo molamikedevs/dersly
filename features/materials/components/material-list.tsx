@@ -2,11 +2,9 @@ import type { ComponentProps } from 'react';
 
 import DataRenderer from '@/components/common/data-renderer';
 import Pagination from '@/components/common/pagination';
-import MaterialCard from '@/features/materials/components/material-card';
-import ReadingRow from '@/features/materials/components/reading-row';
+import MaterialGrid from '@/features/materials/components/material-grid';
 import { getMaterials } from '@/features/materials/queries';
 import type { MaterialKind } from '@/lib/utils';
-import { cn } from '@/lib/utils';
 
 type Props = {
   kind: MaterialKind;
@@ -18,6 +16,7 @@ type Props = {
   empty: ComponentProps<typeof DataRenderer>['empty'];
 };
 
+// Fetches one page of materials and hands it to MaterialGrid
 export default async function MaterialList({
   kind,
   page,
@@ -34,31 +33,14 @@ export default async function MaterialList({
 
   return (
     <>
-      <DataRenderer
+      <MaterialGrid
+        kind={kind}
+        materials={data?.materials}
+        editable={editable}
+        wide={wide}
+        empty={empty}
         success={success}
         error={error}
-        data={data?.materials}
-        empty={empty}
-        render={(materials) =>
-          kind === 'article' ? (
-            <ul className="flex flex-col divide-y divide-border rounded-2xl border border-border bg-card px-5">
-              {materials.map((item) => (
-                <ReadingRow key={item.id} data={item} editable={editable} />
-              ))}
-            </ul>
-          ) : (
-            <div
-              className={cn(
-                'grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3',
-                wide && 'xl:grid-cols-4',
-              )}
-            >
-              {materials.map((item) => (
-                <MaterialCard key={item.id} data={item} editable={editable} />
-              ))}
-            </div>
-          )
-        }
       />
 
       <Pagination isNext={data?.isNext ?? false} />

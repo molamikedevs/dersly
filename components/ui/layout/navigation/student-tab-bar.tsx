@@ -1,11 +1,11 @@
 'use client';
 
+import { useState, type MouseEvent } from 'react';
+
 import { studentTabNav } from '@/constants/nav';
+import { AppLink, useAppPathname } from '@/features/app/app-mode';
 import UserAvatar from '@/features/profile/components/user-avatar';
 import { cn, isActive } from '@/lib/utils';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useState, type MouseEvent } from 'react';
 
 type Props = {
   name: string;
@@ -22,7 +22,7 @@ export default function StudentTabBar({
   avatarUrl,
   classType,
 }: Props) {
-  const pathname = usePathname();
+  const pathname = useAppPathname();
   const items = studentTabNav(classType);
 
   // The tab lights up on touch instead of waiting for the next page to load.
@@ -73,7 +73,7 @@ export default function StudentTabBar({
 
           return (
             <li key={href}>
-              <Link
+              <AppLink
                 href={href}
                 draggable={false}
                 aria-current={active ? 'page' : undefined}
@@ -101,7 +101,7 @@ export default function StudentTabBar({
                     {label}
                   </span>
                 </span>
-              </Link>
+              </AppLink>
             </li>
           );
         })}

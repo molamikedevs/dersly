@@ -3,23 +3,17 @@ import { Users } from 'lucide-react';
 import DataRenderer from '@/components/common/data-renderer';
 import PageHeader from '@/components/common/page-header';
 import Pagination from '@/components/common/pagination';
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import StudentRow, {
-  StudentCard,
-} from '@/features/students/components/student-row';
+import StudentList from '@/features/students/components/student-list';
 import { getStudents } from '@/features/students/queries';
 import { RouteParams } from '@/types/global';
 
 export const metadata = { title: 'Students' };
 
-const headClass =
-  'h-12 px-5 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground';
+function countLine(total: number) {
+  return total === 1
+    ? '1 enrolment across your classes'
+    : `${total} enrolments across your classes`;
+}
 
 export default async function Students({ searchParams }: RouteParams) {
   const { page, pageSize } = await searchParams;
@@ -32,15 +26,8 @@ export default async function Students({ searchParams }: RouteParams) {
   const students = data?.students ?? [];
 
   return (
-    <div className="flex w-full max-w-6xl min-w-0 flex-col gap-10 pb-16">
-      <PageHeader
-        title="Students"
-        subText={
-          data?.total === 1
-            ? '1 enrolment across your classes'
-            : `${data?.total ?? 0} enrolments across your classes`
-        }
-      />
+    <div className="flex w-full max-w-6xl min-w-0 flex-col gap-8 pb-16">
+      <PageHeader title="Students" subText={countLine(data?.total ?? 0)} />
 
       <DataRenderer
         success={success}
@@ -53,58 +40,7 @@ export default async function Students({ searchParams }: RouteParams) {
             'Students appear here once they join a class with your invite code.',
           button: { text: 'Go to classes', href: '/dashboard/classes' },
         }}
-        render={(students) => (
-          <div className="min-w-0 overflow-hidden rounded-2xl border border-border bg-card">
-            <ul className="divide-y divide-border md:hidden">
-              {students.map((item) => (
-                <StudentCard
-                  key={`${item.student.id}-${item.class.id}`}
-                  data={item}
-                />
-              ))}
-            </ul>
-
-            <div className="hidden min-w-0 md:block">
-              <Table className="w-full table-fixed">
-                <TableHeader className="bg-muted">
-                  <TableRow className="border-border hover:bg-transparent">
-                    <TableHead className={`w-[28%] ${headClass}`}>
-                      Student
-                    </TableHead>
-                    <TableHead className={`w-[30%] ${headClass}`}>
-                      Email
-                    </TableHead>
-                    <TableHead className={`w-[22%] ${headClass}`}>
-                      Class
-                    </TableHead>
-                    <TableHead className={`w-[20%] ${headClass}`}>
-                      Level
-                    </TableHead>
-                    <TableHead
-                      className={`hidden w-[18%] lg:table-cell ${headClass}`}
-                    >
-                      Last seen
-                    </TableHead>
-                    <TableHead
-                      className={`hidden w-[20%] xl:table-cell ${headClass}`}
-                    >
-                      Schedule
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-
-                <TableBody className="[&_td]:px-5">
-                  {students.map((item) => (
-                    <StudentRow
-                      key={`${item.student.id}-${item.class.id}`}
-                      data={item}
-                    />
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
-        )}
+        render={(students) => <StudentList students={students} />}
       />
 
       <Pagination isNext={data?.isNext ?? false} />
