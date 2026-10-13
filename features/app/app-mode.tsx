@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   createContext,
   useContext,
@@ -57,6 +57,22 @@ export function toDemoHref(href: string, side: DemoSide) {
       : base + href;
 }
 
+// The other way round: the demo address of the page on screen, read as the
+// real path it stands for. Navigation compares against real paths, so this
+// keeps the active tab right in the demo.
+export function toRealPath(pathname: string) {
+  for (const side of ['teacher', 'student'] as const) {
+    const base = DEMO_BASE[side];
+    if (!startsWithPath(pathname, base)) continue;
+
+    const rest = pathname.slice(base.length);
+    if (side === 'teacher') return `/dashboard${rest}`;
+    return rest || '/';
+  }
+
+  return pathname;
+}
+
 export function AppModeProvider({
   side,
   children,
@@ -78,6 +94,14 @@ export function useAppHref() {
   const { demo, side } = useContext(AppModeContext);
 
   return (href: string) => (demo && side ? toDemoHref(href, side) : href);
+}
+
+// usePathname that answers with the real path, in the demo too
+export function useAppPathname() {
+  const pathname = usePathname();
+  const { demo } = useContext(AppModeContext);
+
+  return demo ? toRealPath(pathname) : pathname;
 }
 
 // next/link that knows about the demo. Use it for every link inside the app.
