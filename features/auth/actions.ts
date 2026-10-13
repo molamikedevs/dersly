@@ -245,7 +245,9 @@ export async function changePassword(values: unknown): Promise<ActionResult> {
 
 export async function deleteAccount(values: unknown): Promise<ActionResult> {
   const parsed = DeleteAccountSchema.safeParse(values);
-  if (!parsed.success) return { error: 'Type delete to confirm.' };
+  if (!parsed.success) {
+    return { error: 'Type delete to confirm.', field: 'confirm' };
+  }
 
   const supabase = createClient(await cookies());
 
@@ -253,15 +255,35 @@ export async function deleteAccount(values: unknown): Promise<ActionResult> {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return { error: 'Please sign in again.' };
+  if (!user) {
+    return {
+      error: 'Your session has ended. Log in again, then try once more.',
+    };
+  }
 
-  // Storage files do not cascade, so remove the avatar folder first
+  // Only students can delete their account. Check before touching any file,
+  // so a teacher's photo is never removed by a request that will fail.
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (profile?.role !== 'student') {
+    return { error: 'Only student accounts can be deleted here.' };
+  }
+
+  // The photo goes first, through the Storage API, while the person is still
+  // signed in. A database trigger cannot do this: Supabase blocks deleting
+  // storage files from inside the database.
   const { data: files, error: listError } = await supabase.storage
     .from('avatars')
     .list(user.id);
 
   if (listError) {
-    return { error: 'Could not delete your account. Please try again.' };
+    return {
+      error: 'Could not delete your account. It is still here, so try again.',
+    };
   }
 
   if (files?.length) {
@@ -270,14 +292,25 @@ export async function deleteAccount(values: unknown): Promise<ActionResult> {
       .remove(files.map((file) => `${user.id}/${file.name}`));
 
     if (removeError) {
-      return { error: 'Could not delete your account. Please try again.' };
+      return {
+        error: 'Could not delete your account. It is still here, so try again.',
+      };
     }
   }
 
   const { error } = await supabase.rpc('delete_own_account');
 
   if (error) {
-    return { error: 'Could not delete your account. Please try again.' };
+    // The photo is already gone, so stop the profile pointing at it
+    await supabase
+      .from('profiles')
+      .update({ avatar_path: null })
+      .eq('id', user.id);
+
+    return {
+      error:
+        'Could not delete your account. Your details are still here, so try again.',
+    };
   }
 
   // The user no longer exists, so only clear the local session cookies
