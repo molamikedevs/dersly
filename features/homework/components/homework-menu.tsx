@@ -1,10 +1,13 @@
 'use client';
 
 import RowMenu from '@/components/common/row-menu';
-import { deleteHomeWork } from '@/features/homework/actions';
+import { useDerslyActions } from '@/features/app/actions-context';
 import AddHomeworkForm from './add-homework-form';
 
 export default function HomeworkMenu({ data }: { data: HomeWorkRecord }) {
+  // The real action in the app, a local one in the demo
+  const { deleteHomework } = useDerslyActions();
+
   return (
     <RowMenu
       label={data.title}
@@ -17,7 +20,7 @@ export default function HomeworkMenu({ data }: { data: HomeWorkRecord }) {
           onSuccess={close}
         />
       )}
-      onDelete={() => deleteHomeWork(data.id)}
+      onDelete={() => deleteHomework(data.id)}
       deleteTitle="Delete this homework?"
       deleteDescription={`${data.title} will be removed for your students. This cannot be undone.`}
       deletedToast="Homework deleted"

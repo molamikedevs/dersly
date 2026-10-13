@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/toast';
+import { useDerslyActions } from '@/features/app/actions-context';
 import FormAlert from '@/features/auth/components/form-alert';
 import MarkdownEditor, {
   type MarkdownView,
@@ -34,7 +35,6 @@ import {
   type MaterialValues,
 } from '@/lib/validation/materials.schema';
 import { MaterialRecord } from '@/types/materials';
-import { createMaterialAction, updateMaterialAction } from '../actions';
 
 // 16px on every screen, so an iPhone does not zoom in on tap
 const TEXT_INPUT = 'h-12 rounded-xl text-base md:text-base';
@@ -82,6 +82,8 @@ export default function AddMaterialForm({
   onSuccess?: () => void;
   material?: MaterialRecord;
 }) {
+  // The real actions in the app, local ones in the demo
+  const { createMaterial, updateMaterial } = useDerslyActions();
   const [view, setView] = useState<MarkdownView>('write');
   const [formError, setFormError] = useState<string | null>(null);
   const isEdit = Boolean(material);
@@ -113,8 +115,8 @@ export default function AddMaterialForm({
     setFormError(null);
 
     const result = isEdit
-      ? await updateMaterialAction(material!.id, data)
-      : await createMaterialAction(data);
+      ? await updateMaterial(material!.id, data)
+      : await createMaterial(data);
 
     // Nothing is cleared on failure, so nothing typed is lost
     if (!result.success) {

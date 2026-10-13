@@ -16,11 +16,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { toast } from '@/components/ui/toast';
-import {
-  archiveClass,
-  resetPackage,
-  undoLesson,
-} from '@/features/classes/actions';
+import { useDerslyActions } from '@/features/app/actions-context';
 import { LESSONS_PER_PACKAGE } from '@/features/classes/constants';
 import AddClassForm from './add-class-form';
 
@@ -29,6 +25,8 @@ export default function ClassMenu({
 }: {
   data: ClassWithCount | PrivateClass;
 }) {
+  // The real actions in the app, local ones in the demo
+  const { archiveClass, resetPackage, undoLesson } = useDerslyActions();
   const [confirmingPayment, setConfirmingPayment] = useState(false);
   const [pending, setPending] = useState(false);
 

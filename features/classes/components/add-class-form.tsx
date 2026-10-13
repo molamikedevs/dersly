@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from '@/components/ui/toast';
-import { createClass, updateClass } from '@/features/classes/actions';
+import { useDerslyActions } from '@/features/app/actions-context';
 import {
   WEEKDAYS,
   classSlots,
@@ -41,6 +41,8 @@ export default function AddClassForm({
   onSuccess?: () => void;
   classRecord?: ClassRecord;
 }) {
+  // The real actions in the app, local ones in the demo
+  const { createClass, updateClass } = useDerslyActions();
   const isEdit = Boolean(classRecord);
   const form = useForm<ClassValues>({
     resolver: zodResolver(ClassSchema),

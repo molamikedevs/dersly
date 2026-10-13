@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/toast';
-import { markLesson } from '@/features/classes/actions';
+import { useDerslyActions } from '@/features/app/actions-context';
 import InviteCode from '@/features/classes/components/invite-code';
 import { LESSONS_PER_PACKAGE } from '@/features/classes/constants';
 import { defaultLessonDate, lessonDateOptions } from '@/lib/lesson-date';
@@ -45,6 +45,7 @@ export default function LessonTracker({
   lessonsDone,
   inviteCode,
 }: Props) {
+  const { markLesson } = useDerslyActions();
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState('');
   // Built when the dialog opens, so "today" is the day it is opened on
