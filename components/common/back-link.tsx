@@ -1,9 +1,9 @@
 'use client';
 
 import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { AppLink } from '@/features/app/app-mode';
 import { cn } from '@/lib/utils';
 
 type Props = {
@@ -23,10 +23,10 @@ export default function BackLink({ href, label = 'Back', className }: Props) {
 
   if (href) {
     return (
-      <Link href={href} className={cn(styles, className)}>
+      <AppLink href={href} className={cn(styles, className)}>
         <ArrowLeft className={icon} aria-hidden />
         {label}
-      </Link>
+      </AppLink>
     );
   }
 

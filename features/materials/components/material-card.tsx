@@ -1,7 +1,7 @@
 import { BookOpen, ExternalLink, Link2, Play } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 
+import { AppLink } from '@/features/app/app-mode';
 import { hostname, youTubeId } from '@/lib/utils';
 import { MaterialRecord } from '@/types/materials';
 import MaterialMenu from './material-menu';
@@ -62,12 +62,12 @@ export default function MaterialCard({
           )}
 
           <h3 className="min-w-0 flex-1 text-base font-semibold leading-snug text-foreground line-clamp-2">
-            <Link
+            <AppLink
               href={href}
               className="after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-ring"
             >
               {title}
-            </Link>
+            </AppLink>
           </h3>
 
           {editable && (

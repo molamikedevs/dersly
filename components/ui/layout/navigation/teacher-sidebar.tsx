@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
+
 import Logo from '@/components/ui/layout/logo';
 import {
   Sidebar,
@@ -9,11 +11,9 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { TEACHER_NAV } from '@/constants/nav';
+import { AppLink, useAppPathname } from '@/features/app/app-mode';
 import UserAvatar from '@/features/profile/components/user-avatar';
 import { cn, isActive } from '@/lib/utils';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useEffect, useRef } from 'react';
 
 type TeacherSidebarProps = {
   name: string;
@@ -26,7 +26,7 @@ export function TeacherSidebar({
   email,
   avatarUrl,
 }: TeacherSidebarProps) {
-  const pathname = usePathname();
+  const pathname = useAppPathname();
   const { open, setOpen, isMobile } = useSidebar();
   const hoverOpened = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -78,7 +78,7 @@ export function TeacherSidebar({
               const active = isActive(pathname, href, href === '/dashboard');
               return (
                 <li key={href}>
-                  <Link
+                  <AppLink
                     onClick={() => {
                       hoverOpened.current = false;
                       setOpen(false);
@@ -89,7 +89,7 @@ export function TeacherSidebar({
                     className={cn(
                       'flex h-11 items-center gap-3 rounded-lg px-3 text-[15px] transition-colors',
                       'group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0',
-                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                      'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
                       active
                         ? 'bg-accent font-semibold text-accent-foreground'
                         : 'font-medium text-muted-foreground hover:bg-muted hover:text-foreground',
@@ -106,7 +106,7 @@ export function TeacherSidebar({
                     <span className="truncate group-data-[collapsible=icon]:hidden">
                       {label}
                     </span>
-                  </Link>
+                  </AppLink>
                 </li>
               );
             })}

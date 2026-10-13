@@ -1,10 +1,9 @@
 'use client';
 
 import { studentTopNav } from '@/constants/nav';
+import { AppLink, useAppPathname } from '@/features/app/app-mode';
 import UserAvatar from '@/features/profile/components/user-avatar';
 import { cn, isActive } from '@/lib/utils';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import Logo from '../logo';
 
 type Props = {
@@ -20,7 +19,7 @@ export default function StudentTopBar({
   avatarUrl,
   classType,
 }: Props) {
-  const pathname = usePathname();
+  const pathname = useAppPathname();
   const items = studentTopNav(classType);
 
   return (
@@ -34,7 +33,7 @@ export default function StudentTopBar({
           {items.map(({ label, href }) => {
             const active = isActive(pathname, href);
             return (
-              <Link
+              <AppLink
                 key={href}
                 href={href}
                 aria-current={active ? 'page' : undefined}
@@ -47,7 +46,7 @@ export default function StudentTopBar({
                 )}
               >
                 {label}
-              </Link>
+              </AppLink>
             );
           })}
         </nav>

@@ -1,5 +1,4 @@
-import Link from 'next/link';
-
+import { AppLink } from '@/features/app/app-mode';
 import { cn } from '@/lib/utils';
 
 export default function Logo({
@@ -10,7 +9,7 @@ export default function Logo({
   className?: string;
 }) {
   return (
-    <Link
+    <AppLink
       href={href}
       aria-label="Dersly home"
       className={cn(
@@ -30,6 +29,6 @@ export default function Logo({
       <span className="font-serif text-[22px] font-semibold tracking-tight text-foreground group-data-[collapsible=icon]:hidden">
         Dersly
       </span>
-    </Link>
+    </AppLink>
   );
 }

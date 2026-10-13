@@ -1,6 +1,6 @@
 import { Video } from 'lucide-react';
-import Link from 'next/link';
 
+import { AppLink } from '@/features/app/app-mode';
 import { classSlots, formatSchedule } from '@/lib/schedule';
 
 type Props<T extends ClassWithCount> = {
@@ -43,7 +43,7 @@ export default function ClassSection<T extends ClassWithCount>({
               key={id}
               className="relative transition-colors hover:bg-muted/60"
             >
-              <Link
+              <AppLink
                 href={`/dashboard/classes/${id}`}
                 aria-label={`Open ${name}`}
                 className="absolute inset-0 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset"

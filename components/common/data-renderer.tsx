@@ -1,9 +1,9 @@
 import { AlertCircle, Inbox, type LucideIcon } from 'lucide-react';
-import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { buttonVariants } from '@/components/ui/button';
 import { DEFAULT_ERROR } from '@/constants/states';
+import { AppLink } from '@/features/app/app-mode';
 import { cn } from '@/lib/utils';
 
 type StateAction = {
@@ -59,12 +59,12 @@ const StateSkeleton = ({
     <p className="mt-2 max-w-sm text-sm text-muted-foreground">{message}</p>
     {action}
     {button && !action && (
-      <Link
+      <AppLink
         href={button.href}
         className={cn(buttonVariants(), 'mt-6 h-11 rounded-xl px-5')}
       >
         {button.text}
-      </Link>
+      </AppLink>
     )}
   </div>
 );

@@ -2,10 +2,10 @@
 
 import { User } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 import type { MouseEvent } from 'react';
 
 import InitialsAvatar from '@/components/common/initials-avatar';
+import { AppLink } from '@/features/app/app-mode';
 import { cn } from '@/lib/utils';
 
 type Props = {
@@ -58,7 +58,7 @@ export default function UserAvatar({
 }: Props) {
   if (variant === 'row') {
     return (
-      <Link
+      <AppLink
         href={href}
         aria-current={active ? 'page' : undefined}
         className={cn(
@@ -85,7 +85,7 @@ export default function UserAvatar({
             </span>
           )}
         </span>
-      </Link>
+      </AppLink>
     );
   }
 
@@ -93,7 +93,7 @@ export default function UserAvatar({
     // Same press feedback as the other tabs: the icon and label shrink a
     // little under the finger, and a long press does not open a link preview.
     return (
-      <Link
+      <AppLink
         href={href}
         draggable={false}
         onClick={onClick}
@@ -134,12 +134,12 @@ export default function UserAvatar({
             Profile
           </span>
         </span>
-      </Link>
+      </AppLink>
     );
   }
 
   return (
-    <Link
+    <AppLink
       href={href}
       aria-label="Your profile"
       aria-current={active ? 'page' : undefined}
@@ -158,6 +158,6 @@ export default function UserAvatar({
           active && 'ring-2 ring-primary ring-offset-2 ring-offset-background',
         )}
       />
-    </Link>
+    </AppLink>
   );
 }

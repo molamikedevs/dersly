@@ -1,6 +1,6 @@
 import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
 
+import { AppLink } from '@/features/app/app-mode';
 import MarkdownContent from './markdown-content';
 
 type Props = {
@@ -14,13 +14,13 @@ export default function HomeworkReader({ data, backHref, backLabel }: Props) {
 
   return (
     <article className="mx-auto flex w-full max-w-3xl min-w-0 flex-col pb-16">
-      <Link
+      <AppLink
         href={backHref}
         className="inline-flex min-h-11 items-center gap-2 self-start rounded-lg text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <ArrowLeft className="size-4" aria-hidden />
         {backLabel}
-      </Link>
+      </AppLink>
 
       <header className="mt-4 border-b border-border pb-8">
         {classes?.name && (

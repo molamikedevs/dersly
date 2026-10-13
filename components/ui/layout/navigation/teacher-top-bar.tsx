@@ -1,9 +1,9 @@
 'use client';
 
 import Logo from '@/components/ui/layout/logo';
+import { useAppPathname } from '@/features/app/app-mode';
 import UserAvatar from '@/features/profile/components/user-avatar';
 import { isActive } from '@/lib/utils';
-import { usePathname } from 'next/navigation';
 
 type Props = {
   name: string;
@@ -13,7 +13,7 @@ type Props = {
 
 /** Phone header for the teacher side. The sidebar takes over from md up. */
 export default function TeacherTopBar({ name, email, avatarUrl }: Props) {
-  const pathname = usePathname();
+  const pathname = useAppPathname();
 
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-background/85 pt-[env(safe-area-inset-top)] backdrop-blur-md md:hidden">
