@@ -16,8 +16,8 @@ import {
 import { saveProgress } from '@/features/level-test/progress';
 
 // The student layout, with the invented student in place of the signed-in
-// one. The banner sits above the top bar and scrolls away, the top bar
-// still sticks.
+// one. The banner and the top bar stick together, so nothing jumps when the
+// page scrolls.
 export default function DemoStudentShell({
   children,
 }: {
@@ -37,13 +37,15 @@ export default function DemoStudentShell({
     <>
       <SkipLink />
       <ScrollToTop />
-      <DemoBanner side="student" />
-      <StudentTopBar
-        name={person.fullName}
-        email={person.email}
-        avatarUrl={person.avatarUrl}
-        classType={classType}
-      />
+      <div className="sticky top-0 z-40">
+        <DemoBanner side="student" />
+        <StudentTopBar
+          name={person.fullName}
+          email={person.email}
+          avatarUrl={person.avatarUrl}
+          classType={classType}
+        />
+      </div>
       <main
         id="main"
         className="container-app flex-1 pt-8 pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pt-14 md:pb-16"

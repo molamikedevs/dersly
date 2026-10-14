@@ -1,5 +1,4 @@
 import { LoginForm } from '@/features/auth/components/login-form';
-import TryDemo from '@/features/demo/components/try-demo';
 
 export const metadata = {
   title: 'Log in',
@@ -21,7 +20,6 @@ export default async function Login({ searchParams }: Props) {
             : null
         }
       />
-      <TryDemo />
     </>
   );
 }

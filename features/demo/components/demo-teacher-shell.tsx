@@ -12,9 +12,8 @@ import DemoBanner from '@/features/demo/components/demo-banner';
 import { useDemoData } from '@/features/demo/components/store';
 
 // The teacher layout, with the invented teacher in place of the signed-in
-// one. The banner sits above the page column, so the desktop sidebar never
-// covers it and the phone top bar still sticks to the top once it scrolls
-// away.
+// one. The banner and the phone top bar stick together, so nothing jumps
+// when the page scrolls.
 export default function DemoTeacherShell({
   children,
 }: {
@@ -33,13 +32,14 @@ export default function DemoTeacherShell({
       />
 
       <div className="relative flex w-full min-w-0 flex-1 flex-col">
-        <DemoBanner side="teacher" />
-
-        <TeacherTopBar
-          name={teacher.fullName}
-          email={teacher.email}
-          avatarUrl={teacher.avatarUrl}
-        />
+        <div className="sticky top-0 z-30">
+          <DemoBanner side="teacher" />
+          <TeacherTopBar
+            name={teacher.fullName}
+            email={teacher.email}
+            avatarUrl={teacher.avatarUrl}
+          />
+        </div>
 
         <main
           id="main"
