@@ -19,6 +19,9 @@ import { AppModeProvider, type DemoSide } from '@/features/app/app-mode';
 import { LESSONS_PER_PACKAGE } from '@/features/classes/constants';
 import { createDemoData } from '@/features/demo/data/index';
 import { scoreDemoTest } from '@/features/demo/data/level-test';
+import { toScheduleColumns } from '@/lib/schedule';
+import { generateInviteCode } from '@/lib/utils';
+import { ClassSchema, type ClassValues } from '@/lib/validation/class.schema';
 
 // Everything the demo shows lives here, in memory. Nothing is sent anywhere,
 // and a reload starts again from the same invented data.
@@ -79,7 +82,25 @@ function fail(message: string) {
   return { success: false as const, error: { message } };
 }
 
-const NOT_IN_DEMO = 'This is not available in the demo.';
+// The columns a class form sets, in the shape the classes query returns
+function classFields({ name, type, level, schedule, meetingUrl }: ClassValues) {
+  const columns = toScheduleColumns(schedule);
+
+  return {
+    name,
+    type,
+    level: level ?? null,
+    meetingUrl: meetingUrl || null,
+    handlesPayment: type === 'one_to_one',
+    scheduleDays: columns.schedule_days,
+    scheduleTimes: columns.schedule_times,
+  };
+}
+
+// The same message the real action shows for a value the schema rejects
+function firstIssue(error: { issues: { message: string }[] }) {
+  return error.issues[0]?.message ?? 'Check the class details and try again.';
+}
 
 const BAKU_DATE = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Baku' });
 
@@ -90,10 +111,56 @@ function buildActions(
   goToLogin: () => void,
 ): DerslyActions {
   return {
-    // Classes are fixed in the demo, so the lessons on screen stay coherent
-    createClass: async () => fail(NOT_IN_DEMO),
-    updateClass: async () => fail(NOT_IN_DEMO),
-    archiveClass: async () => fail(NOT_IN_DEMO),
+    async createClass(values) {
+      await settle();
+      const parsed = ClassSchema.safeParse(values);
+      if (!parsed.success) return fail(firstIssue(parsed.error));
+
+      const data = read();
+      const item: ClassRecord = {
+        id: crypto.randomUUID(),
+        teacherId: data.teacher.id,
+        inviteCode: generateInviteCode(),
+        isActive: true,
+        enrollmentOpen: true,
+        createdAt: new Date().toISOString(),
+        ...classFields(parsed.data),
+      };
+
+      write({ ...data, classes: [...data.classes, item] });
+      return ok(item);
+    },
+
+    async updateClass(id, values) {
+      await settle();
+      const parsed = ClassSchema.safeParse(values);
+      if (!parsed.success) return fail(firstIssue(parsed.error));
+
+      const data = read();
+      const current = data.classes.find((item) => item.id === id);
+      if (!current) return fail('This class no longer exists.');
+
+      const updated = { ...current, ...classFields(parsed.data) };
+
+      write({
+        ...data,
+        classes: data.classes.map((item) => (item.id === id ? updated : item)),
+      });
+
+      return ok(updated);
+    },
+
+    async archiveClass(id) {
+      await settle();
+      const data = read();
+
+      write({
+        ...data,
+        classes: data.classes.filter((item) => item.id !== id),
+      });
+
+      return ok(null);
+    },
 
     async markLesson({ enrollmentId, note, lessonDate }) {
       await settle();
