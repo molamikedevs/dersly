@@ -15,6 +15,7 @@ import type {
 import type { MaterialRecord } from '@/types/materials';
 
 const SORTABLE = ['uploaded_at', 'title'] as const;
+const UP_NEXT_SHOWN = 5;
 
 export async function getMaterials(
   params: PaginatedSearchParams,
@@ -101,3 +102,42 @@ export const getMaterial = cache(
     }
   },
 );
+
+export async function getRelatedVideos(
+  current: Pick<MaterialRecord, 'id' | 'level'>,
+): Promise<ActionResponse<MaterialRecord[]>> {
+  const validationResult = await action({ authorize: true });
+
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
+
+  try {
+    const supabase = createClient(await cookies());
+
+    // A small window is enough to fill five places after sorting by level
+    const { data, error } = await supabase
+      .from('materials')
+      .select('*')
+      .is('class_id', null)
+      .eq('kind', 'link')
+      .neq('id', current.id)
+      .order('uploaded_at', { ascending: false })
+      .limit(20);
+
+    if (error) throwPostgresError(error, 'Material');
+
+    const videos = toCamel<MaterialRecord[]>(data ?? []);
+    const sameLevel = (item: MaterialRecord) =>
+      Number(current.level !== null && item.level === current.level);
+
+    // sort is stable, so newest first is kept inside each group
+    const related = [...videos]
+      .sort((a, b) => sameLevel(b) - sameLevel(a))
+      .slice(0, UP_NEXT_SHOWN);
+
+    return { success: true, data: related };
+  } catch (error) {
+    return handleError(error) as ErrorResponse;
+  }
+}
