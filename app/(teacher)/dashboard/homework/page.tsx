@@ -5,14 +5,19 @@ import { RouteParams } from '@/types/global';
 export const metadata = { title: 'Homework' };
 
 export default async function HomeWork({ searchParams }: RouteParams) {
-  const { page, pageSize } = await searchParams;
+  const { page } = await searchParams;
 
   const { data, success, error } = await getGroupedHomework({
     page: Number(page) || 1,
-    pageSize: Number(pageSize) || 20,
+    pageSize: 10,
   });
 
   return (
-    <HomeworkGroups groups={data?.groups} success={success} error={error} />
+    <HomeworkGroups
+      groups={data?.groups}
+      isNext={data?.isNext ?? false}
+      success={success}
+      error={error}
+    />
   );
 }
