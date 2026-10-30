@@ -98,25 +98,45 @@ export function getClassHomework(
 export async function getGroupedHomework(
   params: PaginatedSearchParams,
 ): Promise<ActionResponse<{ groups: HomeWorkGroup[]; isNext: boolean }>> {
-  const result = await fetchHomework(params);
+  const validationResult = await action({
+    params,
+    schema: PaginatedSearchParamsSchema,
+    authorize: true,
+  });
 
-  if (!result.success || !result.data) return result as ErrorResponse;
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
 
-  const { homework, isNext } = result.data;
+  const { page = 1, pageSize = 10 } = validationResult.params!;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
 
-  const groups = Object.values(
-    homework.reduce<Record<string, HomeWorkGroup>>((acc, work) => {
-      const owner = work.classes;
-      if (!owner) return acc;
+  try {
+    const supabase = createClient(await cookies());
 
-      acc[owner.id] ??= { id: owner.id, name: owner.name, items: [] };
-      acc[owner.id].items.push(work);
+    // !inner leaves out classes with no homework
+    const { data, count, error } = await supabase
+      .from('classes')
+      .select('id, name, homework!inner(*)', { count: 'exact' })
+      .order('name', { ascending: true })
+      .order('created_at', { referencedTable: 'homework', ascending: false })
+      .range(from, to);
 
-      return acc;
-    }, {}),
-  );
+    if (error) throwPostgresError(error, 'Homework');
 
-  return { success: true, data: { groups, isNext } };
+    const groups: HomeWorkGroup[] = toCamel<
+      { id: string; name: string; homework: HomeWorkRecord[] }[]
+    >(data ?? []).map(({ id, name, homework }) => ({
+      id,
+      name,
+      items: homework,
+    }));
+
+    return { success: true, data: { groups, isNext: (count ?? 0) > to + 1 } };
+  } catch (error) {
+    return handleError(error) as ErrorResponse;
+  }
 }
 
 // The ids of the classes that have at least one published homework. Overview

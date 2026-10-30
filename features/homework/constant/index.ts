@@ -88,3 +88,7 @@ export function loadImages(root: HTMLElement) {
     }),
   );
 }
+
+export function countLabel(count: number) {
+  return count === 1 ? '1 homework' : `${count} homework`;
+}
