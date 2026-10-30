@@ -1,4 +1,5 @@
 import { ArrowLeft } from 'lucide-react';
+import { ReactNode } from 'react';
 
 import { AppLink } from '@/features/app/app-mode';
 import MarkdownContent from './markdown-content';
@@ -7,20 +8,30 @@ type Props = {
   data: HomeWorkRecord;
   backHref: string;
   backLabel: string;
+  actions?: ReactNode;
 };
 
-export default function HomeworkReader({ data, backHref, backLabel }: Props) {
+export default function HomeworkReader({
+  data,
+  backHref,
+  backLabel,
+  actions,
+}: Props) {
   const { title, instructions, content, classes } = data;
 
   return (
     <article className="mx-auto flex w-full max-w-3xl min-w-0 flex-col pb-16">
-      <AppLink
-        href={backHref}
-        className="inline-flex min-h-11 items-center gap-2 self-start rounded-lg text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        <ArrowLeft className="size-4" aria-hidden />
-        {backLabel}
-      </AppLink>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <AppLink
+          href={backHref}
+          className="inline-flex min-h-11 items-center gap-2 self-start rounded-lg text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <ArrowLeft className="size-4" aria-hidden />
+          {backLabel}
+        </AppLink>
+
+        {actions}
+      </div>
 
       <header className="mt-4 border-b border-border pb-8">
         {classes?.name && (

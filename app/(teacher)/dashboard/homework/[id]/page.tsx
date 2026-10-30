@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 
+import HomeworkPdfButton from '@/features/homework/components/homework-pdf-button';
 import HomeworkReader from '@/features/homework/components/homework-reader';
 import { getHomework } from '@/features/homework/queries';
 
@@ -23,6 +24,7 @@ export default async function Page({ params }: Props) {
       data={data}
       backHref={`/dashboard/classes/${data.classId}`}
       backLabel="Back to class"
+      actions={<HomeworkPdfButton data={data} />}
     />
   );
 }
