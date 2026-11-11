@@ -30,6 +30,13 @@ import {
   deleteMaterialAction,
   updateMaterialAction,
 } from '@/features/materials/actions';
+import {
+  addMistake,
+  deleteMistake,
+  setMistakeFixed,
+  submitMistakeFix,
+  updateMistake,
+} from '@/features/mistakes/actions';
 import { updateAvatar } from '@/features/profile/actions';
 
 // The real server actions, handed to every component in the signed-in app
@@ -46,6 +53,11 @@ const REAL_ACTIONS: DerslyActions = {
   createMaterial: createMaterialAction,
   updateMaterial: updateMaterialAction,
   deleteMaterial: deleteMaterialAction,
+  addMistake,
+  updateMistake,
+  deleteMistake,
+  submitMistakeFix,
+  setMistakeFixed,
   submitAttempt,
   updateAvatar,
   changePassword,

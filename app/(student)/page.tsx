@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 
 import HomeSkeleton from '@/components/common/home-skeleton';
+import { getMyMistakes } from '@/features/mistakes/queries';
 import StudentHomeView from '@/features/students/components/student-home';
 import { getStudentHome } from '@/features/students/queries';
 
@@ -40,9 +41,14 @@ function HomeError() {
 }
 
 async function HomeContent() {
-  const { data } = await getStudentHome();
+  const [{ data }, mistakes] = await Promise.all([
+    getStudentHome(),
+    getMyMistakes(),
+  ]);
 
   if (!data) return <HomeError />;
 
-  return <StudentHomeView data={data} now={new Date()} />;
+  return (
+    <StudentHomeView data={data} now={new Date()} mistakes={mistakes.data} />
+  );
 }

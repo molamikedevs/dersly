@@ -2,6 +2,7 @@ import { AppLink } from '@/features/app/app-mode';
 import PromptCard from '@/features/level-test/components/prompt-card';
 import ReadingList from '@/features/materials/components/reading-list';
 import RecentMaterials from '@/features/materials/components/recent-materials';
+import FixMistakes from '@/features/mistakes/components/fix-mistakes';
 import CurrentWorkCard from '@/features/students/components/current-work-card';
 import LessonNotes from '@/features/students/components/lesson-notes';
 import NextLessonCard from '@/features/students/components/next-lesson-card';
@@ -17,9 +18,11 @@ import { formatDate } from '@/lib/utils';
 export default function StudentHomeView({
   data,
   now,
+  mistakes,
 }: {
   data: StudentHome;
   now: Date;
+  mistakes?: StudentMistakes;
 }) {
   const {
     firstName,
@@ -92,6 +95,8 @@ export default function StudentHomeView({
               />
             </section>
           )}
+
+          {mistakes && <FixMistakes data={mistakes} />}
 
           <LessonNotes notes={lessonNotes} />
         </div>
