@@ -2,6 +2,7 @@ import { ChevronRight } from 'lucide-react';
 
 import FormDialog from '@/components/common/form-dialog';
 import HomeWorkCard from '@/features/homework/components/homework-card';
+import { cn } from '@/lib/utils';
 import AddHomeWorkForm from './add-homework-form';
 import HomeworkMenu from './homework-menu';
 
@@ -10,15 +11,31 @@ export const HOMEWORK_DIALOG_WIDTH = 'sm:max-w-3xl lg:max-w-4xl';
 type Props = {
   classId: string;
   homeWork: HomeWorkRecord[];
+  showTitle?: boolean;
 };
 
-export default function HomeWorkSection({ classId, homeWork }: Props) {
+export default function HomeWorkSection({
+  classId,
+  homeWork,
+  showTitle = true,
+}: Props) {
   const [current, ...past] = homeWork;
 
   return (
     <section className="flex flex-col gap-5">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-[28px]">
+      <div
+        className={cn(
+          'flex flex-wrap items-center gap-4',
+          showTitle ? 'justify-between' : 'justify-end',
+        )}
+      >
+        <h2
+          className={
+            showTitle
+              ? 'font-serif text-2xl font-medium tracking-tight text-foreground sm:text-[28px]'
+              : 'sr-only'
+          }
+        >
           Homework
         </h2>
 

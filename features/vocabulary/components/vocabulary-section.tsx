@@ -87,11 +87,21 @@ function Week({
             return (
               <li
                 key={item.id}
-                className="flex items-start gap-4 py-4 pr-2 pl-5 sm:pr-3 sm:pl-6"
+                className="flex items-start gap-3 py-4 pr-2 pl-5 sm:pr-3 sm:pl-6"
               >
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
-                  <p className="text-base font-semibold break-words text-foreground">
-                    {item.word}
+                  <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                    <span className="min-w-0 text-base font-semibold break-words text-foreground">
+                      {item.word}
+                    </span>
+                    <span
+                      className={cn(
+                        'shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold',
+                        status.className,
+                      )}
+                    >
+                      {status.label}
+                    </span>
                   </p>
                   <p className="text-[15px] break-words text-foreground">
                     {item.meaning}
@@ -102,15 +112,6 @@ function Week({
                     </p>
                   )}
                 </div>
-
-                <span
-                  className={cn(
-                    'mt-0.5 shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold',
-                    status.className,
-                  )}
-                >
-                  {status.label}
-                </span>
 
                 <WordMenu data={item} />
               </li>
@@ -137,14 +138,11 @@ export default function VocabularySection({ enrollmentId, words }: Props) {
   return (
     <section className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex min-w-0 flex-col gap-1">
-          <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-[28px]">
-            Vocabulary
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            {WORDS_PER_WEEK} words to study this week, checked next week.
-          </p>
-        </div>
+        {/* The tab above already says Vocabulary */}
+        <h2 className="sr-only">Vocabulary</h2>
+        <p className="min-w-0 text-[15px] text-muted-foreground">
+          {WORDS_PER_WEEK} words to study this week, checked next week.
+        </p>
 
         {!full && (
           <FormDialog triggerLabel="Add word" title="Add a word">

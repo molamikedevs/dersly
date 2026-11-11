@@ -34,7 +34,7 @@ export default function ClassHeader({ data, children }: Props) {
     .join(', ');
 
   return (
-    <header className="flex flex-col gap-6 border-b border-border pb-8">
+    <header className="flex flex-col gap-6">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
         <div className="min-w-0">
           <h1 className="font-serif text-3xl leading-[1.1] font-medium tracking-tight text-balance break-words text-foreground sm:text-5xl sm:leading-[1.05]">
@@ -67,14 +67,23 @@ export default function ClassHeader({ data, children }: Props) {
         )}
       </div>
 
-      {children}
+      {/* Anything passed in (the demo passes the lesson count) and the
+          invite code share one row, and wrap under each other on a phone */}
+      {(children || enrollmentOpen) && (
+        <div className="flex flex-wrap items-center gap-x-10 gap-y-4">
+          {children}
 
-      {enrollmentOpen && (
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          <span className="text-sm font-medium text-foreground">
-            Invite code
-          </span>
-          <InviteCodeDialog code={inviteCode} enrollmentOpen={enrollmentOpen} />
+          {enrollmentOpen && (
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <span className="text-sm font-medium text-foreground">
+                Invite code
+              </span>
+              <InviteCodeDialog
+                code={inviteCode}
+                enrollmentOpen={enrollmentOpen}
+              />
+            </div>
+          )}
         </div>
       )}
     </header>
