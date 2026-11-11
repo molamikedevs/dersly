@@ -10,6 +10,8 @@ import { getClassHomework } from '@/features/homework/queries';
 import MistakesSection from '@/features/mistakes/components/mistakes-section';
 import { getStudentMistakes } from '@/features/mistakes/queries';
 import { getClassStudents } from '@/features/students/queries';
+import VocabularySection from '@/features/vocabulary/components/vocabulary-section';
+import { getStudentWords } from '@/features/vocabulary/queries';
 import { RouteParams } from '@/types/global';
 
 const STUDENTS_PER_PAGE = 10;
@@ -54,11 +56,15 @@ export default async function Page({
     ? ((await getLessonProgress(classId)).data ?? null)
     : null;
 
-  // Mistakes are for one-to-one students only, once they have joined
+  // Vocabulary and mistakes are for one-to-one students only, once they
+  // have joined
   const enrollmentId = progress?.enrollmentId ?? null;
-  const mistakes = enrollmentId
-    ? ((await getStudentMistakes(enrollmentId)).data ?? [])
-    : [];
+  const [words, mistakes] = enrollmentId
+    ? await Promise.all([
+        getStudentWords(enrollmentId).then((result) => result.data ?? []),
+        getStudentMistakes(enrollmentId).then((result) => result.data ?? []),
+      ])
+    : [[], []];
 
   return (
     <div className="flex w-full max-w-6xl min-w-0 flex-col gap-10 pb-16">
@@ -76,6 +82,10 @@ export default async function Page({
       </div>
 
       <HomeWorkSection homeWork={homework} classId={classId} />
+
+      {enrollmentId && (
+        <VocabularySection enrollmentId={enrollmentId} words={words} />
+      )}
 
       {enrollmentId && (
         <MistakesSection enrollmentId={enrollmentId} mistakes={mistakes} />

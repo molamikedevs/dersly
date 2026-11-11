@@ -357,6 +357,23 @@ function buildActions(
       return fail('Mistakes are not in the demo yet.');
     },
 
+    // Vocabulary is not part of the demo yet, so nothing in it calls these
+    async addWord() {
+      return fail('Vocabulary is not in the demo yet.');
+    },
+
+    async updateWord() {
+      return fail('Vocabulary is not in the demo yet.');
+    },
+
+    async deleteWord() {
+      return fail('Vocabulary is not in the demo yet.');
+    },
+
+    async checkWord() {
+      return fail('Vocabulary is not in the demo yet.');
+    },
+
     async submitAttempt({ answers }) {
       await settle();
       const data = read();

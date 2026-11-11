@@ -39,6 +39,7 @@ export default function MistakeForm({
   const { addMistake, updateMistake } = useDerslyActions();
   const [formError, setFormError] = useState<string | null>(null);
   const isEdit = Boolean(mistake);
+  console.log('MistakeForm onSuccess:', typeof onSuccess);
 
   const form = useForm<MistakeValues>({
     resolver: zodResolver(MistakeSchema),
@@ -69,20 +70,16 @@ export default function MistakeForm({
       return;
     }
 
-    if (isEdit) {
-      toast.add({ title: 'Changes saved' });
-      onSuccess?.();
-      return;
-    }
-
-    // A lesson usually has a few mistakes, so the form stays open for the
-    // next one
-    toast.add({
-      title: 'Mistake added',
-      description: 'Add the next one, or close when you are done.',
-    });
-    form.reset({ enrollmentId, wrong: '', correct: '', tip: '' });
-    form.setFocus('wrong');
+    toast.add(
+      isEdit
+        ? { title: 'Changes saved' }
+        : {
+            title: 'Mistake added',
+            description: 'Your student sees it on their Home page now.',
+          },
+    );
+    form.reset();
+    onSuccess?.();
   }
 
   return (

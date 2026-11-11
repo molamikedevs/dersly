@@ -9,6 +9,7 @@ import type * as levelTestActions from '@/features/level-test/actions';
 import type * as materialActions from '@/features/materials/actions';
 import type * as mistakeActions from '@/features/mistakes/actions';
 import type * as profileActions from '@/features/profile/actions';
+import type * as vocabularyActions from '@/features/vocabulary/actions';
 
 // Every action a component can trigger. Components call useDerslyActions()
 // instead of importing server actions, so the same component saves to the
@@ -35,6 +36,11 @@ export type DerslyActions = {
   deleteMistake: typeof mistakeActions.deleteMistake;
   submitMistakeFix: typeof mistakeActions.submitMistakeFix;
   setMistakeFixed: typeof mistakeActions.setMistakeFixed;
+
+  addWord: typeof vocabularyActions.addWord;
+  updateWord: typeof vocabularyActions.updateWord;
+  deleteWord: typeof vocabularyActions.deleteWord;
+  checkWord: typeof vocabularyActions.checkWord;
 
   submitAttempt: typeof levelTestActions.submitAttempt;
 
