@@ -38,6 +38,12 @@ import {
   updateMistake,
 } from '@/features/mistakes/actions';
 import { updateAvatar } from '@/features/profile/actions';
+import {
+  addWord,
+  checkWord,
+  deleteWord,
+  updateWord,
+} from '@/features/vocabulary/actions';
 
 // The real server actions, handed to every component in the signed-in app
 const REAL_ACTIONS: DerslyActions = {
@@ -58,6 +64,10 @@ const REAL_ACTIONS: DerslyActions = {
   deleteMistake,
   submitMistakeFix,
   setMistakeFixed,
+  addWord,
+  updateWord,
+  deleteWord,
+  checkWord,
   submitAttempt,
   updateAvatar,
   changePassword,
