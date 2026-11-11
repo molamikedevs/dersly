@@ -7,29 +7,37 @@ type WordRecord = {
   word: string;
   meaning: string;
   example: string | null;
+  // 0 until the student answers it in the check, then 1
   attempts: number;
+  // Set when the student got it right in the check
   learnedAt: string | null;
   createdAt: string;
 };
 
-// What the student sees. The word itself only arrives once it is learned,
-// and the example has the word blanked out.
-type StudentWord = {
+// A word to study this week, shown in full
+type StudyWord = {
+  id: string;
+  word: string;
+  meaning: string;
+  example: string | null;
+};
+
+// A word in the check, from last week. The word itself only arrives once
+// the student has answered, and the example has it blanked out.
+type CheckWord = {
   id: string;
   meaning: string;
   example: string | null;
-  word: string | null;
+  result: WordCheck | null;
 };
 
 type StudentVocabulary = {
-  weekStart: string;
-  words: StudentWord[];
+  study: { weekStart: string; words: StudyWord[] };
+  check: { weekStart: string; words: CheckWord[] };
 };
 
-// The answer to one try: the word once it is right or after two tries,
-// and a hint after the first wrong try
+// The answer to the one try: right or not, and the word either way
 type WordCheck = {
   right: boolean;
-  word: string | null;
-  hint: string | null;
+  word: string;
 };

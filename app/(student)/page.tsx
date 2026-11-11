@@ -5,6 +5,7 @@ import HomeSkeleton from '@/components/common/home-skeleton';
 import { getMyMistakes } from '@/features/mistakes/queries';
 import StudentHomeView from '@/features/students/components/student-home';
 import { getStudentHome } from '@/features/students/queries';
+import { getMyVocabulary } from '@/features/vocabulary/queries';
 
 export const metadata = {
   title: 'Home',
@@ -41,14 +42,20 @@ function HomeError() {
 }
 
 async function HomeContent() {
-  const [{ data }, mistakes] = await Promise.all([
+  const [{ data }, mistakes, vocabulary] = await Promise.all([
     getStudentHome(),
     getMyMistakes(),
+    getMyVocabulary(),
   ]);
 
   if (!data) return <HomeError />;
 
   return (
-    <StudentHomeView data={data} now={new Date()} mistakes={mistakes.data} />
+    <StudentHomeView
+      data={data}
+      now={new Date()}
+      mistakes={mistakes.data}
+      vocabulary={vocabulary.data}
+    />
   );
 }

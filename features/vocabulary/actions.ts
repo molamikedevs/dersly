@@ -36,18 +36,18 @@ export async function addWord(
     return handleError(validationResult) as ErrorResponse;
   }
 
-  const { enrollmentId, week, word, meaning, example } =
-    validationResult.params!;
+  const { enrollmentId, word, meaning, example } = validationResult.params!;
 
   try {
     const supabase = createClient(await cookies());
 
-    // The database allows 5 words a week and one-to-one classes only
+    // Words are for this week. The database allows 5 a week and
+    // one-to-one classes only.
     const { data, error } = await supabase
       .from('words')
       .insert({
         enrollment_id: enrollmentId,
-        week_start: weekStart(new Date(), week === 'next' ? 1 : 0),
+        week_start: weekStart(),
         word,
         meaning,
         example: example || null,
@@ -124,8 +124,8 @@ export async function deleteWord(id: string): Promise<ActionResponse<null>> {
   }
 }
 
-// The student's answer, checked in the database so the word never reaches
-// the page before they try
+// The student's one try at a word from last week, checked in the database
+// so the word never reaches the page before they answer
 export async function checkWord(
   params: WordAnswerValues,
 ): Promise<ActionResponse<WordCheck>> {
@@ -151,12 +151,10 @@ export async function checkWord(
 
     if (error) throwPostgresError(error, 'Word');
 
-    const result = data as WordCheck;
+    // The result shows on Home and on the class page
+    revalidateWordPaths();
 
-    // A learned word shows as learned on Home and on the class page
-    if (result.right) revalidateWordPaths();
-
-    return { success: true, data: result };
+    return { success: true, data: data as WordCheck };
   } catch (error) {
     return handleError(error) as ErrorResponse;
   }

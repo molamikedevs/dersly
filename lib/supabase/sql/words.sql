@@ -141,3 +141,61 @@ $$;
 
 revoke execute on function public.check_word(uuid, text) from public, anon;
 grant execute on function public.check_word(uuid, text) to authenticated;
+
+
+
+create or replace function public.check_word(
+  p_word_id uuid,
+  p_answer text
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_word text;
+  v_attempts smallint;
+  v_week date;
+  v_right boolean;
+  v_last_week date :=
+    (date_trunc('week', now() at time zone 'Asia/Baku'))::date - 7;
+begin
+  if (select auth.uid()) is null then
+    raise exception 'Not signed in' using errcode = '42501';
+  end if;
+
+  if char_length(btrim(coalesce(p_answer, ''))) not between 1 and 60 then
+    raise exception 'Write the word first' using errcode = 'P0001';
+  end if;
+
+  select w.word, w.attempts, w.week_start
+  into v_word, v_attempts, v_week
+  from public.words w
+  join public.enrollments e on e.id = w.enrollment_id
+  where w.id = p_word_id
+    and e.student_id = (select auth.uid())
+  for update of w;
+
+  if not found then
+    raise exception 'Word not found' using errcode = 'P0002';
+  end if;
+
+  if v_week <> v_last_week then
+    raise exception 'This word is not in the check' using errcode = 'P0001';
+  end if;
+
+  if v_attempts > 0 then
+    raise exception 'You have already answered this word' using errcode = 'P0001';
+  end if;
+
+  v_right := lower(btrim(p_answer)) = lower(btrim(v_word));
+
+  update public.words
+  set attempts = 1,
+      learned_at = case when v_right then now() end
+  where id = p_word_id;
+
+  return jsonb_build_object('right', v_right, 'word', v_word);
+end;
+$$;

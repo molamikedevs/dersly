@@ -24,8 +24,6 @@ function text(required: string, max: number) {
 
 export const WordSchema = z.object({
   enrollmentId: z.uuid(),
-  // Words can be set ahead, for the week after this one
-  week: z.enum(['this', 'next']),
   word: text('Write the word.', WORD_MAX),
   meaning: text('Write what it means.', MEANING_MAX),
   example: z

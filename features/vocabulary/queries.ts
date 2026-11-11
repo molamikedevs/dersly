@@ -55,8 +55,9 @@ export async function getStudentWords(
   }
 }
 
-// The signed-in student's words for this week. Row level security keeps it
-// to their own. The word is only sent once it is learned.
+// The signed-in student's words: this week's to study, in full, and last
+// week's for the check, without the word until they have answered.
+// Row level security keeps it to their own.
 export async function getMyVocabulary(): Promise<
   ActionResponse<StudentVocabulary>
 > {
@@ -68,24 +69,48 @@ export async function getMyVocabulary(): Promise<
 
   try {
     const supabase = createClient(await cookies());
-    const thisWeek = weekStart();
+    const now = new Date();
+    const thisWeek = weekStart(now);
+    const lastWeek = weekStart(now, -1);
 
     const { data, error } = await supabase
       .from('words')
-      .select('id, word, meaning, example, learned_at')
-      .eq('week_start', thisWeek)
+      .select('id, week_start, word, meaning, example, attempts, learned_at')
+      .in('week_start', [thisWeek, lastWeek])
       .order('created_at', { ascending: true });
 
     if (error) throwPostgresError(error, 'Word');
 
-    const words: StudentWord[] = (data ?? []).map((row) => ({
-      id: row.id,
-      meaning: row.meaning,
-      example: blankOut(row.example, row.word),
-      word: row.learned_at ? row.word : null,
-    }));
+    const rows = data ?? [];
 
-    return { success: true, data: { weekStart: thisWeek, words } };
+    const study: StudyWord[] = rows
+      .filter((row) => row.week_start === thisWeek)
+      .map(({ id, word, meaning, example }) => ({
+        id,
+        word,
+        meaning,
+        example,
+      }));
+
+    const check: CheckWord[] = rows
+      .filter((row) => row.week_start === lastWeek)
+      .map((row) => ({
+        id: row.id,
+        meaning: row.meaning,
+        example: blankOut(row.example, row.word),
+        result:
+          row.attempts > 0
+            ? { right: Boolean(row.learned_at), word: row.word }
+            : null,
+      }));
+
+    return {
+      success: true,
+      data: {
+        study: { weekStart: thisWeek, words: study },
+        check: { weekStart: lastWeek, words: check },
+      },
+    };
   } catch (error) {
     return handleError(error) as ErrorResponse;
   }

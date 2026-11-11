@@ -10,6 +10,8 @@ import {
   WORK_LABEL,
   WORK_LINK_LABEL,
 } from '@/features/students/constants/index';
+import VocabularyCheck from '@/features/vocabulary/components/vocabulary-check';
+import VocabularyStudy from '@/features/vocabulary/components/vocabulary-study';
 import { formatNextLesson } from '@/lib/schedule';
 import { formatDate } from '@/lib/utils';
 
@@ -19,10 +21,12 @@ export default function StudentHomeView({
   data,
   now,
   mistakes,
+  vocabulary,
 }: {
   data: StudentHome;
   now: Date;
   mistakes?: StudentMistakes;
+  vocabulary?: StudentVocabulary;
 }) {
   const {
     firstName,
@@ -95,6 +99,10 @@ export default function StudentHomeView({
               />
             </section>
           )}
+
+          {vocabulary && <VocabularyStudy words={vocabulary.study.words} />}
+
+          {vocabulary && <VocabularyCheck words={vocabulary.check.words} />}
 
           {mistakes && <FixMistakes data={mistakes} />}
 
