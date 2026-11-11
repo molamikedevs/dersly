@@ -336,6 +336,27 @@ function buildActions(
       return ok(null);
     },
 
+    // Mistakes are not part of the demo yet, so nothing in it calls these
+    async addMistake() {
+      return fail('Mistakes are not in the demo yet.');
+    },
+
+    async updateMistake() {
+      return fail('Mistakes are not in the demo yet.');
+    },
+
+    async deleteMistake() {
+      return fail('Mistakes are not in the demo yet.');
+    },
+
+    async submitMistakeFix() {
+      return fail('Mistakes are not in the demo yet.');
+    },
+
+    async setMistakeFixed() {
+      return fail('Mistakes are not in the demo yet.');
+    },
+
     async submitAttempt({ answers }) {
       await settle();
       const data = read();

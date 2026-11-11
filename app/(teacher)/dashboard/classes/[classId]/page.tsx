@@ -7,6 +7,8 @@ import StudentsSection from '@/features/classes/components/student-section';
 import { getClass, getLessonProgress } from '@/features/classes/queries';
 import HomeWorkSection from '@/features/homework/components/homework-section';
 import { getClassHomework } from '@/features/homework/queries';
+import MistakesSection from '@/features/mistakes/components/mistakes-section';
+import { getStudentMistakes } from '@/features/mistakes/queries';
 import { getClassStudents } from '@/features/students/queries';
 import { RouteParams } from '@/types/global';
 
@@ -52,6 +54,12 @@ export default async function Page({
     ? ((await getLessonProgress(classId)).data ?? null)
     : null;
 
+  // Mistakes are for one-to-one students only, once they have joined
+  const enrollmentId = progress?.enrollmentId ?? null;
+  const mistakes = enrollmentId
+    ? ((await getStudentMistakes(enrollmentId)).data ?? [])
+    : [];
+
   return (
     <div className="flex w-full max-w-6xl min-w-0 flex-col gap-10 pb-16">
       <div className="flex flex-col gap-5">
@@ -68,6 +76,10 @@ export default async function Page({
       </div>
 
       <HomeWorkSection homeWork={homework} classId={classId} />
+
+      {enrollmentId && (
+        <MistakesSection enrollmentId={enrollmentId} mistakes={mistakes} />
+      )}
 
       {!isOneToOne && (
         <StudentsSection

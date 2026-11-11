@@ -7,6 +7,7 @@ import type * as classActions from '@/features/classes/actions';
 import type * as homeworkActions from '@/features/homework/actions';
 import type * as levelTestActions from '@/features/level-test/actions';
 import type * as materialActions from '@/features/materials/actions';
+import type * as mistakeActions from '@/features/mistakes/actions';
 import type * as profileActions from '@/features/profile/actions';
 
 // Every action a component can trigger. Components call useDerslyActions()
@@ -28,6 +29,12 @@ export type DerslyActions = {
   createMaterial: typeof materialActions.createMaterialAction;
   updateMaterial: typeof materialActions.updateMaterialAction;
   deleteMaterial: typeof materialActions.deleteMaterialAction;
+
+  addMistake: typeof mistakeActions.addMistake;
+  updateMistake: typeof mistakeActions.updateMistake;
+  deleteMistake: typeof mistakeActions.deleteMistake;
+  submitMistakeFix: typeof mistakeActions.submitMistakeFix;
+  setMistakeFixed: typeof mistakeActions.setMistakeFixed;
 
   submitAttempt: typeof levelTestActions.submitAttempt;
 
