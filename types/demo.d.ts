@@ -46,4 +46,7 @@ type DemoData = {
   notes: DemoNoteRecord[];
   materials: MaterialRecord[];
   attempts: DemoAttempt[];
+  // One-to-one students only, as in the real app
+  words: WordRecord[];
+  mistakes: MistakeRecord[];
 };

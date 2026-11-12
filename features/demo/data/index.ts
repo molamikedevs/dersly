@@ -1,8 +1,12 @@
+import { weekStart } from '@/features/vocabulary/week';
+
 import { buildClasses, DEMO_ENROLLMENTS } from './classes';
 import { DEMO_HOMEWORK } from './homework';
 import { DEMO_NOTES } from './lesson-notes';
 import { DEMO_MATERIALS } from './materials';
+import { DEMO_MISTAKES } from './mistakes';
 import { DEMO_STUDENTS, DEMO_TEACHER, DEMO_VIEWER_ID } from './people';
+import { DEMO_WORDS } from './vocabulary';
 
 const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
@@ -71,5 +75,19 @@ export function createDemoData(now: number): DemoData {
         takenAt: iso(now, 30 * DAY),
       },
     ],
+
+    words: DEMO_WORDS.map(({ weeksAgo, passed, ...item }) => ({
+      ...item,
+      weekStart: weekStart(new Date(now), -weeksAgo),
+      attempts: passed === null ? 0 : 1,
+      learnedAt: passed ? iso(now, 2 * DAY) : null,
+      createdAt: iso(now, weeksAgo * 7 * DAY),
+    })),
+
+    mistakes: DEMO_MISTAKES.map(({ daysAgo, fixed, ...item }) => ({
+      ...item,
+      fixedAt: fixed ? iso(now, DAY) : null,
+      createdAt: iso(now, daysAgo * DAY),
+    })),
   };
 }
