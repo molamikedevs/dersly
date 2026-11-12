@@ -19,9 +19,13 @@ import { AppModeProvider, type DemoSide } from '@/features/app/app-mode';
 import { LESSONS_PER_PACKAGE } from '@/features/classes/constants';
 import { createDemoData } from '@/features/demo/data/index';
 import { scoreDemoTest } from '@/features/demo/data/level-test';
+import { WORDS_PER_WEEK } from '@/features/vocabulary/constants';
+import { weekStart } from '@/features/vocabulary/week';
 import { toScheduleColumns } from '@/lib/schedule';
 import { generateInviteCode } from '@/lib/utils';
 import { ClassSchema, type ClassValues } from '@/lib/validation/class.schema';
+import { MistakeSchema } from '@/lib/validation/mistake.schema';
+import { WordSchema } from '@/lib/validation/vocabulary.schema';
 
 // Everything the demo shows lives here, in memory. Nothing is sent anywhere,
 // and a reload starts again from the same invented data.
@@ -336,42 +340,139 @@ function buildActions(
       return ok(null);
     },
 
-    // Mistakes are not part of the demo yet, so nothing in it calls these
-    async addMistake() {
-      return fail('Mistakes are not in the demo yet.');
+    // Mistakes and words, for the teacher side. The demo student is in a
+    // conversation class, which has neither, so the student actions are
+    // never called.
+    async addMistake(values) {
+      await settle();
+      const parsed = MistakeSchema.safeParse(values);
+      if (!parsed.success) return fail(firstIssue(parsed.error));
+
+      const data = read();
+      const { enrollmentId, wrong, correct, tip } = parsed.data;
+      const item: MistakeRecord = {
+        id: crypto.randomUUID(),
+        enrollmentId,
+        wrong,
+        correct,
+        tip: tip || null,
+        attempt: null,
+        fixedAt: null,
+        createdAt: new Date().toISOString(),
+      };
+
+      write({ ...data, mistakes: [item, ...data.mistakes] });
+      return ok(item);
     },
 
-    async updateMistake() {
-      return fail('Mistakes are not in the demo yet.');
+    async updateMistake(id, values) {
+      await settle();
+      const parsed = MistakeSchema.safeParse(values);
+      if (!parsed.success) return fail(firstIssue(parsed.error));
+
+      const data = read();
+      const current = data.mistakes.find((item) => item.id === id);
+      if (!current) return fail('This mistake no longer exists.');
+
+      const { wrong, correct, tip } = parsed.data;
+      const updated = { ...current, wrong, correct, tip: tip || null };
+
+      write({
+        ...data,
+        mistakes: data.mistakes.map((item) =>
+          item.id === id ? updated : item,
+        ),
+      });
+
+      return ok(updated);
     },
 
-    async deleteMistake() {
-      return fail('Mistakes are not in the demo yet.');
+    async deleteMistake(id) {
+      await settle();
+      const data = read();
+      write({
+        ...data,
+        mistakes: data.mistakes.filter((item) => item.id !== id),
+      });
+      return ok(null);
     },
 
     async submitMistakeFix() {
-      return fail('Mistakes are not in the demo yet.');
+      return fail('Only one-to-one students fix mistakes.');
     },
 
     async setMistakeFixed() {
-      return fail('Mistakes are not in the demo yet.');
+      return fail('Only one-to-one students fix mistakes.');
     },
 
-    // Vocabulary is not part of the demo yet, so nothing in it calls these
-    async addWord() {
-      return fail('Vocabulary is not in the demo yet.');
+    async addWord(values) {
+      await settle();
+      const parsed = WordSchema.safeParse(values);
+      if (!parsed.success) return fail(firstIssue(parsed.error));
+
+      const data = read();
+      const { enrollmentId, word, meaning, example } = parsed.data;
+      const thisWeek = weekStart(new Date(data.now));
+      const sameWeek = data.words.filter(
+        (item) =>
+          item.enrollmentId === enrollmentId && item.weekStart === thisWeek,
+      );
+
+      // The same rules as the database
+      if (sameWeek.length >= WORDS_PER_WEEK) {
+        return fail('A week has 5 words at most');
+      }
+      if (
+        sameWeek.some((item) => item.word.toLowerCase() === word.toLowerCase())
+      ) {
+        return fail('Word already exists.');
+      }
+
+      const item: WordRecord = {
+        id: crypto.randomUUID(),
+        enrollmentId,
+        weekStart: thisWeek,
+        word,
+        meaning,
+        example: example || null,
+        attempts: 0,
+        learnedAt: null,
+        createdAt: new Date().toISOString(),
+      };
+
+      write({ ...data, words: [...data.words, item] });
+      return ok(item);
     },
 
-    async updateWord() {
-      return fail('Vocabulary is not in the demo yet.');
+    async updateWord(id, values) {
+      await settle();
+      const parsed = WordSchema.safeParse(values);
+      if (!parsed.success) return fail(firstIssue(parsed.error));
+
+      const data = read();
+      const current = data.words.find((item) => item.id === id);
+      if (!current) return fail('This word no longer exists.');
+
+      const { word, meaning, example } = parsed.data;
+      const updated = { ...current, word, meaning, example: example || null };
+
+      write({
+        ...data,
+        words: data.words.map((item) => (item.id === id ? updated : item)),
+      });
+
+      return ok(updated);
     },
 
-    async deleteWord() {
-      return fail('Vocabulary is not in the demo yet.');
+    async deleteWord(id) {
+      await settle();
+      const data = read();
+      write({ ...data, words: data.words.filter((item) => item.id !== id) });
+      return ok(null);
     },
 
     async checkWord() {
-      return fail('Vocabulary is not in the demo yet.');
+      return fail('Only one-to-one students have a word check.');
     },
 
     async submitAttempt({ answers }) {

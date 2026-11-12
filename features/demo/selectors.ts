@@ -121,6 +121,29 @@ export function homeworkGroups(data: DemoData): HomeWorkGroup[] {
   return [...groups.values()];
 }
 
+// One student's words, newest week first, as getStudentWords returns them
+export function wordsOf(data: DemoData, enrollmentId: string) {
+  return data.words
+    .filter((item) => item.enrollmentId === enrollmentId)
+    .sort(
+      (a, b) =>
+        b.weekStart.localeCompare(a.weekStart) ||
+        a.createdAt.localeCompare(b.createdAt),
+    );
+}
+
+// One student's mistakes, open first, newest first, as getStudentMistakes
+// returns them
+export function mistakesOf(data: DemoData, enrollmentId: string) {
+  return data.mistakes
+    .filter((item) => item.enrollmentId === enrollmentId)
+    .sort(
+      (a, b) =>
+        Number(Boolean(a.fixedAt)) - Number(Boolean(b.fixedAt)) ||
+        b.createdAt.localeCompare(a.createdAt),
+    );
+}
+
 // Shared materials of one kind, newest first, optionally at one level
 export function materialsOf(data: DemoData, kind: string, level?: string) {
   return data.materials

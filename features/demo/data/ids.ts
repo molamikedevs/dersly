@@ -16,4 +16,6 @@ export const ID = {
   quiz: id(8, 1),
   question: (n: number) => id(9, n),
   option: (q: number, o: number) => id(10, q * 10 + o),
+  word: (n: number) => id(11, n),
+  mistake: (n: number) => id(12, n),
 };

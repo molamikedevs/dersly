@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 
 import BackLink from '@/components/common/back-link';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ClassHeader from '@/features/classes/components/class-header';
-import LessonTracker from '@/features/classes/components/lesson-tracker';
 import StudentsSection from '@/features/classes/components/student-section';
 import { getClass, getLessonProgress } from '@/features/classes/queries';
 import HomeWorkSection from '@/features/homework/components/homework-section';
@@ -12,6 +12,7 @@ import { getStudentMistakes } from '@/features/mistakes/queries';
 import { getClassStudents } from '@/features/students/queries';
 import VocabularySection from '@/features/vocabulary/components/vocabulary-section';
 import { getStudentWords } from '@/features/vocabulary/queries';
+import { weekStart } from '@/features/vocabulary/week';
 import { RouteParams } from '@/types/global';
 
 const STUDENTS_PER_PAGE = 10;
@@ -51,7 +52,8 @@ export default async function Page({
   const hasMoreStudents = studentResult.data?.isNext ?? false;
   const isOneToOne = data.type === 'one_to_one';
 
-  // Only a one-to-one class has a single lesson count to show
+  // A one-to-one class has one enrolment, which vocabulary and mistakes
+  // belong to
   const progress = isOneToOne
     ? ((await getLessonProgress(classId)).data ?? null)
     : null;
@@ -66,29 +68,51 @@ export default async function Page({
       ])
     : [[], []];
 
+  const thisWeek = weekStart();
+  const wordCount = words.filter((item) => item.weekStart === thisWeek).length;
+  const openMistakes = mistakes.filter((item) => !item.fixedAt).length;
+
   return (
     <div className="flex w-full max-w-6xl min-w-0 flex-col gap-10 pb-16">
       <div className="flex flex-col gap-5">
         <BackLink href="/dashboard/classes" label="Back to classes" />
-        <ClassHeader data={data}>
-          {isOneToOne && (
-            <LessonTracker
-              name={data.name}
-              enrollmentId={progress?.enrollmentId ?? null}
-              lessonsDone={progress?.lessonsDone ?? 0}
-            />
-          )}
-        </ClassHeader>
+        <ClassHeader data={data} />
       </div>
 
-      <HomeWorkSection homeWork={homework} classId={classId} />
+      {/* A one-to-one student's work, one part at a time. Every part is
+          rendered on the server; the tabs only choose which one shows. */}
+      {enrollmentId ? (
+        <Tabs defaultValue="homework" className="gap-6">
+          <TabsList>
+            <TabsTrigger value="homework">Homework</TabsTrigger>
+            <TabsTrigger value="vocabulary">
+              Vocabulary
+              {wordCount > 0 && <Count>{wordCount}</Count>}
+            </TabsTrigger>
+            <TabsTrigger value="mistakes">
+              Mistakes
+              {openMistakes > 0 && <Count>{openMistakes}</Count>}
+            </TabsTrigger>
+          </TabsList>
 
-      {enrollmentId && (
-        <VocabularySection enrollmentId={enrollmentId} words={words} />
-      )}
+          <TabsContent value="homework">
+            <HomeWorkSection
+              homeWork={homework}
+              classId={classId}
+              showTitle={false}
+            />
+          </TabsContent>
 
-      {enrollmentId && (
-        <MistakesSection enrollmentId={enrollmentId} mistakes={mistakes} />
+          <TabsContent value="vocabulary">
+            <VocabularySection enrollmentId={enrollmentId} words={words} />
+          </TabsContent>
+
+          <TabsContent value="mistakes">
+            <MistakesSection enrollmentId={enrollmentId} mistakes={mistakes} />
+          </TabsContent>
+        </Tabs>
+      ) : (
+        <HomeWorkSection homeWork={homework} classId={classId} />
       )}
 
       {!isOneToOne && (
@@ -100,5 +124,14 @@ export default async function Page({
         />
       )}
     </div>
+  );
+}
+
+// What still needs the student, next to the tab name
+function Count({ children }: { children: number }) {
+  return (
+    <span className="rounded-full bg-muted px-1.5 text-xs text-muted-foreground tabular-nums">
+      {children}
+    </span>
   );
 }

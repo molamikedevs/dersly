@@ -21,16 +21,13 @@ export default function MistakesSection({ enrollmentId, mistakes }: Props) {
   return (
     <section className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex min-w-0 flex-col gap-1">
-          <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-[28px]">
-            Mistakes
-          </h2>
-          {mistakes.length > 0 && (
-            <p className="text-sm text-muted-foreground tabular-nums">
-              {summary(mistakes)}
-            </p>
-          )}
-        </div>
+        {/* The tab above already says Mistakes */}
+        <h2 className="sr-only">Mistakes</h2>
+        <p className="min-w-0 text-[15px] text-muted-foreground tabular-nums">
+          {mistakes.length > 0
+            ? summary(mistakes)
+            : 'What your student said, and how to say it.'}
+        </p>
 
         <FormDialog triggerLabel="Add mistake" title="Add a mistake">
           <MistakeForm enrollmentId={enrollmentId} />
@@ -55,11 +52,23 @@ export default function MistakesSection({ enrollmentId, mistakes }: Props) {
             return (
               <li
                 key={item.id}
-                className="flex items-start gap-4 py-4 pr-2 pl-5 sm:pr-3 sm:pl-6"
+                className="flex items-start gap-3 py-4 pr-2 pl-5 sm:pr-3 sm:pl-6"
               >
                 <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                  <p className="text-[15px] break-words text-muted-foreground line-through decoration-destructive/60">
-                    {item.wrong}
+                  <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                    <span className="min-w-0 text-[15px] break-words text-muted-foreground line-through decoration-destructive/60">
+                      {item.wrong}
+                    </span>
+                    <span
+                      className={cn(
+                        'shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold',
+                        fixed
+                          ? 'bg-success-subtle text-success-subtle-foreground'
+                          : 'bg-muted text-muted-foreground',
+                      )}
+                    >
+                      {fixed ? 'Fixed' : 'To fix'}
+                    </span>
                   </p>
                   <p className="text-[15px] font-medium break-words text-foreground">
                     {item.correct}
@@ -78,17 +87,6 @@ export default function MistakesSection({ enrollmentId, mistakes }: Props) {
                     </p>
                   )}
                 </div>
-
-                <span
-                  className={cn(
-                    'mt-0.5 shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold',
-                    fixed
-                      ? 'bg-success-subtle text-success-subtle-foreground'
-                      : 'bg-muted text-muted-foreground',
-                  )}
-                >
-                  {fixed ? 'Fixed' : 'To fix'}
-                </span>
 
                 <MistakeMenu data={item} />
               </li>
