@@ -37,7 +37,7 @@ export default function ComingUp({
               </span>
 
               <ChevronRight
-                className="size-4 shrink-0 text-muted-foreground"
+                className="size-4 shrink-0 text-muted-foreground transition-transform duration-150 ease-out group-hover:translate-x-0.5"
                 aria-hidden
               />
             </AppLink>

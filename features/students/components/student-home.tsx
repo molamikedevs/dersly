@@ -83,10 +83,10 @@ export default function StudentHomeView({
             <WeekChecklist {...week} className="lg:hidden" />
           </div>
 
-          {/* The homework title is left out here, since the heading already
-              says what this is and "See all" opens the full page. A
-              conversation topic keeps its name as a plain line, because the
-              questions under it make no sense without it. */}
+          {/* The heading says what kind of work this is and the title says
+              which one, so the student knows what they are opening before
+              they tap. For a conversation topic the title also names the
+              questions under it. "See all" opens the full page. */}
           {current && (
             <section id="homework" className="flex scroll-mt-24 flex-col gap-3">
               <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
@@ -103,7 +103,7 @@ export default function StudentHomeView({
 
               <CurrentWorkCard
                 title={current.title}
-                titleDisplay={type === 'conversation' ? 'plain' : 'hidden'}
+                titleDisplay="plain"
                 instructions={current.instructions}
                 attachmentName={current.attachmentName}
                 signedUrl={current.signedUrl}
