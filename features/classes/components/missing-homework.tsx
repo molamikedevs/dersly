@@ -18,7 +18,7 @@ export default function MissingHomework({
 }) {
   return (
     <section className="flex flex-col gap-3">
-      <h2 className={HEADING}>No homework posted</h2>
+      <h2 className={HEADING}>Homework to post</h2>
 
       {classes === null ? (
         <p
@@ -46,7 +46,7 @@ export default function MissingHomework({
                 </span>
 
                 <ChevronRight
-                  className="size-4 shrink-0 text-muted-foreground"
+                  className="size-4 shrink-0 text-muted-foreground transition-transform duration-150 ease-out group-hover:translate-x-0.5"
                   aria-hidden
                 />
               </AppLink>

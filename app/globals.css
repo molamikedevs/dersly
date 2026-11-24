@@ -53,6 +53,12 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
 
+  /* Featured surface, used by the next-lesson card. Same as the primary
+     pair in light. In dark it becomes a tonal forest surface instead of a
+     bright mint slab. See the note on --hero in .dark. */
+  --color-hero: var(--hero);
+  --color-hero-foreground: var(--hero-foreground);
+
   /* Status. Solid pair = filled badge or button. Subtle pair = tinted row
      or inline badge. See the note on --warning in :root. */
   --color-destructive: var(--destructive);
@@ -126,6 +132,10 @@
 
   --accent: oklch(0.912 0.018 85);
   --accent-foreground: oklch(0.26 0.02 165);
+
+  /* Identical to the primary pair, so light mode does not change. */
+  --hero: oklch(0.38 0.055 168);
+  --hero-foreground: oklch(0.962 0.009 85);
 
   --destructive: oklch(0.565 0.196 26);
   --destructive-foreground: oklch(0.985 0.005 60);
@@ -203,6 +213,14 @@
   --accent: oklch(0.305 0.05 342);
   --accent-foreground: oklch(0.885 0.045 165);
 
+  /* The one surface allowed to leave the plum family. A full mint card
+     (L 0.74) was the brightest thing on a dark screen by far. This is the
+     light mode's forest card, dimmed, so the hero reads as the same object
+     in both modes and mint stays an accent: time, button, progress.
+     Mint on forest is 6.9:1, and still 4.6:1 at 75% opacity. */
+  --hero: oklch(0.3 0.05 165);
+  --hero-foreground: oklch(0.78 0.085 165);
+
   --destructive: oklch(0.665 0.172 24);
   /* Was oklch(0.985 0.005 60) at 3.16:1, a fail. Now 7.9:1. */
   --destructive-foreground: oklch(0.185 0.035 25);
@@ -257,9 +275,11 @@
   }
 
   /* shadcn components carry outline-none plus their own focus-visible ring,
-     so this does not double up on them. It covers everything else. */
+     so this does not double up on them. It covers everything else.
+     Solid, not 50% alpha: at 50% the ring measured 2.5:1 on light and
+     2.9:1 on dark, under the 3:1 of WCAG 1.4.11. Solid is 8.7:1 and 8.5:1. */
   :focus-visible {
-    outline: 2px solid color-mix(in oklch, var(--ring) 50%, transparent);
+    outline: 2px solid var(--ring);
     outline-offset: 2px;
   }
 
@@ -344,10 +364,11 @@
   min-block-size: 2.75rem;
 }
 
-/* classes.invite_code. Mono already supplies tabular figures and a slashed
-   zero via --font-mono--font-feature-settings. */
+/* classes.invite_code. @apply font-mono, not font-family: var(--font-mono).
+   Only the font-mono utility carries --font-mono--font-feature-settings,
+   so setting the family alone loses the slashed zero. */
 @utility invite-code {
-  font-family: var(--font-mono);
+  @apply font-mono;
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }

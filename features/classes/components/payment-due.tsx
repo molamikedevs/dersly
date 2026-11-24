@@ -1,5 +1,8 @@
 import { AppLink } from '@/features/app/app-mode';
-import { LESSONS_PER_PACKAGE } from '@/features/classes/constants';
+import {
+  LESSONS_PER_PACKAGE,
+  PAYMENT_SOON,
+} from '@/features/classes/constants';
 
 import { cn } from '@/lib/utils';
 
@@ -8,12 +11,10 @@ const HEADING = 'text-xl leading-snug font-bold tracking-tight text-foreground';
 const ROW_LINK =
   'group flex min-h-14 touch-manipulation items-center gap-4 py-3 select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset';
 
-const PAYMENT_SOON = LESSONS_PER_PACKAGE - 1;
-
 export default function PaymentDue({ students }: { students: PrivateClass[] }) {
   return (
     <section className="flex flex-col gap-3">
-      <h2 className={HEADING}>Payment due</h2>
+      <h2 className={HEADING}>Payments</h2>
 
       {students.length === 0 ? (
         <p className="text-[15px] leading-relaxed text-muted-foreground">
