@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import { BookOpen } from 'lucide-react';
 
 import DataRenderer from '@/components/common/data-renderer';
@@ -8,19 +9,13 @@ import ClassMenu from '@/features/classes/components/class-menu';
 import ClassSection from '@/features/classes/components/class-section';
 import LessonTracker from '@/features/classes/components/lesson-tracker';
 import { studentCountLabel } from '@/features/classes/constants/index';
-import { SCHEDULE_TIME_ZONE, bakuWeekday, classSlots } from '@/lib/schedule';
+import { bakuWeekday, classSlots } from '@/lib/schedule';
+import { inBaku } from '@/lib/time-zone';
 
 // The classes page, without the fetching. The dashboard passes it the
 // database rows, the demo passes it invented ones.
 
 type AnyClass = ClassWithCount | PrivateClass;
-
-const todayLabel = new Intl.DateTimeFormat('en-GB', {
-  weekday: 'long',
-  day: 'numeric',
-  month: 'short',
-  timeZone: SCHEDULE_TIME_ZONE,
-});
 
 // Students who have joined come first, closest to the end of their package
 // at the top, so 7 of 8 and 8 of 8 are the first thing on the page.
@@ -121,7 +116,7 @@ export default function ClassList({
             {today.length > 0 && (
               <ClassSection
                 title="Today"
-                meta={todayLabel.format(now)}
+                meta={format(now, 'EEEE d MMM', inBaku)}
                 classes={today}
                 rowSchedule={(item) => `Today, ${todayTime.get(item.id)}`}
                 rowAside={rowAside}

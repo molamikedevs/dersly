@@ -2,7 +2,19 @@
 // own start time. Everything here is Baku time, whatever time zone the server
 // or the browser is in.
 
-export const SCHEDULE_TIME_ZONE = 'Asia/Baku';
+import {
+  addDays,
+  differenceInCalendarDays,
+  format,
+  getHours,
+  getISODay,
+  isBefore,
+  set,
+  startOfDay,
+  subMinutes,
+} from 'date-fns';
+
+import { inBaku } from '@/lib/time-zone';
 
 // ISO weekdays: 1 is Monday, 7 is Sunday. The week starts on Monday here.
 export const WEEKDAYS = [
@@ -115,85 +127,27 @@ export function formatSchedule(slots: readonly ScheduleSlot[]): string | null {
   return `${days}, ${slots[0].time}`;
 }
 
-const zonedFormat = new Intl.DateTimeFormat('en-GB', {
-  timeZone: SCHEDULE_TIME_ZONE,
-  hourCycle: 'h23',
-  weekday: 'long',
-  year: 'numeric',
-  month: 'numeric',
-  day: 'numeric',
-  hour: 'numeric',
-  minute: 'numeric',
-  second: 'numeric',
-});
-
-const monthFormat = new Intl.DateTimeFormat('en-GB', {
-  timeZone: SCHEDULE_TIME_ZONE,
-  month: 'short',
-});
-
-// The wall clock in Baku at a given instant
-function zonedParts(date: Date) {
-  const parts: Record<string, string> = {};
-
-  for (const { type, value } of zonedFormat.formatToParts(date)) {
-    parts[type] = value;
-  }
-
-  return {
-    weekdayName: parts.weekday,
-    year: Number(parts.year),
-    month: Number(parts.month),
-    day: Number(parts.day),
-    hour: Number(parts.hour),
-    minute: Number(parts.minute),
-    second: Number(parts.second),
-  };
-}
-
-// Today's ISO weekday in Baku
+// Today's ISO weekday in Baku, 1 for Monday to 7 for Sunday
 export function bakuWeekday(now: Date = new Date()) {
-  const { weekdayName } = zonedParts(now);
-  return WEEKDAYS.find((weekday) => weekday.long === weekdayName)?.value ?? 1;
+  return getISODay(now, inBaku);
 }
 
-// How far Baku is ahead of UTC at a given instant, with the wall clock there.
-// The offset is read from the time zone data and not hard-coded, in case it
-// ever changes.
-function bakuClock(now: Date) {
-  const local = zonedParts(now);
-
-  const offset =
-    Date.UTC(
-      local.year,
-      local.month - 1,
-      local.day,
-      local.hour,
-      local.minute,
-      local.second,
-    ) -
-    Math.floor(now.getTime() / 1000) * 1000;
-
-  return { local, offset };
-}
-
-// The lesson on the Baku calendar day that is `ahead` days from today, as a
-// real instant in milliseconds. Null when the class does not meet that day.
+// The lesson on the Baku calendar day that is `ahead` days from today, or
+// null when the class does not meet that day. Returned as a plain Date, so
+// it prints and serialises the same on the server and in the browser.
 function lessonOnDay(
   slots: readonly ScheduleSlot[],
-  { local, offset }: ReturnType<typeof bakuClock>,
+  now: Date,
   ahead: number,
-) {
-  // Date.UTC rolls an overflowing day into the next month or year
-  const midnight = Date.UTC(local.year, local.month - 1, local.day + ahead);
-  const weekday = new Date(midnight).getUTCDay() || 7;
-  const slot = slots.find((item) => item.day === weekday);
+): Date | null {
+  const day = addDays(startOfDay(now, inBaku), ahead, inBaku);
+  const slot = slots.find((item) => item.day === getISODay(day, inBaku));
 
   if (!slot) return null;
 
   const [hours, minutes] = slot.time.split(':').map(Number);
 
-  return midnight + (hours * 60 + minutes) * 60_000 - offset;
+  return new Date(set(day, { hours, minutes }, inBaku).getTime());
 }
 
 // The next lesson as a real instant, or null when the class has no schedule.
@@ -207,16 +161,15 @@ export function getNextLesson(
 ): Date | null {
   if (slots.length === 0) return null;
 
-  const clock = bakuClock(now);
-  const earliest = now.getTime() - graceMinutes * 60_000;
+  const earliest = subMinutes(now, graceMinutes);
 
   // Today plus the next seven days always contains every weekday. The scan
   // starts at yesterday so a late lesson that began before midnight still
   // counts while it is inside the grace period.
   for (let ahead = -1; ahead <= 7; ahead += 1) {
-    const start = lessonOnDay(slots, clock, ahead);
+    const start = lessonOnDay(slots, now, ahead);
 
-    if (start !== null && start >= earliest) return new Date(start);
+    if (start && !isBefore(start, earliest)) return start;
   }
 
   return null;
@@ -228,36 +181,17 @@ export function getTodaysLesson(
   slots: readonly ScheduleSlot[],
   now: Date = new Date(),
 ): Date | null {
-  if (slots.length === 0) return null;
-
-  const start = lessonOnDay(slots, bakuClock(now), 0);
-
-  return start === null ? null : new Date(start);
+  return lessonOnDay(slots, now, 0);
 }
 
 // "22:00", the start time on the Baku clock
 export function formatLessonTime(date: Date) {
-  const { hour, minute } = zonedParts(date);
-  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+  return format(date, 'HH:mm', inBaku);
 }
 
 // "Monday 12 Oct, 22:00"
 export function formatLessonDate(date: Date) {
-  const { weekdayName, day } = zonedParts(date);
-
-  return `${weekdayName} ${day} ${monthFormat.format(date)}, ${formatLessonTime(date)}`;
-}
-
-// Whole calendar days from one instant to another, counted in Baku
-function daysApart(from: Date, to: Date) {
-  const start = zonedParts(from);
-  const end = zonedParts(to);
-
-  return Math.round(
-    (Date.UTC(end.year, end.month - 1, end.day) -
-      Date.UTC(start.year, start.month - 1, start.day)) /
-      86_400_000,
-  );
+  return format(date, 'EEEE d MMM, HH:mm', inBaku);
 }
 
 // From this hour a lesson later today reads "Tonight"
@@ -269,11 +203,11 @@ const EVENING_STARTS_AT = 18;
 //   Tomorrow, 22:00
 //   Monday 12 Oct, 22:00
 export function formatNextLesson(start: Date, now: Date = new Date()) {
-  const days = daysApart(now, start);
+  const days = differenceInCalendarDays(start, now, inBaku);
   const time = formatLessonTime(start);
 
   if (days === 0) {
-    const evening = zonedParts(start).hour >= EVENING_STARTS_AT;
+    const evening = getHours(start, inBaku) >= EVENING_STARTS_AT;
     return `${evening ? 'Tonight' : 'Today'}, ${time}`;
   }
 

@@ -1,5 +1,4 @@
 import { AppLink } from '@/features/app/app-mode';
-import { type TodayClass } from '@/features/classes/today';
 import { formatNextLesson } from '@/lib/schedule';
 import { ChevronRight } from 'lucide-react';
 

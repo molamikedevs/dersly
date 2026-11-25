@@ -1,4 +1,3 @@
-import { type TodayClass } from '@/features/classes/today';
 import { formatNextLesson } from '@/lib/schedule';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';

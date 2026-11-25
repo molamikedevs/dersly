@@ -4,26 +4,6 @@ import { classSlots, getNextLesson, getTodaysLesson } from '@/lib/schedule';
 // home uses the same hour.
 export const LESSON_MINUTES = 60;
 
-export type TodayClass = ClassWithCount | PrivateClass;
-
-export type TodayLesson = {
-  class: TodayClass;
-  start: Date;
-  state: 'earlier' | 'now' | 'later';
-};
-
-export type UpNext = {
-  class: TodayClass;
-  start: Date;
-  started: boolean;
-  isToday: boolean;
-};
-
-export type Today = {
-  lessons: TodayLesson[];
-  upNext: UpNext | null;
-};
-
 function byStart<T extends { class: TodayClass; start: Date }>(a: T, b: T) {
   return (
     a.start.getTime() - b.start.getTime() ||

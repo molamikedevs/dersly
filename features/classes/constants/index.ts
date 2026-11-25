@@ -1,4 +1,3 @@
-import { type TodayClass, type UpNext } from '@/features/classes/today';
 import {
   classSlots,
   formatNextLesson,
@@ -86,3 +85,25 @@ export function studentCountLabel(count: number) {
 }
 
 export const PAYMENT_SOON = LESSONS_PER_PACKAGE - 1;
+
+// One line under the class name. One-to-one classes show the lesson package,
+// everything else shows what kind of class it is and how many students.
+export function describe(item: TodayClass) {
+  if ('lessonsDone' in item) {
+    if (!item.enrollmentId) return { text: 'Not joined yet', due: false };
+
+    const done = Math.min(Math.max(item.lessonsDone, 0), LESSONS_PER_PACKAGE);
+
+    return done >= LESSONS_PER_PACKAGE
+      ? {
+          text: `${done} of ${LESSONS_PER_PACKAGE} done, payment due`,
+          due: true,
+        }
+      : { text: `${done} of ${LESSONS_PER_PACKAGE} lessons done`, due: false };
+  }
+
+  const type = TYPES.find((entry) => entry.value === item.type)?.label;
+  const students = studentCountLabel(item.studentCount).toLowerCase();
+
+  return { text: type ? `${type}, ${students}` : students, due: false };
+}

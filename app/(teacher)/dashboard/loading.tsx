@@ -23,14 +23,14 @@ export default function Loading() {
 
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-14">
         <div className="flex min-w-0 flex-col">
-          <div className="mb-3 flex flex-col gap-6 rounded-3xl bg-primary p-6 sm:flex-row sm:items-end sm:justify-between sm:p-8">
+          <div className="mb-3 flex flex-col gap-6 rounded-3xl bg-hero p-6 sm:flex-row sm:items-end sm:justify-between sm:p-8">
             <div className="flex flex-col gap-3">
-              <Skeleton className="h-4 w-20 bg-primary-foreground/15" />
-              <Skeleton className="h-10 w-32 bg-primary-foreground/15 sm:h-12 sm:w-40" />
-              <Skeleton className="h-5 w-40 bg-primary-foreground/15" />
-              <Skeleton className="h-4 w-32 bg-primary-foreground/15" />
+              <Skeleton className="h-4 w-20 bg-hero-foreground/15" />
+              <Skeleton className="h-10 w-32 bg-hero-foreground/15 sm:h-14 sm:w-48" />
+              <Skeleton className="h-5 w-40 bg-hero-foreground/15" />
+              <Skeleton className="h-4 w-32 bg-hero-foreground/15" />
             </div>
-            <Skeleton className="h-12 w-full rounded-xl bg-primary-foreground/15 sm:w-36" />
+            <Skeleton className="h-12 w-full rounded-xl bg-hero-foreground/15 sm:w-36" />
           </div>
 
           <div className="flex flex-col divide-y divide-border border-b border-border">

@@ -1,5 +1,8 @@
+import { format } from 'date-fns';
+
 import Pagination from '@/components/common/pagination';
 import InviteCode from '@/features/classes/components/invite-code';
+import { inBaku } from '@/lib/time-zone';
 
 type Props = {
   students: StudentRecord[];
@@ -7,12 +10,6 @@ type Props = {
   isNext: boolean;
   inviteCode: string;
 };
-
-const joinedDate = new Intl.DateTimeFormat('en-GB', {
-  day: 'numeric',
-  month: 'short',
-  timeZone: 'Asia/Baku',
-});
 
 export default function StudentsSection({
   students,
@@ -68,7 +65,7 @@ export default function StudentsSection({
                 )}
               </p>
               <p className="shrink-0 text-sm text-muted-foreground">
-                Joined {joinedDate.format(new Date(joinedAt))}
+                Joined {format(new Date(joinedAt), 'd MMM', inBaku)}
               </p>
             </li>
           ))}

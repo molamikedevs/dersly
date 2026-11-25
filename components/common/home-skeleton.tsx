@@ -1,7 +1,9 @@
 import { Skeleton } from '@/components/ui/skeleton';
 
 // Same shape as the student home: the lesson card, the week list, homework,
-// the word tiles and practice, with materials in the side column
+// the word tiles and practice, with materials in the side column. The lesson
+// card uses the same hero colours as the real one, so it does not flash from
+// one green to another when the page loads.
 function WeekRows({ className }: { className?: string }) {
   return (
     <div className={className}>
@@ -37,22 +39,30 @@ export default function HomeSkeleton() {
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-14">
         <div className="flex min-w-0 flex-col gap-12">
           <div className="flex flex-col gap-8">
-            <div className="flex flex-col gap-6 rounded-3xl bg-primary p-6 sm:p-9">
+            <div className="flex flex-col gap-6 rounded-3xl bg-hero p-6 sm:p-9">
               <div className="flex flex-col gap-3">
-                <Skeleton className="h-4 w-24 bg-primary-foreground/15" />
-                <Skeleton className="h-10 w-64 max-w-full bg-primary-foreground/15 sm:h-14 sm:w-96" />
-                <Skeleton className="h-5 w-48 bg-primary-foreground/15" />
-                <Skeleton className="h-4 w-56 max-w-full bg-primary-foreground/15" />
+                <Skeleton className="h-4 w-24 bg-hero-foreground/15" />
+                <Skeleton className="h-10 w-64 max-w-full bg-hero-foreground/15 sm:h-14 sm:w-96" />
+                <Skeleton className="h-5 w-48 bg-hero-foreground/15" />
+                <Skeleton className="h-4 w-56 max-w-full bg-hero-foreground/15" />
               </div>
-              <Skeleton className="h-12 w-full rounded-xl bg-primary-foreground/15 sm:w-40" />
+              <Skeleton className="h-12 w-full rounded-xl bg-hero-foreground/15 sm:w-40" />
             </div>
 
             <WeekRows className="lg:hidden" />
           </div>
 
+          {/* Homework: the heading with "See all", the homework title, then
+              the button */}
           <div className="flex flex-col gap-3">
-            <Skeleton className="h-7 w-40" />
-            <Skeleton className="h-12 w-full rounded-xl sm:w-40" />
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-7 w-40" />
+              <Skeleton className="h-4 w-14" />
+            </div>
+            <div className="flex flex-col gap-4">
+              <Skeleton className="h-5 w-56 max-w-full" />
+              <Skeleton className="h-12 w-full rounded-xl sm:w-40" />
+            </div>
           </div>
 
           <div className="flex flex-col gap-4">

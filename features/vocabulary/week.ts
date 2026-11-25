@@ -1,34 +1,21 @@
 // Vocabulary weeks start on Monday in Baku. A week is stored as the date of
 // that Monday, 'YYYY-MM-DD', the same as the words table.
 
-import { SCHEDULE_TIME_ZONE } from '@/lib/schedule';
+import { addDays, addWeeks, format, parseISO, startOfISOWeek } from 'date-fns';
 
-const bakuDay = new Intl.DateTimeFormat('en-CA', {
-  timeZone: SCHEDULE_TIME_ZONE,
-});
-
-// A week date has no time zone of its own, so it is read as a UTC day
-const labelFormat = new Intl.DateTimeFormat('en-GB', {
-  timeZone: 'UTC',
-  day: 'numeric',
-  month: 'short',
-});
+import { inBaku } from '@/lib/time-zone';
 
 // The Monday of this week, or of a week before or after it
 export function weekStart(now: Date = new Date(), offsetWeeks = 0) {
-  const date = new Date(`${bakuDay.format(now)}T00:00:00Z`);
-  const fromMonday = (date.getUTCDay() + 6) % 7;
+  const monday = addWeeks(startOfISOWeek(now, inBaku), offsetWeeks, inBaku);
 
-  date.setUTCDate(date.getUTCDate() - fromMonday + offsetWeeks * 7);
-
-  return date.toISOString().slice(0, 10);
+  return format(monday, 'yyyy-MM-dd', inBaku);
 }
 
-// "10 Nov to 16 Nov"
+// "10 Nov to 16 Nov". A week date is a plain calendar day with no time zone,
+// so parseISO reads it as that day wherever the code runs.
 export function weekLabel(start: string) {
-  const monday = new Date(`${start}T00:00:00Z`);
-  const sunday = new Date(monday);
-  sunday.setUTCDate(sunday.getUTCDate() + 6);
+  const monday = parseISO(start);
 
-  return `${labelFormat.format(monday)} to ${labelFormat.format(sunday)}`;
+  return `${format(monday, 'd MMM')} to ${format(addDays(monday, 6), 'd MMM')}`;
 }
