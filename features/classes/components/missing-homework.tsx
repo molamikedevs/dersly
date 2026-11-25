@@ -1,7 +1,6 @@
 import { ChevronRight } from 'lucide-react';
 
 import { AppLink } from '@/features/app/app-mode';
-import { type TodayClass } from '@/features/classes/today';
 import { nextLessonLine } from '../constants/index';
 
 const HEADING = 'text-xl leading-snug font-bold tracking-tight text-foreground';

@@ -1,3 +1,4 @@
+import { differenceInHours } from 'date-fns';
 import { ChevronRight } from 'lucide-react';
 
 import InitialsAvatar from '@/components/common/initials-avatar';
@@ -44,7 +45,7 @@ function LevelMeter({ level }: { level: string | null }) {
 
 function seenRecently(value: string | null) {
   if (!value) return false;
-  return Date.now() - new Date(value).getTime() < ACTIVE_HOURS * 60 * 60 * 1000;
+  return differenceInHours(new Date(), new Date(value)) < ACTIVE_HOURS;
 }
 
 function LastSeen({ value }: { value: string | null }) {

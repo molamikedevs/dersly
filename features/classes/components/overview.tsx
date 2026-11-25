@@ -1,5 +1,5 @@
 import TodayLessons from '@/features/classes/components/today-lessons';
-import { buildToday, type TodayClass } from '@/features/classes/today';
+import { buildToday } from '@/features/classes/today';
 import { classSlots, getNextLesson } from '@/lib/schedule';
 import { formatDate } from '@/lib/utils';
 import {

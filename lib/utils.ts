@@ -1,5 +1,12 @@
 import { clsx, type ClassValue } from 'clsx';
+import {
+  differenceInSeconds,
+  format,
+  formatDistanceToNowStrict,
+} from 'date-fns';
 import { twMerge } from 'tailwind-merge';
+
+import { inBaku } from '@/lib/time-zone';
 
 const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 
@@ -20,21 +27,6 @@ export function initials(name?: string | null) {
   if (parts.length === 0) return '?';
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
-
-export function formatDueDate(dueDate: string | null) {
-  if (!dueDate) return 'Due before the next lesson';
-
-  const date = new Date(dueDate);
-  const days = Math.ceil((date.getTime() - Date.now()) / 86_400_000);
-
-  if (days < 0) return 'Overdue';
-  if (days === 0) return 'Due today';
-  if (days === 1) return 'Due tomorrow';
-  if (days < 7)
-    return `Due ${date.toLocaleDateString('en-GB', { weekday: 'long' })}`;
-
-  return `Due ${date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`;
 }
 
 export function formatSize(bytes: number) {
@@ -103,22 +95,14 @@ export function shuffle<T>(items: T[]): T[] {
   return copy;
 }
 
+// "Just now", "5 minutes ago", "3 hours ago", "2 days ago", "4 months ago"
 export function formatLastSeen(value: string | null) {
   if (!value) return 'Never';
 
-  const minutes = Math.round((Date.now() - new Date(value).getTime()) / 60000);
-  if (minutes < 1) return 'Just now';
+  const seen = new Date(value);
+  if (differenceInSeconds(new Date(), seen) < 60) return 'Just now';
 
-  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
-  if (minutes < 60) return rtf.format(-minutes, 'minute');
-
-  const hours = Math.round(minutes / 60);
-  if (hours < 24) return rtf.format(-hours, 'hour');
-
-  const days = Math.round(hours / 24);
-  if (days < 30) return rtf.format(-days, 'day');
-
-  return rtf.format(-Math.round(days / 30), 'month');
+  return formatDistanceToNowStrict(seen, { addSuffix: true });
 }
 
 const MATERIAL_KINDS = ['link', 'guide', 'article'] as const;
@@ -130,28 +114,17 @@ export function toMaterialKind(value: unknown): MaterialKind {
     : 'link';
 }
 
-const APP_TIME_ZONE = 'Asia/Baku';
-
-// Built once when the module loads. Creating a formatter is the slow part,
-// so they are reused instead of rebuilt on every call.
+// short: "Wed 25 Nov"
+// long:  "Wednesday 25 November"
 const DATE_FORMATS = {
-  short: new Intl.DateTimeFormat('en-GB', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-    timeZone: APP_TIME_ZONE,
-  }),
-  long: new Intl.DateTimeFormat('en-GB', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    timeZone: APP_TIME_ZONE,
-  }),
+  short: 'EEE d MMM',
+  long: 'EEEE d MMMM',
 } as const;
 
+// A date on the Baku calendar, whatever time zone the code runs in
 export function formatDate(
   value: string | Date = new Date(),
   style: keyof typeof DATE_FORMATS = 'short',
 ) {
-  return DATE_FORMATS[style].format(new Date(value));
+  return format(new Date(value), DATE_FORMATS[style], inBaku);
 }

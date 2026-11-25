@@ -28,3 +28,23 @@ type PrivateClass = ClassWithCount & {
   enrollmentId: string | null;
   lessonsDone: number;
 };
+
+type TodayClass = ClassWithCount | PrivateClass;
+
+type TodayLesson = {
+  class: TodayClass;
+  start: Date;
+  state: 'earlier' | 'now' | 'later';
+};
+
+type UpNext = {
+  class: TodayClass;
+  start: Date;
+  started: boolean;
+  isToday: boolean;
+};
+
+type Today = {
+  lessons: TodayLesson[];
+  upNext: UpNext | null;
+};

@@ -4,7 +4,6 @@ import { AppLink } from '@/features/app/app-mode';
 
 type Props = {
   title: string;
-  // heading - a bold title, for a list of homework
   // plain   - a normal line, when a section heading already sits above it
   // hidden  - no title at all
   titleDisplay?: 'heading' | 'plain' | 'hidden';
@@ -14,12 +13,8 @@ type Props = {
   downloadUrl?: string | null;
   asQuestions?: boolean;
   readHref?: string;
-  // "For your lesson on Wednesday 14 Oct, 21:00"
   forLesson?: string | null;
-  // "Posted yesterday"
   posted?: string | null;
-  // primary - the filled button, for the work that matters now
-  // quiet   - an outlined button, for earlier work in a list
   readStyle?: 'primary' | 'quiet';
 };
 

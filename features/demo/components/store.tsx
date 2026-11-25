@@ -21,6 +21,7 @@ import { createDemoData } from '@/features/demo/data/index';
 import { scoreDemoTest } from '@/features/demo/data/level-test';
 import { WORDS_PER_WEEK } from '@/features/vocabulary/constants';
 import { weekStart } from '@/features/vocabulary/week';
+import { bakuToday } from '@/lib/lesson-date';
 import { toScheduleColumns } from '@/lib/schedule';
 import { generateInviteCode } from '@/lib/utils';
 import { ClassSchema, type ClassValues } from '@/lib/validation/class.schema';
@@ -106,8 +107,6 @@ function firstIssue(error: { issues: { message: string }[] }) {
   return error.issues[0]?.message ?? 'Check the class details and try again.';
 }
 
-const BAKU_DATE = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Baku' });
-
 function buildActions(
   side: DemoSide,
   read: () => DemoData,
@@ -188,7 +187,7 @@ function buildActions(
               {
                 id: crypto.randomUUID(),
                 enrollmentId,
-                lessonDate: lessonDate ?? BAKU_DATE.format(new Date()),
+                lessonDate: lessonDate ?? bakuToday(),
                 note,
               },
               ...data.notes,

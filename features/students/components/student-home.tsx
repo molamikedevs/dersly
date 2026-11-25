@@ -29,10 +29,7 @@ export default function StudentHomeView({
 }: {
   data: StudentHome;
   now: Date;
-  // A one-to-one student's open mistakes. The demo leaves this out.
   mistakes?: StudentMistakes;
-  // A one-to-one student's words to study and to check. The demo leaves
-  // this out.
   vocabulary?: StudentVocabulary;
 }) {
   const {

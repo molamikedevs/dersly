@@ -1,6 +1,9 @@
+import { differenceInCalendarDays } from 'date-fns';
+
 import { AppLink } from '@/features/app/app-mode';
 import CurrentWorkCard from '@/features/students/components/current-work-card';
 import { formatNextLesson } from '@/lib/schedule';
+import { inBaku } from '@/lib/time-zone';
 import { formatDate } from '@/lib/utils';
 
 // The student homework page, without the fetching. The page passes it the
@@ -9,22 +12,18 @@ import { formatDate } from '@/lib/utils';
 const BUTTON =
   'inline-flex h-12 touch-manipulation items-center justify-center self-start rounded-xl bg-primary px-6 text-[15px] font-semibold text-primary-foreground transition-[scale,background-color] duration-150 ease-out select-none hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.97]';
 
-const DAY = 86_400_000;
-
 function readHref(item: HomeworkItem) {
   return item.content ? `/homework/${item.id}` : undefined;
 }
 
 // "Posted today", "Posted yesterday", "Posted Friday 9 October"
 function postedLine(createdAt: string, now: Date) {
-  const day = formatDate(createdAt, 'long');
+  const days = differenceInCalendarDays(now, new Date(createdAt), inBaku);
 
-  if (day === formatDate(now, 'long')) return 'Posted today';
-  if (day === formatDate(new Date(now.getTime() - DAY), 'long')) {
-    return 'Posted yesterday';
-  }
+  if (days === 0) return 'Posted today';
+  if (days === 1) return 'Posted yesterday';
 
-  return `Posted ${day}`;
+  return `Posted ${formatDate(createdAt, 'long')}`;
 }
 
 // Which lesson the work is for. A one-to-one class is named after the
