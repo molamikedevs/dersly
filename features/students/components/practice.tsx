@@ -17,6 +17,7 @@ import { WORD_MAX } from '@/lib/validation/vocabulary.schema';
 type Props = {
   check: CheckWord[];
   mistakes: OpenMistake[];
+  compact?: boolean;
 };
 
 type Item =
@@ -24,8 +25,9 @@ type Item =
   | { kind: 'mistake'; id: string; mistake: OpenMistake };
 
 const BUTTON =
-  'h-12 shrink-0 touch-manipulation gap-2 rounded-xl px-5 text-[15px] font-semibold select-none active:scale-[0.97]';
-const INPUT = 'h-12 min-w-0 rounded-xl text-base sm:flex-1 md:text-base';
+  'h-10 shrink-0 touch-manipulation gap-2 rounded-xl px-4 text-sm font-semibold select-none active:scale-[0.97]';
+const INPUT =
+  'h-10 min-w-0 rounded-xl border-input-border/80 bg-background/60 text-sm sm:flex-1';
 
 // Close enough to count as the same sentence: case, spaces, curly quotes
 // and the full stop at the end do not matter
@@ -42,7 +44,7 @@ function sameSentence(a: string, b: string) {
   return plain(a) === plain(b);
 }
 
-export default function Practice({ check, mistakes }: Props) {
+export default function Practice({ check, mistakes, compact = false }: Props) {
   // The item on screen stays put while its answer shows, even after the
   // page data refreshes underneath it
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -83,25 +85,28 @@ export default function Practice({ check, mistakes }: Props) {
   }
 
   return (
-    <section id="practice" className="flex scroll-mt-24 flex-col gap-4">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h2 className="text-xl leading-snug font-bold tracking-tight text-foreground">
-          Practice
-        </h2>
-        {active && (
-          <p className="text-sm text-muted-foreground tabular-nums">
-            {left === 0 ? 'Last one' : `${left} more after this`}
-          </p>
-        )}
-      </div>
+    <section
+      id="practice"
+      className="surface-card flex scroll-mt-24 flex-col justify-between gap-4 p-5 sm:p-6"
+    >
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+          <h2 className="text-lg leading-snug font-semibold tracking-tight text-foreground">
+            Practice
+          </h2>
+          {active && (
+            <p className="text-xs text-muted-foreground tabular-nums">
+              {left === 0 ? 'Last one' : `${left} more after this`}
+            </p>
+          )}
+        </div>
 
-      <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
         {!active ? (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 pt-1">
             <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-success-subtle text-success-subtle-foreground">
               <Check className="size-4" aria-hidden />
             </span>
-            <p className="text-[15px] text-foreground">
+            <p className="text-sm text-foreground">
               All done for now. New practice comes after your next lesson.
             </p>
           </div>
@@ -109,6 +114,7 @@ export default function Practice({ check, mistakes }: Props) {
           <WordCard
             key={`${active.id}-${round}`}
             item={active.word}
+            compact={compact}
             onAnswered={() => setActiveId(active.id)}
             onNext={next}
           />
@@ -116,6 +122,7 @@ export default function Practice({ check, mistakes }: Props) {
           <MistakeCard
             key={`${active.id}-${round}`}
             item={active.mistake}
+            compact={compact}
             onAnswered={() => setActiveId(active.id)}
             onLater={() => putOff(active.id)}
             onDone={next}
@@ -127,12 +134,16 @@ export default function Practice({ check, mistakes }: Props) {
 }
 
 function Kind({ children }: { children: string }) {
-  return <p className="text-sm font-medium text-primary">{children}</p>;
+  return (
+    <p className="text-xs font-semibold tracking-wide text-primary uppercase">
+      {children}
+    </p>
+  );
 }
 
 function ErrorLine({ id, children }: { id: string; children: string }) {
   return (
-    <p id={id} role="alert" className="text-sm font-medium text-destructive">
+    <p id={id} role="alert" className="text-xs font-medium text-destructive">
       {children}
     </p>
   );
@@ -140,10 +151,12 @@ function ErrorLine({ id, children }: { id: string; children: string }) {
 
 function WordCard({
   item,
+  compact,
   onAnswered,
   onNext,
 }: {
   item: CheckWord;
+  compact: boolean;
   onAnswered: () => void;
   onNext: () => void;
 }) {
@@ -179,24 +192,24 @@ function WordCard({
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-3.5">
+      <div className="flex flex-col gap-1">
         <Kind>Word check</Kind>
-        <p className="text-lg leading-snug font-semibold break-words text-foreground">
+        <p className="text-[15px] leading-snug font-semibold break-words text-foreground">
           {item.meaning}
         </p>
         {item.example && (
-          <p className="text-[15px] break-words text-muted-foreground">
+          <p className="text-sm break-words text-muted-foreground">
             {item.example}
           </p>
         )}
       </div>
 
       {result ? (
-        <div className="flex flex-col gap-4" aria-live="polite">
+        <div className="flex flex-col gap-3" aria-live="polite">
           <p
             className={cn(
-              'flex items-center gap-2.5 rounded-xl px-4 py-3 text-[15px]',
+              'flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm',
               result.right
                 ? 'bg-success-subtle text-success-subtle-foreground'
                 : 'bg-destructive-subtle text-destructive-subtle-foreground',
@@ -215,7 +228,7 @@ function WordCard({
           <Button
             type="button"
             onClick={onNext}
-            className={cn(BUTTON, 'sm:self-start')}
+            className={cn(BUTTON, 'self-start')}
           >
             Next
             <ArrowRight className="size-4" aria-hidden />
@@ -225,7 +238,7 @@ function WordCard({
         <form
           onSubmit={handleCheck}
           noValidate
-          className="flex flex-col gap-2 sm:flex-row"
+          className={cn('flex flex-col gap-2', !compact && 'sm:flex-row')}
         >
           <label htmlFor={inputId} className="sr-only">
             The word that means: {item.meaning}
@@ -261,11 +274,13 @@ function WordCard({
 
 function MistakeCard({
   item,
+  compact,
   onAnswered,
   onLater,
   onDone,
 }: {
   item: OpenMistake;
+  compact: boolean;
   onAnswered: () => void;
   onLater: () => void;
   onDone: () => void;
@@ -318,11 +333,11 @@ function MistakeCard({
   const right = answer ? sameSentence(attempt, answer.correct) : false;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-3.5">
+      <div className="flex flex-col gap-1">
         <Kind>Fix your mistake</Kind>
-        <p className="text-sm text-muted-foreground">You said</p>
-        <p className="text-lg leading-snug font-semibold break-words text-foreground">
+        <p className="text-xs text-muted-foreground">You said</p>
+        <p className="text-[15px] leading-snug font-semibold break-words text-foreground">
           {item.wrong}
         </p>
       </div>
@@ -331,7 +346,7 @@ function MistakeCard({
         <form
           onSubmit={handleCheck}
           noValidate
-          className="flex flex-col gap-2 sm:flex-row"
+          className={cn('flex flex-col gap-2', !compact && 'sm:flex-row')}
         >
           <label htmlFor={inputId} className="sr-only">
             Your fix for: {item.wrong}
@@ -359,39 +374,39 @@ function MistakeCard({
           </Button>
         </form>
       ) : (
-        <div className="flex flex-col gap-4" aria-live="polite">
-          <dl className="flex flex-col gap-3 rounded-xl bg-muted/60 px-4 py-3">
+        <div className="flex flex-col gap-3" aria-live="polite">
+          <dl className="flex flex-col gap-2.5 rounded-xl border border-border-subtle bg-secondary/55 px-3.5 py-2.5">
             <div className="flex flex-col gap-0.5">
-              <dt className="text-sm text-muted-foreground">You wrote</dt>
-              <dd className="text-[15px] break-words text-foreground">
+              <dt className="text-xs text-muted-foreground">You wrote</dt>
+              <dd className="text-sm break-words text-foreground">
                 {attempt.trim()}
               </dd>
             </div>
             <div className="flex flex-col gap-0.5">
-              <dt className="text-sm text-muted-foreground">
+              <dt className="text-xs text-muted-foreground">
                 Your teacher&apos;s version
               </dt>
-              <dd className="text-[15px] font-semibold break-words text-foreground">
+              <dd className="text-sm font-semibold break-words text-foreground">
                 {answer.correct}
               </dd>
             </div>
             {answer.tip && (
               <div className="flex flex-col gap-0.5">
-                <dt className="text-sm text-muted-foreground">Remember</dt>
-                <dd className="text-[15px] break-words text-foreground">
+                <dt className="text-xs text-muted-foreground">Remember</dt>
+                <dd className="text-sm break-words text-foreground">
                   {answer.tip}
                 </dd>
               </div>
             )}
           </dl>
 
-          <p className="text-[15px] font-medium text-foreground">
+          <p className="text-sm font-medium text-foreground">
             {right
               ? 'You got it right.'
               : 'Compare the two. Did you fix the mistake?'}
           </p>
 
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="flex flex-wrap gap-2">
             <Button
               type="button"
               onClick={handleGotIt}
