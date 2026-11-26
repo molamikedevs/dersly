@@ -60,7 +60,7 @@ export default function StudentTabBar({
   return (
     <nav
       aria-label="Main"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 pr-[env(safe-area-inset-right)] pb-[max(env(safe-area-inset-bottom),0.25rem)] pl-[env(safe-area-inset-left)] backdrop-blur-md md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-border-subtle bg-card/90 pr-[env(safe-area-inset-right)] pb-[max(env(safe-area-inset-bottom),0.25rem)] pl-[env(safe-area-inset-left)] backdrop-blur-xl md:hidden"
     >
       <ul
         className="grid"
@@ -86,12 +86,19 @@ export default function StudentTabBar({
                   active ? 'text-primary' : 'text-muted-foreground',
                 )}
               >
-                <span className="flex w-full min-w-0 flex-col items-center gap-1 transition-transform duration-150 ease-out group-active:scale-[0.92]">
-                  <Icon
-                    className="size-5 shrink-0"
-                    aria-hidden
-                    strokeWidth={active ? 2.25 : 1.75}
-                  />
+                <span className="flex w-full min-w-0 flex-col items-center gap-0.5 transition-transform duration-150 ease-out group-active:scale-[0.92]">
+                  <span
+                    className={cn(
+                      'flex h-7 w-11 items-center justify-center rounded-full transition-colors duration-150',
+                      active ? 'bg-primary/15' : 'bg-transparent',
+                    )}
+                  >
+                    <Icon
+                      className="size-[19px] shrink-0"
+                      aria-hidden
+                      strokeWidth={active ? 2.25 : 1.75}
+                    />
+                  </span>
                   <span
                     className={cn(
                       'max-w-full truncate text-[11px] leading-tight',

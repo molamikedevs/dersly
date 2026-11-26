@@ -50,7 +50,7 @@ export default async function TeacherLayout({
             indicator and 2rem of air, so the last row always clears the bar. */}
           <main
             id="main"
-            className="flex-1 px-4 pt-8 pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:px-6 md:px-10 md:pt-14 md:pb-16"
+            className="flex-1 px-4 pt-8 pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:px-6 md:px-10 md:pt-12 md:pb-16"
           >
             <div className="mx-auto w-full max-w-6xl">{children}</div>
           </main>

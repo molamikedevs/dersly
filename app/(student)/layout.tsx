@@ -47,7 +47,7 @@ export default async function StudentLayout({
           indicator and 2rem of air, so the last row always clears the bar. */}
       <main
         id="main"
-        className="container-app flex-1 pt-8 pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pt-14 md:pb-16"
+        className="container-app flex-1 pt-8 pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pt-12 md:pb-16"
       >
         {children}
       </main>

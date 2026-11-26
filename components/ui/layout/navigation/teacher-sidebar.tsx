@@ -73,7 +73,7 @@ export function TeacherSidebar({
 
       <SidebarContent className="px-3 py-3 group-data-[collapsible=icon]:px-2">
         <nav aria-label="Dashboard">
-          <ul className="flex flex-col gap-1">
+          <ul className="flex flex-col gap-1.5">
             {TEACHER_NAV.map(({ label, href, icon: Icon }) => {
               const active = isActive(pathname, href, href === '/dashboard');
               return (
@@ -87,17 +87,17 @@ export function TeacherSidebar({
                     title={label}
                     aria-current={active ? 'page' : undefined}
                     className={cn(
-                      'flex h-11 items-center gap-3 rounded-lg px-3 text-[15px] transition-colors',
+                      'flex h-11 items-center gap-3 rounded-xl px-3 text-[15px] transition-all duration-150',
                       'group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0',
                       'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
                       active
-                        ? 'bg-accent font-semibold text-accent-foreground'
-                        : 'font-medium text-muted-foreground hover:bg-muted hover:text-foreground',
+                        ? 'bg-accent/90 font-semibold text-foreground shadow-[inset_0_1px_0_0_oklch(1_0_0/0.06)] ring-1 ring-border'
+                        : 'font-medium text-muted-foreground hover:bg-muted/60 hover:text-foreground',
                     )}
                   >
                     <Icon
                       className={cn(
-                        'size-[18px] shrink-0',
+                        'size-[18px] shrink-0 transition-colors',
                         active ? 'text-primary' : 'text-current',
                       )}
                       aria-hidden
@@ -106,6 +106,12 @@ export function TeacherSidebar({
                     <span className="truncate group-data-[collapsible=icon]:hidden">
                       {label}
                     </span>
+                    {active && (
+                      <span
+                        aria-hidden
+                        className="ml-auto size-1.5 shrink-0 rounded-full bg-primary shadow-[0_0_8px_var(--primary)] group-data-[collapsible=icon]:hidden"
+                      />
+                    )}
                   </AppLink>
                 </li>
               );
@@ -114,7 +120,7 @@ export function TeacherSidebar({
         </nav>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-border p-3 group-data-[collapsible=icon]:px-2">
+      <SidebarFooter className="border-t border-border-subtle p-3 group-data-[collapsible=icon]:px-2">
         <UserAvatar
           name={name}
           email={email}

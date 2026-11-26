@@ -16,7 +16,7 @@ export default function TeacherTopBar({ name, email, avatarUrl }: Props) {
   const pathname = useAppPathname();
 
   return (
-    <header className="sticky top-0 z-20 border-b border-border bg-background/85 pt-[env(safe-area-inset-top)] backdrop-blur-md md:hidden">
+    <header className="sticky top-0 z-20 border-b border-border-subtle bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur-xl md:hidden">
       <div className="flex h-16 items-center justify-between gap-4 px-4 sm:px-6">
         <Logo href="/dashboard" />
 
