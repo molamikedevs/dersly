@@ -18,18 +18,23 @@ type Props = {
 type Status = 'studying' | 'passed' | 'missed' | 'unchecked';
 
 const STATUS: Record<Status, { label: string; className: string }> = {
-  studying: { label: 'Studying', className: 'bg-muted text-muted-foreground' },
+  studying: {
+    label: 'Studying',
+    className: 'border border-border-subtle bg-secondary text-muted-foreground',
+  },
   passed: {
     label: 'Passed',
-    className: 'bg-success-subtle text-success-subtle-foreground',
+    className:
+      'border border-success/25 bg-success-subtle text-success-subtle-foreground',
   },
   missed: {
     label: 'Not passed',
-    className: 'bg-destructive-subtle text-destructive-subtle-foreground',
+    className:
+      'border border-destructive/25 bg-destructive-subtle text-destructive-subtle-foreground',
   },
   unchecked: {
     label: 'Not checked',
-    className: 'bg-muted text-muted-foreground',
+    className: 'border border-border-subtle bg-secondary text-muted-foreground',
   },
 };
 
@@ -39,7 +44,6 @@ function statusOf(item: WordRecord, thisWeek: string): Status {
   return item.attempts > 0 ? 'missed' : 'unchecked';
 }
 
-// "3 of 5 passed", once the week is in the check
 function passedLine(words: WordRecord[]) {
   const passed = words.filter((item) => item.learnedAt).length;
   return `${passed} of ${words.length} passed`;
@@ -61,59 +65,64 @@ function Week({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h3 className="text-base font-semibold text-foreground">
+        <h3 className="text-sm font-semibold text-foreground sm:text-base">
           {title}
           {note && (
-            <span className="font-normal text-muted-foreground"> {note}</span>
+            <span className="font-normal text-muted-foreground"> · {note}</span>
           )}
         </h3>
         {words.length > 0 && !studying && (
-          <p className="text-sm text-muted-foreground tabular-nums">
+          <p className="text-xs text-muted-foreground tabular-nums">
             {passedLine(words)}
           </p>
         )}
       </div>
 
       {words.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-input-border px-5 py-4 text-sm text-muted-foreground sm:px-6">
+        <p className="surface-card rounded-2xl border-dashed border-border px-5 py-5 text-sm text-muted-foreground sm:px-6">
           No words yet. Add up to {WORDS_PER_WEEK} for your student to study
           this week.
         </p>
       ) : (
-        <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
+        <ul className="surface-card flex flex-col overflow-hidden">
           {words.map((item) => {
             const status = STATUS[statusOf(item, thisWeek)];
 
             return (
               <li
                 key={item.id}
-                className="flex items-start gap-3 py-4 pr-2 pl-5 sm:pr-3 sm:pl-6"
+                className="surface-row grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2 py-4 pr-3 pl-5 sm:grid-cols-[minmax(0,13rem)_minmax(0,1fr)_auto] sm:items-baseline sm:gap-x-6 sm:pr-4 sm:pl-6"
               >
-                <div className="flex min-w-0 flex-1 flex-col gap-1">
-                  <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-                    <span className="min-w-0 text-base font-semibold break-words text-foreground">
-                      {item.word}
-                    </span>
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                  <span className="font-serif text-lg font-medium tracking-tight break-words text-foreground sm:text-xl">
+                    {item.word}
+                  </span>
+                  {!studying && (
                     <span
                       className={cn(
-                        'shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold',
+                        'shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold',
                         status.className,
                       )}
                     >
                       {status.label}
                     </span>
-                  </p>
-                  <p className="text-[15px] break-words text-foreground">
+                  )}
+                </div>
+
+                <div className="order-last col-span-2 flex min-w-0 flex-col gap-0.5 sm:order-none sm:col-span-1">
+                  <p className="text-sm font-medium break-words text-foreground sm:text-[15px]">
                     {item.meaning}
                   </p>
                   {item.example && (
-                    <p className="text-sm break-words text-muted-foreground">
+                    <p className="text-xs break-words text-muted-foreground italic sm:text-sm">
                       {item.example}
                     </p>
                   )}
                 </div>
 
-                <WordMenu data={item} />
+                <div className="justify-self-end">
+                  <WordMenu data={item} />
+                </div>
               </li>
             );
           })}
@@ -138,11 +147,7 @@ export default function VocabularySection({ enrollmentId, words }: Props) {
   return (
     <section className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        {/* The tab above already says Vocabulary */}
         <h2 className="sr-only">Vocabulary</h2>
-        <p className="min-w-0 text-[15px] text-muted-foreground">
-          {WORDS_PER_WEEK} words to study this week, checked next week.
-        </p>
 
         {!full && (
           <FormDialog triggerLabel="Add word" title="Add a word">
@@ -170,7 +175,7 @@ export default function VocabularySection({ enrollmentId, words }: Props) {
 
         {olderWeeks.length > 0 && (
           <details className="group">
-            <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-lg text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none [&::-webkit-details-marker]:hidden">
+            <summary className="inline-flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-lg text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none [&::-webkit-details-marker]:hidden">
               <ChevronRight
                 className="size-4 transition-transform group-open:rotate-90"
                 aria-hidden

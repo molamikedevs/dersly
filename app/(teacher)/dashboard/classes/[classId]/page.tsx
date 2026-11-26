@@ -72,24 +72,29 @@ export default async function Page({
   const wordCount = words.filter((item) => item.weekStart === thisWeek).length;
   const openMistakes = mistakes.filter((item) => !item.fixedAt).length;
 
+  const tabTriggerClass =
+    'rounded-lg px-3.5 py-1.5 text-sm font-semibold text-muted-foreground transition-all data-active:bg-card data-active:text-foreground data-active:shadow-xs';
+
   return (
-    <div className="flex w-full max-w-6xl min-w-0 flex-col gap-10 pb-16">
-      <div className="flex flex-col gap-5">
-        <BackLink href="/dashboard/classes" label="Back to classes" />
-        <ClassHeader data={data} />
+    <div className="flex w-full max-w-6xl min-w-0 flex-col gap-7 pb-16">
+      <div className="flex flex-col gap-3">
+        <BackLink href="/dashboard/classes" label="Classes" />
+        <ClassHeader data={data} hasJoined={Boolean(enrollmentId)} />
       </div>
 
       {/* A one-to-one student's work, one part at a time. Every part is
           rendered on the server; the tabs only choose which one shows. */}
       {enrollmentId ? (
         <Tabs defaultValue="homework" className="gap-6">
-          <TabsList>
-            <TabsTrigger value="homework">Homework</TabsTrigger>
-            <TabsTrigger value="vocabulary">
+          <TabsList className="inline-flex h-auto w-fit flex-wrap gap-1 rounded-xl border border-border-subtle bg-secondary/75 p-1">
+            <TabsTrigger value="homework" className={tabTriggerClass}>
+              Homework
+            </TabsTrigger>
+            <TabsTrigger value="vocabulary" className={tabTriggerClass}>
               Vocabulary
               {wordCount > 0 && <Count>{wordCount}</Count>}
             </TabsTrigger>
-            <TabsTrigger value="mistakes">
+            <TabsTrigger value="mistakes" className={tabTriggerClass}>
               Mistakes
               {openMistakes > 0 && <Count>{openMistakes}</Count>}
             </TabsTrigger>
@@ -130,7 +135,7 @@ export default async function Page({
 // What still needs the student, next to the tab name
 function Count({ children }: { children: number }) {
   return (
-    <span className="rounded-full bg-muted px-1.5 text-xs text-muted-foreground tabular-nums">
+    <span className="ml-1.5 inline-flex items-center rounded-full bg-background/80 px-2 py-0.5 text-xs font-medium text-muted-foreground tabular-nums">
       {children}
     </span>
   );

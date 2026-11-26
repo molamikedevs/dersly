@@ -1,81 +1,68 @@
-import { Video } from 'lucide-react';
-
 import InviteCodeDialog from '@/features/classes/components/invite-code-dialog';
 import { studentCountLabel } from '@/features/classes/constants/index';
 import { classSlots, formatSchedule } from '@/lib/schedule';
 
 type Props = {
   data: ClassWithCount;
+  hasJoined?: boolean;
   children?: React.ReactNode;
 };
 
-export default function ClassHeader({ data, children }: Props) {
-  const {
-    name,
-    type,
-    level,
-    meetingUrl,
-    inviteCode,
-    enrollmentOpen,
-    studentCount,
-  } = data;
+function formatLevel(level: string | null) {
+  if (!level) return null;
+  return level.charAt(0).toUpperCase() + level.slice(1);
+}
 
+export default function ClassHeader({
+  data,
+  hasJoined = false,
+  children,
+}: Props) {
+  const { name, type, level, inviteCode, enrollmentOpen, studentCount } = data;
+
+  const isOneToOne = type === 'one_to_one';
   const schedule = formatSchedule(classSlots(data));
+  const typeLabel = isOneToOne
+    ? 'One to one'
+    : type === 'conversation'
+      ? 'Conversation club'
+      : 'Group class';
 
-  // One plain sentence. It wraps like text, so no separator can be orphaned.
-  const facts = [
-    level,
-    type === 'one_to_one'
-      ? null
-      : studentCountLabel(studentCount).toLowerCase(),
-    enrollmentOpen ? null : 'enrolment closed',
+  const subtitle = [
+    typeLabel,
+    schedule,
+    formatLevel(level),
+    !isOneToOne ? studentCountLabel(studentCount).toLowerCase() : null,
+    !enrollmentOpen ? 'enrolment closed' : null,
   ]
     .filter(Boolean)
-    .join(', ');
+    .join(' · ');
+
+  // Group classes show the invite code inside StudentsSection when empty;
+  // one-to-one classes only need it until the student joins.
+  const showInvite = isOneToOne && !hasJoined && enrollmentOpen;
 
   return (
-    <header className="flex flex-col gap-6">
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
-        <div className="min-w-0">
-          <h1 className="font-serif text-3xl leading-[1.1] font-medium tracking-tight text-balance break-words text-foreground sm:text-5xl sm:leading-[1.05]">
-            {name}
-          </h1>
+    <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+      <div className="min-w-0">
+        <h1 className="font-serif text-3xl leading-[1.1] font-medium tracking-tight text-balance break-words text-foreground sm:text-5xl sm:leading-[1.05]">
+          {name}
+        </h1>
 
-          {schedule && (
-            <p className="mt-3 text-base break-words text-foreground">
-              {schedule}
-            </p>
-          )}
-
-          {facts && (
-            <p className="mt-1 text-[15px] text-muted-foreground first-letter:uppercase">
-              {facts}
-            </p>
-          )}
-        </div>
-
-        {meetingUrl && (
-          <a
-            href={meetingUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex h-11 shrink-0 touch-manipulation items-center justify-center gap-2 self-start rounded-xl bg-primary px-5 text-[15px] font-semibold text-primary-foreground transition-[scale,background-color] duration-150 ease-out select-none hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none active:scale-[0.97]"
-          >
-            <Video className="size-4" aria-hidden />
-            Join lesson
-          </a>
+        {subtitle && (
+          <p className="mt-2 text-sm text-muted-foreground sm:text-[15px]">
+            {subtitle}
+          </p>
         )}
       </div>
 
-      {/* Anything passed in (the demo passes the lesson count) and the
-          invite code share one row, and wrap under each other on a phone */}
-      {(children || enrollmentOpen) && (
-        <div className="flex flex-wrap items-center gap-x-10 gap-y-4">
+      {(showInvite || children) && (
+        <div className="flex flex-wrap items-center gap-4 self-start sm:self-end">
           {children}
 
-          {enrollmentOpen && (
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <span className="text-sm font-medium text-foreground">
+          {showInvite && (
+            <div className="flex shrink-0 items-center gap-2.5">
+              <span className="text-xs font-medium text-muted-foreground">
                 Invite code
               </span>
               <InviteCodeDialog

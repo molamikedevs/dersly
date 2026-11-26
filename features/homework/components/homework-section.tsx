@@ -1,8 +1,8 @@
-import { ChevronRight } from 'lucide-react';
+import { BookOpen, ChevronRight, ExternalLink } from 'lucide-react';
 
 import FormDialog from '@/components/common/form-dialog';
+import { AppLink } from '@/features/app/app-mode';
 import HomeWorkCard from '@/features/homework/components/homework-card';
-import { cn } from '@/lib/utils';
 import AddHomeWorkForm from './add-homework-form';
 import HomeworkMenu from './homework-menu';
 
@@ -23,21 +23,21 @@ export default function HomeWorkSection({
 
   return (
     <section className="flex flex-col gap-5">
-      <div
-        className={cn(
-          'flex flex-wrap items-center gap-4',
-          showTitle ? 'justify-between' : 'justify-end',
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        {showTitle ? (
+          <h2 className="text-lg leading-snug font-semibold tracking-tight text-foreground sm:text-xl">
+            Homework
+          </h2>
+        ) : (
+          <>
+            <h2 className="sr-only">Homework</h2>
+            <p className="min-w-0 text-sm text-muted-foreground">
+              {current
+                ? 'Latest assignment posted for this student.'
+                : 'Post homework or a lesson guide for this student.'}
+            </p>
+          </>
         )}
-      >
-        <h2
-          className={
-            showTitle
-              ? 'font-serif text-2xl font-medium tracking-tight text-foreground sm:text-[28px]'
-              : 'sr-only'
-          }
-        >
-          Homework
-        </h2>
 
         <FormDialog
           triggerLabel="New homework"
@@ -49,7 +49,7 @@ export default function HomeWorkSection({
       </div>
 
       {!current ? (
-        <div className="rounded-2xl border border-dashed border-input-border p-5 sm:p-6">
+        <div className="surface-card rounded-2xl border-dashed border-border p-6 sm:p-8">
           <p className="text-base font-semibold text-foreground">
             No homework yet
           </p>
@@ -58,7 +58,7 @@ export default function HomeWorkSection({
           </p>
         </div>
       ) : (
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6">
           <HomeWorkCard
             data={current}
             readHref={`/dashboard/homework/${current.id}`}
@@ -66,7 +66,7 @@ export default function HomeWorkSection({
 
           {past.length > 0 && (
             <details className="group">
-              <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-lg text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none [&::-webkit-details-marker]:hidden">
+              <summary className="inline-flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-lg text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none [&::-webkit-details-marker]:hidden">
                 <ChevronRight
                   className="size-4 transition-transform group-open:rotate-90"
                   aria-hidden
@@ -74,18 +74,54 @@ export default function HomeWorkSection({
                 Earlier homework ({past.length})
               </summary>
 
-              <ul className="mt-3 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
-                {past.map((item) => (
-                  <li
-                    key={item.id}
-                    className="flex min-h-14 items-center gap-4 py-2 pr-2 pl-5 sm:pr-3 sm:pl-6"
-                  >
-                    <span className="min-w-0 flex-1 text-[15px] font-medium break-words text-foreground">
-                      {item.title}
-                    </span>
-                    <HomeworkMenu data={item} />
-                  </li>
-                ))}
+              <ul className="surface-card mt-3 flex flex-col overflow-hidden">
+                {past.map((item) => {
+                  const hasGuide = Boolean(item.content);
+                  const fileUrl = item.signedUrl ?? item.downloadUrl;
+
+                  return (
+                    <li
+                      key={item.id}
+                      className="surface-row group/row flex min-h-14 items-center gap-3 py-2.5 pr-3 pl-5 sm:pr-4 sm:pl-6"
+                    >
+                      {hasGuide ? (
+                        <AppLink
+                          href={`/dashboard/homework/${item.id}`}
+                          className="flex min-w-0 flex-1 items-center justify-between gap-4 py-1 text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                        >
+                          <span className="min-w-0 truncate text-sm font-semibold text-foreground transition-colors group-hover/row:text-primary sm:text-[15px]">
+                            {item.title}
+                          </span>
+                          <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors group-hover/row:text-primary">
+                            <BookOpen className="size-3.5" aria-hidden />
+                            Preview
+                          </span>
+                        </AppLink>
+                      ) : fileUrl ? (
+                        <a
+                          href={fileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex min-w-0 flex-1 items-center justify-between gap-4 py-1 text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                        >
+                          <span className="min-w-0 truncate text-sm font-semibold text-foreground transition-colors group-hover/row:text-primary sm:text-[15px]">
+                            {item.title}
+                          </span>
+                          <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors group-hover/row:text-primary">
+                            <ExternalLink className="size-3.5" aria-hidden />
+                            Open file
+                          </span>
+                        </a>
+                      ) : (
+                        <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground sm:text-[15px]">
+                          {item.title}
+                        </span>
+                      )}
+
+                      <HomeworkMenu data={item} />
+                    </li>
+                  );
+                })}
               </ul>
             </details>
           )}

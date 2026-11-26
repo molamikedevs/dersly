@@ -41,13 +41,13 @@ export default function InviteCodeDialog({ code, enrollmentOpen }: Props) {
     <Dialog>
       <DialogTrigger
         aria-label={`Show invite code ${code}`}
-        className="group inline-flex h-11 items-center gap-3 rounded-xl border border-border bg-muted px-4 transition-colors hover:border-input-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="group inline-flex h-9 items-center gap-2.5 rounded-lg border border-border-subtle bg-secondary/80 px-3 transition-colors hover:border-input-border hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
       >
-        <span className="invite-code text-base font-semibold text-foreground">
+        <span className="invite-code text-sm font-semibold tracking-wider text-foreground">
           {code}
         </span>
         <Maximize2
-          className="size-3.5 text-muted-foreground transition-colors group-hover:text-foreground"
+          className="size-3.5 text-muted-foreground transition-colors group-hover:text-primary"
           aria-hidden
         />
       </DialogTrigger>
@@ -66,7 +66,7 @@ export default function InviteCodeDialog({ code, enrollmentOpen }: Props) {
 
         <p
           className={cn(
-            'invite-code my-2 rounded-xl bg-muted py-8 text-center text-4xl font-semibold tracking-[0.3em]',
+            'invite-code my-2 rounded-xl border border-border-subtle bg-secondary py-8 text-center text-4xl font-semibold tracking-[0.3em]',
             enrollmentOpen ? 'text-foreground' : 'text-muted-foreground',
           )}
         >
