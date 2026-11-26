@@ -13,12 +13,16 @@ export default function Logo({
       href={href}
       aria-label="Dersly home"
       className={cn(
-        'flex items-center gap-2.5 rounded-lg',
+        'group/logo flex items-center gap-2.5 rounded-lg transition-opacity hover:opacity-90',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
         className,
       )}
     >
-      <svg viewBox="0 0 64 64" className="size-9 shrink-0" aria-hidden>
+      <svg
+        viewBox="0 0 64 64"
+        className="size-9 shrink-0 rounded-[10px] shadow-xs ring-1 ring-inset ring-white/15"
+        aria-hidden
+      >
         <rect width="64" height="64" rx="16" fill="var(--primary)" />
         <path
           d="M17 15 H30 A17 17 0 0 1 30 49 H17 Z M25 23 H30 A9 9 0 0 1 30 41 H25 Z"
