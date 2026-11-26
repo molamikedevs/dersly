@@ -66,9 +66,6 @@ export default function PaymentDue({ students }: { students: PrivateClass[] }) {
     <section className="flex flex-col gap-3">
       <div className="flex items-baseline justify-between gap-2">
         <h2 className={HEADING}>Lesson packages</h2>
-        <span className="text-xs text-muted-foreground">
-          {LESSONS_PER_PACKAGE} lessons each
-        </span>
       </div>
 
       {students.length === 0 ? (

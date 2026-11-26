@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import { BookOpen } from 'lucide-react';
 
 import DataRenderer from '@/components/common/data-renderer';
@@ -9,8 +8,6 @@ import ClassMenu from '@/features/classes/components/class-menu';
 import ClassSection from '@/features/classes/components/class-section';
 import LessonTracker from '@/features/classes/components/lesson-tracker';
 import { studentCountLabel } from '@/features/classes/constants/index';
-import { bakuWeekday, classSlots } from '@/lib/schedule';
-import { inBaku } from '@/lib/time-zone';
 
 // The classes page, without the fetching. The dashboard passes it the
 // database rows, the demo passes it invented ones.
@@ -43,7 +40,7 @@ function rowAside(item: AnyClass) {
   }
 
   return (
-    <p className="text-sm text-muted-foreground tabular-nums sm:text-right">
+    <p className="text-sm text-muted-foreground tabular-nums">
       {studentCountLabel(item.studentCount)}
     </p>
   );
@@ -68,21 +65,8 @@ export default function ClassList({
   const oneToOne = [...privateClasses].sort(byLessonsDone);
   const all: AnyClass[] = [...oneToOne, ...groups];
 
-  // Classes with a lesson today in Baku, earliest first
-  const weekday = bakuWeekday(now);
-  const todayTime = new Map<string, string>();
-
-  for (const item of all) {
-    const slot = classSlots(item).find((entry) => entry.day === weekday);
-    if (slot) todayTime.set(item.id, slot.time);
-  }
-
-  const today = all
-    .filter((item) => todayTime.has(item.id))
-    .sort((a, b) => todayTime.get(a.id)!.localeCompare(todayTime.get(b.id)!));
-
   return (
-    <div className="flex w-full max-w-6xl min-w-0 flex-col gap-10 pb-16">
+    <div className="flex w-full max-w-6xl min-w-0 flex-col gap-9 pb-16">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <PageHeader
           title="Classes"
@@ -113,21 +97,13 @@ export default function ClassList({
         }}
         render={() => (
           <div className="flex flex-col gap-10">
-            {today.length > 0 && (
-              <ClassSection
-                title="Today"
-                meta={format(now, 'EEEE d MMM', inBaku)}
-                classes={today}
-                rowSchedule={(item) => `Today, ${todayTime.get(item.id)}`}
-                rowAside={rowAside}
-                rowMenu={(item) => <ClassMenu data={item} />}
-              />
-            )}
             {oneToOne.length > 0 && (
               <ClassSection
                 title="One to one"
-                meta={`${oneToOne.length} ${oneToOne.length === 1 ? 'student' : 'students'}`}
                 classes={oneToOne}
+                now={now}
+                showColumnHeaders
+                asideHeader="Package"
                 rowAside={rowAside}
                 rowMenu={(item) => <ClassMenu data={item} />}
               />
@@ -135,9 +111,9 @@ export default function ClassList({
             {groups.length > 0 && (
               <ClassSection
                 title="Groups & clubs"
-                meta={`${groups.length} ${groups.length === 1 ? 'class' : 'classes'}`}
                 classes={groups}
-                rowAside={rowAside}
+                now={now}
+                variant="cards"
                 rowMenu={(item) => <ClassMenu data={item} />}
               />
             )}

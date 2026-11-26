@@ -23,12 +23,14 @@ export default function Pagination({ isNext }: { isNext: boolean }) {
   }
 
   const buttonClass =
-    'inline-flex h-9 items-center gap-1 rounded-lg px-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30';
+    'inline-flex h-8 items-center gap-1 rounded-lg border border-border-subtle bg-card px-2.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-input-border hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-35';
 
   return (
-    <nav aria-label="Pagination" className="flex items-center justify-end">
-      <div className="flex items-center gap-1">
-        <span className="pr-1 text-sm text-muted-foreground">Page: {page}</span>
+    <nav aria-label="Pagination" className="flex items-center justify-end pt-1">
+      <div className="flex items-center gap-2">
+        <span className="pr-1 text-xs font-medium text-muted-foreground tabular-nums">
+          Page {page}
+        </span>
 
         <button
           type="button"
@@ -36,7 +38,7 @@ export default function Pagination({ isNext }: { isNext: boolean }) {
           onClick={() => goTo(page - 1)}
           className={buttonClass}
         >
-          <ChevronLeft className="size-4" aria-hidden />
+          <ChevronLeft className="size-3.5" aria-hidden />
           <span className="hidden sm:inline">Previous</span>
           <span className="sr-only sm:hidden">Previous page</span>
         </button>
@@ -49,7 +51,7 @@ export default function Pagination({ isNext }: { isNext: boolean }) {
         >
           <span className="hidden sm:inline">Next</span>
           <span className="sr-only sm:hidden">Next page</span>
-          <ChevronRight className="size-4" aria-hidden />
+          <ChevronRight className="size-3.5" aria-hidden />
         </button>
       </div>
     </nav>

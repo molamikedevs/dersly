@@ -1,5 +1,3 @@
-import { Plus } from 'lucide-react';
-
 import { AppLink } from '@/features/app/app-mode';
 import TodayLessons from '@/features/classes/components/today-lessons';
 import { buildToday } from '@/features/classes/today';
@@ -105,14 +103,6 @@ export default function Overview({
             {allDone && '. All done for today.'}
           </p>
         </div>
-
-        <AppLink
-          href="/dashboard/homework"
-          className="inline-flex h-10 shrink-0 touch-manipulation items-center justify-center gap-2 self-start rounded-xl border border-border bg-card px-4 text-sm font-semibold text-foreground shadow-[inset_0_1px_0_0_oklch(1_0_0/0.04)] transition-all duration-150 select-none hover:bg-accent/70 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-[0.98] sm:self-auto"
-        >
-          <Plus className="size-4 text-primary" aria-hidden />
-          New homework
-        </AppLink>
       </header>
 
       {/* 7-day at-a-glance strip */}

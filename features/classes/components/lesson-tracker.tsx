@@ -56,8 +56,10 @@ export default function LessonTracker({
 
   if (!enrollmentId) {
     return (
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 sm:w-72">
-        <p className="text-sm text-muted-foreground">Not joined yet</p>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <p className="text-xs font-medium text-muted-foreground sm:text-sm">
+          Not joined yet
+        </p>
         {inviteCode && <InviteCode code={inviteCode} />}
       </div>
     );
@@ -107,16 +109,14 @@ export default function LessonTracker({
 
   return (
     <>
-      {/* The strip keeps a 5rem floor. Below that the button wraps under it,
-          which is what happens at 200% text size on a small phone. */}
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 sm:w-72">
-        <div className="min-w-20 flex-1">
-          <div aria-hidden className="flex max-w-31 gap-1">
+      <div className="flex w-full max-w-64 flex-wrap items-center justify-between gap-x-3 gap-y-2">
+        <div className="min-w-0">
+          <div aria-hidden className="flex items-center gap-1">
             {Array.from({ length: LESSONS_PER_PACKAGE }, (_, index) => (
               <span
                 key={index}
                 className={cn(
-                  'h-2 flex-1 rounded-full transition-colors duration-300 ease-out',
+                  'size-2 rounded-full transition-colors duration-300 ease-out',
                   index >= done
                     ? 'bg-border'
                     : isComplete
@@ -129,7 +129,7 @@ export default function LessonTracker({
 
           <p
             className={cn(
-              'mt-1.5 text-sm tabular-nums',
+              'mt-1.5 text-xs whitespace-nowrap tabular-nums',
               isComplete
                 ? 'font-semibold text-warning-subtle-foreground'
                 : 'text-muted-foreground',
@@ -147,10 +147,10 @@ export default function LessonTracker({
             variant="outline"
             onClick={() => handleOpenChange(true)}
             aria-label={`Lesson done for ${name}`}
-            className="h-11 shrink-0 touch-manipulation gap-2 rounded-xl px-4 text-sm font-semibold active:scale-[0.97]"
+            className="h-8 shrink-0 touch-manipulation gap-1.5 rounded-lg border-input-border/80 bg-secondary/70 px-2.5 text-xs font-semibold text-foreground transition-colors hover:border-primary/45 hover:bg-accent active:scale-[0.97]"
           >
-            <Check className="size-4" aria-hidden />
-            Lesson done
+            <Check className="size-3.5 text-primary" aria-hidden />
+            Done
           </Button>
         )}
       </div>

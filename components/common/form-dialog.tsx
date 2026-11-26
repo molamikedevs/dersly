@@ -51,10 +51,12 @@ export default function FormDialog({
       <DialogTrigger
         className={cn(
           buttonVariants({ variant: triggerVariant, size: triggerSize }),
-          'h-11 touch-manipulation gap-2 rounded-xl px-5 text-[15px] font-semibold active:scale-[0.97]',
+          'h-10 shrink-0 touch-manipulation gap-2 rounded-xl px-4 text-sm font-semibold active:scale-[0.97]',
+          triggerVariant === 'default' &&
+            'shadow-[inset_0_1px_0_0_oklch(1_0_0/0.22),0_1px_2px_0_oklch(0_0_0/0.35)]',
         )}
       >
-        {triggerIcon ?? <Plus className="size-4" aria-hidden />}
+        {triggerIcon ?? <Plus className="size-4 stroke-[2.25]" aria-hidden />}
         {triggerLabel}
       </DialogTrigger>
 
@@ -75,7 +77,7 @@ export default function FormDialog({
           )}
         </DialogHeader>
 
-        <div className="min-h-0 flex-1 [scrollbar-width:thin] [scrollbar-gutter:stable_both-edges] overflow-y-auto overscroll-contain bg-inherit px-5 pb-6 sm:px-7 sm:pb-7">
+        <div className="min-h-0 flex-1 [scrollbar-gutter:stable_both-edges] [scrollbar-width:thin] overflow-y-auto overscroll-contain bg-inherit px-5 pb-6 sm:px-7 sm:pb-7">
           {form}
         </div>
       </DialogContent>

@@ -45,18 +45,23 @@ const StateSkeleton = ({
   button,
   action,
 }: StateSkeletonProps) => (
-  <div className="flex w-full flex-col items-center justify-center rounded-lg border border-dashed px-6 py-16 text-center">
+  <div className="surface-card flex w-full flex-col items-center justify-center rounded-2xl border-dashed border-border px-6 py-16 text-center">
     <span
-      className={
-        tone === 'destructive' ? 'text-destructive' : 'text-muted-foreground'
-      }
+      className={cn(
+        'flex size-12 items-center justify-center rounded-2xl border',
+        tone === 'destructive'
+          ? 'border-destructive/25 bg-destructive-subtle text-destructive'
+          : 'border-border-subtle bg-secondary text-muted-foreground',
+      )}
       aria-hidden
     >
-      <Icon className="size-10" strokeWidth={1.5} />
+      <Icon className="size-6" strokeWidth={1.75} />
     </span>
 
     <h2 className="mt-5 text-lg font-semibold text-foreground">{title}</h2>
-    <p className="mt-2 max-w-sm text-sm text-muted-foreground">{message}</p>
+    <p className="mt-1.5 max-w-sm text-sm leading-relaxed text-muted-foreground">
+      {message}
+    </p>
     {action}
     {button && !action && (
       <AppLink

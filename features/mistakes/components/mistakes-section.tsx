@@ -14,16 +14,15 @@ type Props = {
 function summary(mistakes: MistakeRecord[]) {
   const fixed = mistakes.filter((item) => item.fixedAt).length;
   const open = mistakes.length - fixed;
-  return `${open} to fix, ${fixed} fixed`;
+  return `${open} to fix · ${fixed} fixed`;
 }
 
 export default function MistakesSection({ enrollmentId, mistakes }: Props) {
   return (
     <section className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        {/* The tab above already says Mistakes */}
         <h2 className="sr-only">Mistakes</h2>
-        <p className="min-w-0 text-[15px] text-muted-foreground tabular-nums">
+        <p className="min-w-0 text-sm text-muted-foreground tabular-nums">
           {mistakes.length > 0
             ? summary(mistakes)
             : 'What your student said, and how to say it.'}
@@ -35,7 +34,7 @@ export default function MistakesSection({ enrollmentId, mistakes }: Props) {
       </div>
 
       {mistakes.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-input-border p-5 sm:p-6">
+        <div className="surface-card rounded-2xl border-dashed border-border p-6 sm:p-8">
           <p className="text-base font-semibold text-foreground">
             No mistakes yet
           </p>
@@ -45,43 +44,48 @@ export default function MistakesSection({ enrollmentId, mistakes }: Props) {
           </p>
         </div>
       ) : (
-        <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
+        <ul className="surface-card flex flex-col overflow-hidden">
           {mistakes.map((item) => {
             const fixed = Boolean(item.fixedAt);
 
             return (
               <li
                 key={item.id}
-                className="flex items-start gap-3 py-4 pr-2 pl-5 sm:pr-3 sm:pl-6"
+                className="surface-row flex items-start justify-between gap-4 py-4 pr-3 pl-5 sm:pr-4 sm:pl-6"
               >
                 <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                  <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-                    <span className="min-w-0 text-[15px] break-words text-muted-foreground line-through decoration-destructive/60">
-                      {item.wrong}
-                    </span>
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <p className="font-serif text-lg leading-snug font-medium break-words text-foreground sm:text-xl">
+                      <span className="text-destructive/90 line-through decoration-destructive/60">
+                        {item.wrong}
+                      </span>{' '}
+                      <span>{item.correct}</span>
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm">
+                    {item.tip && (
+                      <span className="break-words text-muted-foreground">
+                        {item.tip}
+                      </span>
+                    )}
+
                     <span
                       className={cn(
-                        'shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold',
+                        'inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold',
                         fixed
-                          ? 'bg-success-subtle text-success-subtle-foreground'
-                          : 'bg-muted text-muted-foreground',
+                          ? 'border border-success/25 bg-success-subtle text-success-subtle-foreground'
+                          : 'border border-destructive/25 bg-destructive-subtle text-destructive-subtle-foreground',
                       )}
                     >
                       {fixed ? 'Fixed' : 'To fix'}
                     </span>
-                  </p>
-                  <p className="text-[15px] font-medium break-words text-foreground">
-                    {item.correct}
-                  </p>
-                  {item.tip && (
-                    <p className="text-sm break-words text-muted-foreground">
-                      {item.tip}
-                    </p>
-                  )}
+                  </div>
+
                   {!fixed && item.attempt && (
-                    <p className="text-sm break-words text-muted-foreground">
-                      <span className="font-medium text-foreground">
-                        Their last try:
+                    <p className="text-xs break-words text-muted-foreground">
+                      <span className="font-medium text-foreground/85">
+                        Last try:
                       </span>{' '}
                       {item.attempt}
                     </p>

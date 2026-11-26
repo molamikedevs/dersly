@@ -20,18 +20,18 @@ export default function StudentsSection({
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-baseline justify-between gap-4">
-        <h2 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-[28px]">
+        <h2 className="text-lg leading-snug font-semibold tracking-tight text-foreground sm:text-xl">
           Students
         </h2>
         {total > 0 && (
-          <p className="shrink-0 text-sm text-muted-foreground tabular-nums">
+          <p className="shrink-0 text-xs font-medium text-muted-foreground tabular-nums sm:text-sm">
             {total}
           </p>
         )}
       </div>
 
       {total === 0 ? (
-        <div className="flex flex-col items-start gap-4 rounded-2xl border border-dashed border-input-border p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div className="surface-card flex flex-col items-start gap-4 rounded-2xl border-dashed border-border p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div className="min-w-0">
             <p className="text-base font-semibold text-foreground">
               No students yet
@@ -43,28 +43,27 @@ export default function StudentsSection({
           <InviteCode code={inviteCode} />
         </div>
       ) : students.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-input-border p-5 text-sm text-muted-foreground sm:p-6">
+        <p className="surface-card rounded-2xl border-dashed border-border p-5 text-sm text-muted-foreground sm:p-6">
           No students on this page.
         </p>
       ) : (
-        <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
+        <ul className="surface-card flex flex-col overflow-hidden">
           {students.map(({ student, joinedAt }) => (
             <li
               key={student.id}
-              className="flex flex-col gap-0.5 px-5 py-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6 sm:px-6"
+              className="surface-row flex flex-col gap-1 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6"
             >
-              <p className="min-w-0 text-[15px] font-semibold break-words text-foreground">
-                {student.fullName}
+              <div className="flex min-w-0 flex-wrap items-center gap-2">
+                <span className="text-sm font-semibold break-words text-foreground sm:text-[15px]">
+                  {student.fullName}
+                </span>
                 {student.level && (
-                  <>
-                    {' '}
-                    <span className="text-sm font-normal text-muted-foreground">
-                      {student.level}
-                    </span>
-                  </>
+                  <span className="inline-flex items-center rounded-full border border-border-subtle bg-secondary px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground capitalize">
+                    {student.level}
+                  </span>
                 )}
-              </p>
-              <p className="shrink-0 text-sm text-muted-foreground">
+              </div>
+              <p className="shrink-0 text-xs text-muted-foreground tabular-nums">
                 Joined {format(new Date(joinedAt), 'd MMM', inBaku)}
               </p>
             </li>

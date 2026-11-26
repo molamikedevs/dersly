@@ -24,61 +24,66 @@ export default function HomeWorkCard({ data, action, readHref }: Props) {
   const canRead = Boolean(content && readHref);
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-border bg-card">
-      <div className="p-6 sm:p-7">
+    <article className="surface-card overflow-hidden">
+      <div className="px-5 py-4 sm:px-6 sm:py-5">
         <header className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2.5">
-              <h3 className="min-w-0 text-xl font-bold tracking-tight text-foreground">
+              <h3 className="min-w-0 font-serif text-xl font-medium tracking-tight text-foreground sm:text-2xl">
                 {title}
               </h3>
 
               {!isPublished && (
-                <span className="shrink-0 rounded-full border border-input-border px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
+                <span className="shrink-0 rounded-full border border-border-subtle bg-secondary px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
                   Draft
                 </span>
               )}
             </div>
 
             {instructions && (
-              <p className="mt-2 max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
+              <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
                 {instructions}
               </p>
             )}
           </div>
 
-          <div className="-mr-2 -mt-1 shrink-0">
+          <div className="-mt-1 -mr-2 shrink-0">
             {action ?? <HomeworkMenu data={data} />}
           </div>
         </header>
       </div>
 
       {canRead ? (
-        <div className="border-t border-border bg-muted/50 px-6 py-4 sm:px-7">
+        <div className="flex items-center justify-between gap-4 border-t border-border-subtle bg-secondary/45 px-5 py-3 sm:px-6">
+          <span className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+            <FileText className="size-4 text-primary" aria-hidden />
+            Lesson guide
+          </span>
+
           <AppLink
             href={readHref!}
-            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+            className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-input-border/80 bg-card px-3.5 text-xs font-semibold text-foreground shadow-[inset_0_1px_0_0_oklch(1_0_0/0.04)] transition-colors hover:border-primary/45 hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none sm:text-sm"
           >
-            <BookOpen className="size-4" aria-hidden />
-            Read guide
+            <BookOpen className="size-3.5 text-primary" aria-hidden />
+            Preview guide
           </AppLink>
         </div>
       ) : (
         attachmentPath && (
-          <div className="border-t border-border bg-muted/50 px-6 py-4 sm:px-7">
+          <div className="border-t border-border-subtle bg-secondary/45 px-5 py-3 sm:px-6">
             <div className="flex items-center gap-3 sm:gap-4">
               <div
                 aria-hidden
-                className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-warning-subtle-foreground"
+                className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-border-subtle bg-card text-primary"
               >
-                <FileText className="size-5" />
+                <FileText className="size-4" />
               </div>
 
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[15px] font-semibold text-foreground">
+                <p className="truncate text-sm font-semibold text-foreground">
                   {attachmentName ?? 'Attachment'}
                 </p>
-                <p className="text-[13px] text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Homework attachment
                 </p>
               </div>
@@ -89,7 +94,7 @@ export default function HomeWorkCard({ data, action, readHref }: Props) {
                     href={signedUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex h-11 items-center gap-2 rounded-lg border border-input-border bg-card px-4 text-sm font-semibold text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-input-border/80 bg-card px-3.5 text-xs font-semibold text-foreground transition-colors hover:border-primary/45 hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                   >
                     Open
                     <ExternalLink className="size-3.5" aria-hidden />
@@ -101,9 +106,9 @@ export default function HomeWorkCard({ data, action, readHref }: Props) {
                     href={downloadUrl}
                     download={attachmentName ?? undefined}
                     aria-label={`Download ${attachmentName ?? 'attachment'}`}
-                    className="inline-flex size-11 items-center justify-center rounded-lg border border-input-border bg-card text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="inline-flex size-9 items-center justify-center rounded-lg border border-input-border/80 bg-card text-foreground transition-colors hover:border-primary/45 hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                   >
-                    <Download className="size-4" aria-hidden />
+                    <Download className="size-3.5" aria-hidden />
                   </a>
                 )}
               </div>
