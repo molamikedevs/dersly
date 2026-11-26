@@ -1,16 +1,14 @@
+import { ArrowRight, BookOpen } from 'lucide-react';
+
 import { AppLink } from '@/features/app/app-mode';
 import PromptCard from '@/features/level-test/components/prompt-card';
 import ReadingList from '@/features/materials/components/reading-list';
 import RecentMaterials from '@/features/materials/components/recent-materials';
-import CurrentWorkCard from '@/features/students/components/current-work-card';
 import LessonNotes from '@/features/students/components/lesson-notes';
 import NextLessonCard from '@/features/students/components/next-lesson-card';
 import Practice from '@/features/students/components/practice';
 import WeekChecklist from '@/features/students/components/week-checklist';
-import {
-  WORK_LABEL,
-  WORK_LINK_LABEL,
-} from '@/features/students/constants/index';
+import { WORK_LABEL } from '@/features/students/constants/index';
 import VocabularyStudy from '@/features/vocabulary/components/vocabulary-study';
 import { formatNextLesson } from '@/lib/schedule';
 import { formatDate } from '@/lib/utils';
@@ -50,8 +48,12 @@ export default function StudentHomeView({
     mistakes,
   };
 
+  const homeworkHref = current?.hasGuide
+    ? `/homework/${current.id}`
+    : '/homework';
+
   return (
-    <div className="flex w-full max-w-6xl min-w-0 flex-col gap-7 pb-10 sm:gap-10">
+    <div className="flex w-full max-w-6xl min-w-0 flex-col gap-7 pb-10 sm:gap-9">
       {/* Kept short on a phone so the next lesson is on the first screen */}
       <header className="flex min-w-0 flex-col gap-1.5">
         <h1 className="font-serif text-3xl font-medium tracking-tight text-balance wrap-break-word text-foreground sm:text-5xl">
@@ -62,9 +64,9 @@ export default function StudentHomeView({
         </p>
       </header>
 
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-14">
-        <div className="flex min-w-0 flex-col gap-12">
-          <div className="flex flex-col gap-8">
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start lg:gap-12">
+        <div className="flex min-w-0 flex-col gap-9">
+          <div className="flex flex-col gap-6">
             <NextLessonCard
               when={nextLesson ? formatNextLesson(nextLesson, now) : null}
               started={Boolean(nextLesson && nextLesson <= now)}
@@ -80,40 +82,38 @@ export default function StudentHomeView({
             <WeekChecklist {...week} className="lg:hidden" />
           </div>
 
-          {/* The heading says what kind of work this is and the title says
-              which one, so the student knows what they are opening before
-              they tap. For a conversation topic the title also names the
-              questions under it. "See all" opens the full page. */}
           {current && (
-            <section id="homework" className="flex scroll-mt-24 flex-col gap-3">
-              <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-                <h2 className="text-xl leading-snug font-bold tracking-tight text-foreground">
-                  {WORK_LABEL[type]}
-                </h2>
-                <AppLink
-                  href="/homework"
-                  className="-my-3 inline-flex shrink-0 touch-manipulation items-center text-sm font-semibold text-primary underline-offset-4 tap-row hover:underline"
-                >
-                  {WORK_LINK_LABEL[type]}
-                </AppLink>
-              </div>
+            <section id="homework" className="scroll-mt-24">
+              <AppLink
+                href={homeworkHref}
+                className="surface-card group flex min-h-15 touch-manipulation items-center justify-between gap-4 px-5 py-3.5 transition-all duration-150 hover:border-primary/45 hover:bg-accent/35 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+              >
+                <span className="flex min-w-0 items-center gap-3.5">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-border-subtle bg-secondary text-primary">
+                    <BookOpen className="size-4" aria-hidden />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                      {WORK_LABEL[type]}
+                    </span>
+                    <span className="block truncate text-[15px] font-semibold text-foreground transition-colors group-hover:text-primary">
+                      {current.title}
+                    </span>
+                  </span>
+                </span>
 
-              <CurrentWorkCard
-                title={current.title}
-                titleDisplay="plain"
-                instructions={current.instructions}
-                attachmentName={current.attachmentName}
-                signedUrl={current.signedUrl}
-                downloadUrl={current.downloadUrl}
-                asQuestions={type === 'conversation'}
-                readHref={
-                  current.hasGuide ? `/homework/${current.id}` : undefined
-                }
-              />
+                <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-primary">
+                  <span className="hidden sm:inline">
+                    {current.hasGuide ? 'Read guide' : 'Open'}
+                  </span>
+                  <ArrowRight
+                    className="size-4 transition-transform duration-150 ease-out group-hover:translate-x-0.5"
+                    aria-hidden
+                  />
+                </span>
+              </AppLink>
             </section>
           )}
-
-          {vocabulary && <VocabularyStudy words={vocabulary.study.words} />}
 
           {(vocabulary || mistakes) && (
             <Practice
@@ -122,10 +122,12 @@ export default function StudentHomeView({
             />
           )}
 
+          {vocabulary && <VocabularyStudy words={vocabulary.study.words} />}
+
           <LessonNotes notes={lessonNotes} />
         </div>
 
-        <aside className="flex min-w-0 flex-col gap-10">
+        <aside className="flex min-w-0 flex-col gap-8">
           <WeekChecklist {...week} className="hidden lg:flex" />
 
           {!studentLevel && <PromptCard />}

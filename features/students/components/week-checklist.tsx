@@ -3,9 +3,6 @@ import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
 
-// The week at a glance, next to the lesson card: what is waiting and how
-// far along it is. Each row jumps to its part of the page.
-
 type Row = {
   href: string;
   icon: ReactNode;
@@ -78,36 +75,43 @@ export default function WeekChecklist(props: Props) {
   return (
     <nav
       aria-labelledby="week-heading"
-      className={cn('flex flex-col gap-2', props.className)}
+      className={cn('flex flex-col gap-3', props.className)}
     >
       <h2
         id="week-heading"
-        className="text-xl leading-snug font-bold tracking-tight text-foreground"
+        className="text-lg leading-snug font-semibold tracking-tight text-foreground"
       >
         This week
       </h2>
 
-      <ul className="flex flex-col">
+      <ul className="surface-card flex flex-col overflow-hidden">
         {rows.map((row) => (
-          <li key={row.label}>
+          <li key={row.label} className="surface-row">
             <a
               href={row.href}
-              className="-mx-3 flex min-h-13 touch-manipulation items-center gap-3 rounded-xl px-3 py-2.5 transition-colors select-none hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:bg-muted"
+              className="group flex min-h-13 touch-manipulation items-center gap-3 px-4 py-3 transition-colors select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset"
             >
               <span
                 className={cn(
-                  'flex size-8 shrink-0 items-center justify-center rounded-full',
+                  'flex size-8 shrink-0 items-center justify-center rounded-lg border transition-colors',
                   row.done
-                    ? 'bg-success-subtle text-success-subtle-foreground'
-                    : 'bg-muted text-foreground',
+                    ? 'border-success/25 bg-success-subtle text-success-subtle-foreground'
+                    : 'border-border-subtle bg-secondary text-muted-foreground group-hover:text-foreground',
                 )}
               >
                 {row.done ? <Check className="size-4" aria-hidden /> : row.icon}
               </span>
-              <span className="min-w-0 flex-1 text-[15px] font-semibold text-foreground">
+              <span className="min-w-0 flex-1 text-sm font-semibold text-foreground transition-colors group-hover:text-primary">
                 {row.label}
               </span>
-              <span className="shrink-0 text-sm text-muted-foreground tabular-nums">
+              <span
+                className={cn(
+                  'shrink-0 text-xs tabular-nums',
+                  row.done
+                    ? 'font-medium text-success-subtle-foreground'
+                    : 'text-muted-foreground',
+                )}
+              >
                 {row.detail}
               </span>
             </a>

@@ -18,8 +18,6 @@ type Props = {
   readStyle?: 'primary' | 'quiet';
 };
 
-// One piece of homework, set straight on the page with no box around it, so
-// the text gets the full width of a phone.
 export default function CurrentWorkCard({
   title,
   titleDisplay = 'heading',
@@ -57,7 +55,7 @@ export default function CurrentWorkCard({
           )}
 
           {titleDisplay === 'plain' && (
-            <p className="text-base leading-snug font-semibold wrap-break-word text-foreground">
+            <p className="text-[15px] leading-snug font-semibold wrap-break-word text-foreground">
               {title}
             </p>
           )}
@@ -78,7 +76,7 @@ export default function CurrentWorkCard({
 
           {/* pre-line keeps the line breaks the teacher typed */}
           {showText && (
-            <p className="max-w-prose text-base leading-relaxed wrap-break-word whitespace-pre-line text-foreground">
+            <p className="max-w-prose text-sm leading-relaxed wrap-break-word whitespace-pre-line text-muted-foreground">
               {instructions}
             </p>
           )}
@@ -86,13 +84,16 @@ export default function CurrentWorkCard({
       )}
 
       {showAsList && (
-        <ol className="flex flex-col divide-y divide-border border-y border-border">
+        <ol className="flex flex-col gap-2">
           {lines.map((line, index) => (
-            <li key={index} className="flex gap-3 py-3.5">
-              <span className="w-6 shrink-0 font-serif text-lg leading-snug font-medium text-primary tabular-nums">
+            <li
+              key={index}
+              className="flex gap-3 rounded-xl border border-border-subtle bg-secondary/45 px-3.5 py-2.5"
+            >
+              <span className="w-5 shrink-0 font-serif text-base leading-snug font-medium text-primary tabular-nums">
                 {index + 1}
               </span>
-              <span className="min-w-0 text-base leading-relaxed wrap-break-word text-foreground">
+              <span className="min-w-0 text-sm leading-relaxed wrap-break-word text-foreground">
                 {line}
               </span>
             </li>
@@ -105,27 +106,21 @@ export default function CurrentWorkCard({
           href={readHref}
           className={
             readStyle === 'primary'
-              ? 'inline-flex h-12 w-full touch-manipulation items-center justify-center gap-2 rounded-xl bg-primary px-6 text-[15px] font-semibold text-primary-foreground transition-[scale,background-color] duration-150 ease-out select-none hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none active:scale-[0.97] sm:w-auto sm:self-start'
-              : 'inline-flex h-11 touch-manipulation items-center justify-center gap-2 self-start rounded-xl border border-input-border bg-card px-4 text-sm font-semibold text-foreground transition-[scale,background-color] duration-150 ease-out select-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-[0.97]'
+              ? 'inline-flex h-11 w-full touch-manipulation items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-xs transition-[scale,background-color] duration-150 ease-out select-none hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none active:scale-[0.97] sm:w-auto sm:self-start'
+              : 'inline-flex h-10 touch-manipulation items-center justify-center gap-2 self-start rounded-xl border border-input-border/80 bg-secondary/80 px-4 text-sm font-semibold text-foreground shadow-[inset_0_1px_0_0_oklch(1_0_0/0.04)] transition-[scale,background-color,border-color] duration-150 ease-out select-none hover:border-primary/45 hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-[0.97]'
           }
         >
-          <BookOpen className="size-4" aria-hidden />
+          <BookOpen className="size-4 text-primary" aria-hidden />
           Read guide
         </AppLink>
       ) : (
         (signedUrl || downloadUrl) && (
-          // The file is the one boxed thing here, because it is an object the
-          // student picks up. The name takes the first line on a narrow phone
-          // and the two actions wrap under it.
-          <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-3 sm:pl-4">
-            <FileText
-              className="size-5 shrink-0 text-muted-foreground"
-              aria-hidden
-            />
+          <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border-subtle bg-secondary/55 p-3 sm:pl-4">
+            <FileText className="size-5 shrink-0 text-primary" aria-hidden />
 
             <p
               title={fileName}
-              className="line-clamp-2 min-w-0 flex-1 basis-40 text-[15px] font-semibold wrap-break-word text-foreground"
+              className="line-clamp-2 min-w-0 flex-1 basis-40 text-sm font-semibold wrap-break-word text-foreground"
             >
               {fileName}
             </p>
@@ -136,7 +131,7 @@ export default function CurrentWorkCard({
                   href={signedUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex h-11 touch-manipulation items-center gap-2 rounded-lg border border-input-border px-4 text-sm font-semibold text-foreground transition-[scale,background-color] duration-150 ease-out select-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-[0.97]"
+                  className="inline-flex h-10 touch-manipulation items-center gap-2 rounded-lg border border-input-border/80 bg-card px-3.5 text-sm font-semibold text-foreground transition-[scale,background-color] duration-150 ease-out select-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-[0.97]"
                 >
                   Open
                   <ExternalLink className="size-3.5" aria-hidden />
@@ -148,7 +143,7 @@ export default function CurrentWorkCard({
                   href={downloadUrl}
                   download={attachmentName ?? undefined}
                   aria-label={`Download ${fileName}`}
-                  className="inline-flex size-11 touch-manipulation items-center justify-center rounded-lg border border-input-border text-foreground transition-[scale,background-color] duration-150 ease-out select-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-[0.97]"
+                  className="inline-flex size-10 touch-manipulation items-center justify-center rounded-lg border border-input-border/80 bg-card text-foreground transition-[scale,background-color] duration-150 ease-out select-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-[0.97]"
                 >
                   <Download className="size-4" aria-hidden />
                 </a>
