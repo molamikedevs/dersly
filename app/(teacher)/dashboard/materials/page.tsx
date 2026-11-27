@@ -26,7 +26,7 @@ export default async function Materials({ searchParams }: RouteParams) {
   const currentPage = Number(page) || 1;
 
   return (
-    <div className="flex w-full max-w-6xl min-w-0 flex-col gap-8 pb-16">
+    <div className="flex w-full max-w-6xl min-w-0 flex-col gap-7 pb-16">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <PageHeader
           title="Materials"

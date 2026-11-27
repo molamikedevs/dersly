@@ -6,6 +6,37 @@ import { hostname, youTubeId } from '@/lib/utils';
 import { MaterialRecord } from '@/types/materials';
 import MaterialMenu from './material-menu';
 
+const LEVEL_CODE: Record<string, string> = {
+  beginner: 'A1',
+  elementary: 'A2',
+  intermediate: 'B1',
+  'upper-intermediate': 'B2',
+  advanced: 'C1',
+};
+
+function LevelBadge({ level }: { level: string | null }) {
+  if (!level) {
+    return (
+      <span className="hidden text-xs font-medium text-muted-foreground sm:inline">
+        Any level
+      </span>
+    );
+  }
+
+  const code = LEVEL_CODE[level.toLowerCase()];
+
+  return (
+    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground capitalize">
+      {code && (
+        <span className="rounded border border-border-subtle bg-secondary px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-foreground uppercase">
+          {code}
+        </span>
+      )}
+      <span className="hidden sm:inline">{level}</span>
+    </span>
+  );
+}
+
 export default function MaterialCard({
   data,
   editable = false,
@@ -13,95 +44,97 @@ export default function MaterialCard({
   data: MaterialRecord;
   editable?: boolean;
 }) {
-  const { id, title, description, url, level, kind } = data;
+  const { id, title, url, level, kind } = data;
 
   const isGuide = kind === 'guide';
   const videoId = url ? youTubeId(url) : null;
   const site = url ? hostname(url) : null;
   const href = editable ? `/dashboard/materials/${id}` : `/materials/${id}`;
 
-  return (
-    <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-colors hover:border-input-border">
-      {videoId && (
-        <div className="relative aspect-video w-full shrink-0 overflow-hidden bg-muted">
-          <Image
-            src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
-            alt=""
-            fill
-            sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-          />
-          <span
-            aria-hidden
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            <span className="flex size-12 items-center justify-center rounded-full bg-card/95 shadow-sm">
-              <Play className="size-4 translate-x-px fill-foreground text-foreground" />
-            </span>
-          </span>
-        </div>
-      )}
+  const subtitle = isGuide
+    ? 'Guide · written by you'
+    : videoId
+      ? 'Video · YouTube'
+      : site
+        ? `Video · ${site}`
+        : 'Video';
 
-      <div className="flex flex-1 flex-col gap-2 p-5">
-        <div className="flex items-start gap-3">
-          {!videoId && (
+  return (
+    <li className="surface-row group relative transition-colors">
+      <AppLink
+        href={href}
+        className="absolute inset-0 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset"
+      >
+        <span className="sr-only">Open {title}</span>
+      </AppLink>
+
+      <div className="pointer-events-none relative flex items-center gap-3.5 py-3 pr-3 pl-4 sm:gap-4 sm:py-3.5 sm:pr-4 sm:pl-5">
+        {videoId ? (
+          <div className="relative h-14 w-24 shrink-0 overflow-hidden rounded-lg border border-border-subtle bg-secondary sm:h-16 sm:w-28">
+            <Image
+              src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
+              alt=""
+              fill
+              sizes="112px"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+            />
             <span
               aria-hidden
-              className={
-                isGuide
-                  ? 'flex size-10 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-foreground'
-                  : 'flex size-10 shrink-0 items-center justify-center rounded-lg bg-warning-subtle text-warning-subtle-foreground'
-              }
+              className="absolute inset-0 flex items-center justify-center bg-black/25 transition-colors group-hover:bg-black/15"
             >
-              {isGuide ? (
-                <BookOpen className="size-4" />
-              ) : (
-                <Link2 className="size-4" />
-              )}
+              <span className="flex size-7 items-center justify-center rounded-full bg-background/90 text-foreground shadow-sm backdrop-blur-xs transition-transform duration-200 group-hover:scale-105">
+                <Play className="size-3.5 translate-x-px fill-current" />
+              </span>
             </span>
-          )}
-
-          <h3 className="min-w-0 flex-1 text-base font-semibold leading-snug text-foreground line-clamp-2">
-            <AppLink
-              href={href}
-              className="after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-ring"
-            >
-              {title}
-            </AppLink>
-          </h3>
-
-          {editable && (
-            <div className="relative z-10 -mr-1.5 -mt-1.5 shrink-0">
-              <MaterialMenu data={data} />
-            </div>
-          )}
-        </div>
-
-        {description && (
-          <p className="text-sm leading-relaxed text-muted-foreground line-clamp-2">
-            {description}
-          </p>
+          </div>
+        ) : (
+          <span
+            aria-hidden
+            className={
+              isGuide
+                ? 'flex h-11 w-12 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary transition-colors group-hover:border-primary/35 group-hover:bg-primary/15'
+                : 'flex h-11 w-12 shrink-0 items-center justify-center rounded-xl border border-warning/25 bg-warning-subtle text-warning-subtle-foreground'
+            }
+          >
+            {isGuide ? (
+              <BookOpen className="size-4" />
+            ) : (
+              <Link2 className="size-4" />
+            )}
+          </span>
         )}
 
-        <div className="mt-auto flex items-center gap-x-2 pt-2 text-[13px] text-muted-foreground">
-          {level && <span className="capitalize">{level}</span>}
-          {level && (site || isGuide) && <span aria-hidden>&middot;</span>}
-          {isGuide && <span>Guide</span>}
-          {site && <span className="truncate">{site}</span>}
+        <div className="min-w-0 flex-1">
+          <h3 className="line-clamp-2 font-serif text-base leading-snug font-medium tracking-tight text-foreground transition-colors group-hover:text-primary sm:line-clamp-1 sm:text-[17px]">
+            {title}
+          </h3>
+          <p className="mt-0.5 truncate text-xs text-muted-foreground">
+            {subtitle}
+          </p>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-3 sm:gap-4">
+          <LevelBadge level={level} />
 
           {url && !videoId && (
             <a
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="relative z-10 ml-auto inline-flex h-9 items-center gap-1.5 rounded-lg border border-input-border bg-card px-3 text-[13px] font-semibold text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="pointer-events-auto relative z-10 inline-flex h-8 items-center gap-1.5 rounded-lg border border-input-border/80 bg-card px-2.5 text-xs font-semibold text-foreground transition-colors hover:border-primary/45 hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
             >
               Open
-              <ExternalLink className="size-3.5" aria-hidden />
+              <ExternalLink className="size-3" aria-hidden />
             </a>
+          )}
+
+          {editable && (
+            <div className="pointer-events-auto relative z-10">
+              <MaterialMenu data={data} />
+            </div>
           )}
         </div>
       </div>
-    </article>
+    </li>
   );
 }
