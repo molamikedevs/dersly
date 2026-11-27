@@ -27,36 +27,41 @@ export default async function Materials({ searchParams }: RouteParams) {
   const currentPage = Number(page) || 1;
 
   return (
-    <div className="flex w-full min-w-0 flex-col gap-8 pb-16">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <PageHeader
-          title="Materials"
-          subText="Guides, videos and reading for all students."
-        />
+    <div className="flex w-full min-w-0 flex-col gap-7 pb-16">
+      <PageHeader
+        title="Materials"
+        subText="Videos, guides and reading your teacher picked for you."
+      />
 
-        <Filter
-          options={[
-            { label: 'Beginner', value: 'beginner' },
-            { label: 'Elementary', value: 'elementary' },
-            { label: 'Intermediate', value: 'intermediate' },
-            { label: 'Advanced', value: 'advanced' },
-          ]}
-          allLabel="All levels"
-        />
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <MaterialTabs />
+
+        <div className="flex items-center gap-2.5">
+          <span className="text-xs font-medium text-muted-foreground">
+            Level
+          </span>
+          <Filter
+            options={[
+              { label: 'Beginner', value: 'beginner' },
+              { label: 'Elementary', value: 'elementary' },
+              { label: 'Intermediate', value: 'intermediate' },
+              { label: 'Advanced', value: 'advanced' },
+            ]}
+            allLabel="All levels"
+            className="h-10 w-44 rounded-xl border-border-subtle bg-card text-sm font-medium"
+          />
+        </div>
       </div>
-
-      <MaterialTabs />
 
       <Suspense
         key={`${activeKind}-${currentPage}-${activeFilter ?? 'all'}`}
-        fallback={<MaterialListSkeleton kind={activeKind} wide />}
+        fallback={<MaterialListSkeleton kind={activeKind} />}
       >
         <MaterialList
           kind={activeKind}
           page={currentPage}
           pageSize={Number(pageSize) || 8}
           filter={activeFilter}
-          wide
           empty={
             activeFilter
               ? {

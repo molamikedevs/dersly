@@ -1,8 +1,10 @@
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AccountSettingsSkeleton({
+  allowDelete = false,
   embedded = false,
 }: {
+  allowDelete?: boolean;
   embedded?: boolean;
 }) {
   const rows = (
@@ -22,12 +24,33 @@ export default function AccountSettingsSkeleton({
     </>
   );
 
-  if (embedded) return rows;
+  const deleteSection = allowDelete ? (
+    <div className="flex flex-col items-start gap-3">
+      <div className="flex flex-col gap-1.5">
+        <Skeleton className="h-5 w-32" />
+        <Skeleton className="h-4 w-72 max-w-full" />
+      </div>
+      <Skeleton className="h-10 w-36 rounded-xl" />
+    </div>
+  ) : null;
+
+  if (embedded) {
+    return (
+      <>
+        {rows}
+        {deleteSection}
+      </>
+    );
+  }
 
   return (
-    <div className="flex flex-col gap-3">
-      <Skeleton className="h-6 w-24" />
-      <div className="surface-card flex flex-col overflow-hidden">{rows}</div>
-    </div>
+    <>
+      <div className="flex flex-col gap-3">
+        <Skeleton className="h-6 w-24" />
+        <div className="surface-card flex flex-col overflow-hidden">{rows}</div>
+      </div>
+
+      {deleteSection}
+    </>
   );
 }
