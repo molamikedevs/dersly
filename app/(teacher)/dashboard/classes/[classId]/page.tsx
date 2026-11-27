@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import BackLink from '@/components/common/back-link';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ClassHeader from '@/features/classes/components/class-header';
+import LessonLog from '@/features/classes/components/lesson-log';
 import StudentsSection from '@/features/classes/components/student-section';
 import { getClass, getLessonProgress } from '@/features/classes/queries';
 import HomeWorkSection from '@/features/homework/components/homework-section';
@@ -13,6 +14,7 @@ import { getClassStudents } from '@/features/students/queries';
 import VocabularySection from '@/features/vocabulary/components/vocabulary-section';
 import { getStudentWords } from '@/features/vocabulary/queries';
 import { weekStart } from '@/features/vocabulary/week';
+import { classSlots, formatNextLesson, getNextLesson } from '@/lib/schedule';
 import { RouteParams } from '@/types/global';
 
 const STUDENTS_PER_PAGE = 10;
@@ -68,9 +70,13 @@ export default async function Page({
       ])
     : [[], []];
 
-  const thisWeek = weekStart();
+  const now = new Date();
+  const thisWeek = weekStart(now);
   const wordCount = words.filter((item) => item.weekStart === thisWeek).length;
   const openMistakes = mistakes.filter((item) => !item.fixedAt).length;
+
+  const nextDate = getNextLesson(classSlots(data), now);
+  const nextLesson = nextDate ? formatNextLesson(nextDate, now) : null;
 
   const tabTriggerClass =
     'rounded-lg px-3.5 py-1.5 text-sm font-semibold text-muted-foreground transition-all data-active:bg-card data-active:text-foreground data-active:shadow-xs';
@@ -82,40 +88,53 @@ export default async function Page({
         <ClassHeader data={data} hasJoined={Boolean(enrollmentId)} />
       </div>
 
-      {/* A one-to-one student's work, one part at a time. Every part is
-          rendered on the server; the tabs only choose which one shows. */}
-      {enrollmentId ? (
-        <Tabs defaultValue="homework" className="gap-6">
-          <TabsList className="inline-flex h-auto w-fit flex-wrap gap-1 rounded-xl border border-border-subtle bg-secondary/75 p-1">
-            <TabsTrigger value="homework" className={tabTriggerClass}>
-              Homework
-            </TabsTrigger>
-            <TabsTrigger value="vocabulary" className={tabTriggerClass}>
-              Vocabulary
-              {wordCount > 0 && <Count>{wordCount}</Count>}
-            </TabsTrigger>
-            <TabsTrigger value="mistakes" className={tabTriggerClass}>
-              Mistakes
-              {openMistakes > 0 && <Count>{openMistakes}</Count>}
-            </TabsTrigger>
-          </TabsList>
+      {/* A one-to-one student's work, one part at a time, paired with a
+          persistent package Lesson log sidebar. */}
+      {enrollmentId && progress ? (
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_18.5rem] lg:items-start lg:gap-10">
+          <Tabs defaultValue="homework" className="min-w-0 gap-6">
+            <TabsList className="inline-flex h-auto w-fit flex-wrap gap-1 rounded-xl border border-border-subtle bg-secondary/75 p-1">
+              <TabsTrigger value="homework" className={tabTriggerClass}>
+                Homework
+              </TabsTrigger>
+              <TabsTrigger value="vocabulary" className={tabTriggerClass}>
+                Vocabulary
+                {wordCount > 0 && <Count>{wordCount}</Count>}
+              </TabsTrigger>
+              <TabsTrigger value="mistakes" className={tabTriggerClass}>
+                Mistakes
+                {openMistakes > 0 && <Count>{openMistakes}</Count>}
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="homework">
-            <HomeWorkSection
-              homeWork={homework}
-              classId={classId}
-              showTitle={false}
+            <TabsContent value="homework">
+              <HomeWorkSection
+                homeWork={homework}
+                classId={classId}
+                showTitle={false}
+              />
+            </TabsContent>
+
+            <TabsContent value="vocabulary">
+              <VocabularySection enrollmentId={enrollmentId} words={words} />
+            </TabsContent>
+
+            <TabsContent value="mistakes">
+              <MistakesSection
+                enrollmentId={enrollmentId}
+                mistakes={mistakes}
+              />
+            </TabsContent>
+          </Tabs>
+
+          <div className="lg:sticky lg:top-24">
+            <LessonLog
+              studentName={data.name}
+              lessonsDone={progress.lessonsDone}
+              nextLesson={nextLesson}
             />
-          </TabsContent>
-
-          <TabsContent value="vocabulary">
-            <VocabularySection enrollmentId={enrollmentId} words={words} />
-          </TabsContent>
-
-          <TabsContent value="mistakes">
-            <MistakesSection enrollmentId={enrollmentId} mistakes={mistakes} />
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       ) : (
         <HomeWorkSection homeWork={homework} classId={classId} />
       )}
