@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 import InitialsAvatar from '@/components/common/initials-avatar';
+import { Button } from '@/components/ui/button';
 import { useDerslyActions } from '@/features/app/actions-context';
 import { resizeImage } from '@/lib/resize-image';
 import { cn } from '@/lib/utils';
@@ -13,8 +14,8 @@ import { cn } from '@/lib/utils';
 type Props = {
   name: string;
   src?: string | null;
-  // The name and email, shown beside the photo
-  children: ReactNode;
+  // Optional content shown beside the photo (used on the student profile)
+  children?: ReactNode;
 };
 
 const ACCEPTED = ['image/jpeg', 'image/png', 'image/webp'];
@@ -31,19 +32,17 @@ type Status =
   | { kind: 'error'; message: string };
 
 export default function AvatarUploader({ name, src, children }: Props) {
-  // The real action in the app, a local preview in the demo
   const { updateAvatar } = useDerslyActions();
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [saved, setSaved] = useState<string | null>(src ?? null);
-  // The chosen photo, shown at once while it uploads
   const [draft, setDraft] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
 
   const uploading = status.kind === 'uploading';
   const shown = draft ?? saved;
+  const hasInlineDetails = Boolean(children);
 
-  // Free the temporary preview once it is no longer shown
   useEffect(() => {
     if (!draft) return;
     return () => URL.revokeObjectURL(draft);
@@ -89,7 +88,6 @@ export default function AvatarUploader({ name, src, children }: Props) {
       setSaved(result.data!.avatarUrl);
       setDraft(null);
       setStatus({ kind: 'saved' });
-      // The top bar and tab bar show the photo too
       router.refresh();
     } catch {
       setDraft(null);
@@ -102,8 +100,8 @@ export default function AvatarUploader({ name, src, children }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-4 sm:gap-6">
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-4 sm:gap-5">
         <input
           ref={inputRef}
           id="avatar"
@@ -114,16 +112,19 @@ export default function AvatarUploader({ name, src, children }: Props) {
           onChange={handleChange}
         />
 
-        {/* The whole photo is the button. The camera badge says it can be
-            changed. */}
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
           aria-label={shown ? 'Change your photo' : 'Add a photo'}
-          className="group relative shrink-0 touch-manipulation rounded-full select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background focus-visible:outline-none disabled:cursor-default"
+          className="group relative shrink-0 touch-manipulation rounded-full select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-card focus-visible:outline-none disabled:cursor-default"
         >
-          <span className="block size-20 overflow-hidden rounded-full bg-muted ring-1 ring-border transition-[scale] duration-150 ease-out group-active:scale-[0.96] sm:size-24">
+          <span
+            className={cn(
+              'block overflow-hidden rounded-full bg-secondary ring-1 ring-border-subtle transition-[scale] duration-150 ease-out group-active:scale-[0.96]',
+              hasInlineDetails ? 'size-20 sm:size-24' : 'size-16 sm:size-18',
+            )}
+          >
             {shown ? (
               <Image
                 src={shown}
@@ -139,7 +140,10 @@ export default function AvatarUploader({ name, src, children }: Props) {
             ) : (
               <InitialsAvatar
                 name={name}
-                className="size-full text-2xl sm:text-3xl"
+                className={cn(
+                  'size-full',
+                  hasInlineDetails ? 'text-2xl sm:text-3xl' : 'text-xl',
+                )}
               />
             )}
           </span>
@@ -147,36 +151,52 @@ export default function AvatarUploader({ name, src, children }: Props) {
           {uploading && (
             <span className="absolute inset-0 flex items-center justify-center">
               <Loader2
-                className="size-6 animate-spin text-foreground"
+                className="size-5 animate-spin text-foreground"
                 aria-hidden
               />
             </span>
           )}
 
-          <span
-            aria-hidden
-            className="absolute -right-0.5 -bottom-0.5 flex size-9 items-center justify-center rounded-full bg-foreground text-background ring-4 ring-background transition-colors group-hover:bg-foreground/85"
-          >
-            <Camera className="size-4" />
-          </span>
+          {hasInlineDetails && (
+            <span
+              aria-hidden
+              className="absolute -right-0.5 -bottom-0.5 flex size-9 items-center justify-center rounded-full bg-foreground text-background ring-4 ring-background transition-colors group-hover:bg-foreground/85"
+            >
+              <Camera className="size-4" />
+            </span>
+          )}
         </button>
 
-        <div className="min-w-0 flex-1">{children}</div>
+        {hasInlineDetails ? (
+          <div className="min-w-0 flex-1">{children}</div>
+        ) : (
+          <Button
+            type="button"
+            variant="outline"
+            disabled={uploading}
+            onClick={() => inputRef.current?.click()}
+            className="h-9 rounded-lg border-input-border/80 bg-secondary/70 px-3.5 text-xs font-semibold text-foreground transition-colors hover:border-primary/45 hover:bg-accent"
+          >
+            {uploading ? 'Saving…' : 'Change photo'}
+          </Button>
+        )}
       </div>
 
-      <p
-        role={status.kind === 'error' ? 'alert' : 'status'}
-        className={cn(
-          'min-h-5 text-sm',
-          status.kind === 'error'
-            ? 'font-medium text-destructive'
-            : 'text-muted-foreground',
-        )}
-      >
-        {status.kind === 'uploading' && 'Saving your photo'}
-        {status.kind === 'saved' && 'Photo saved.'}
-        {status.kind === 'error' && status.message}
-      </p>
+      {status.kind !== 'idle' && (
+        <p
+          role={status.kind === 'error' ? 'alert' : 'status'}
+          className={cn(
+            'text-xs font-medium',
+            status.kind === 'error'
+              ? 'text-destructive-subtle-foreground'
+              : 'text-primary',
+          )}
+        >
+          {status.kind === 'uploading' && 'Saving your photo…'}
+          {status.kind === 'saved' && 'Photo saved.'}
+          {status.kind === 'error' && status.message}
+        </p>
+      )}
     </div>
   );
 }
