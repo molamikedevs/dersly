@@ -1,3 +1,4 @@
+import { Play } from 'lucide-react';
 import Image from 'next/image';
 
 import { AppLink } from '@/features/app/app-mode';
@@ -14,44 +15,52 @@ export default function UpNext({ items, hrefBase }: Props) {
 
   return (
     <section aria-labelledby="up-next-heading" className="flex flex-col gap-3">
-      <h2
-        id="up-next-heading"
-        className="text-xl leading-snug font-bold tracking-tight text-foreground"
-      >
-        Up next
-      </h2>
+      <div className="flex items-baseline justify-between gap-2">
+        <h2
+          id="up-next-heading"
+          className="text-sm font-semibold tracking-tight text-foreground"
+        >
+          Up next
+        </h2>
+      </div>
 
-      <ul className="flex flex-col gap-1">
+      <ul className="surface-card flex flex-col overflow-hidden">
         {items.map(({ id, title, level, url }) => {
           const videoId = url ? youTubeId(url) : null;
 
           return (
-            <li key={id}>
+            <li key={id} className="surface-row">
               <AppLink
                 href={`${hrefBase}/${id}`}
-                className="group -mx-2 flex touch-manipulation gap-3 rounded-xl p-2 transition-colors hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:bg-accent"
+                className="group flex touch-manipulation items-center gap-3 p-3 transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset"
               >
-                <span className="relative block aspect-video w-32 shrink-0 overflow-hidden rounded-lg bg-muted sm:w-36">
+                <span className="relative block aspect-video w-28 shrink-0 overflow-hidden rounded-lg border border-border-subtle bg-secondary">
                   {videoId && (
                     <Image
                       src={`https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`}
                       alt=""
                       fill
-                      sizes="(min-width: 640px) 144px, 128px"
-                      className="object-cover"
+                      sizes="112px"
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                   )}
+                  <span
+                    aria-hidden
+                    className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition-opacity group-hover:opacity-100"
+                  >
+                    <span className="flex size-6 items-center justify-center rounded-full bg-background/90 text-foreground shadow-xs">
+                      <Play className="size-3 translate-x-px fill-current" />
+                    </span>
+                  </span>
                 </span>
 
-                <span className="min-w-0 flex-1 py-0.5">
-                  <span className="line-clamp-2 text-[15px] leading-snug font-semibold wrap-break-word text-foreground group-hover:underline group-hover:underline-offset-4">
+                <span className="min-w-0 flex-1">
+                  <span className="line-clamp-2 font-serif text-sm leading-snug font-medium wrap-break-word text-foreground transition-colors group-hover:text-primary">
                     {title}
                   </span>
-                  {level && (
-                    <span className="mt-1 block text-sm text-muted-foreground capitalize">
-                      {level}
-                    </span>
-                  )}
+                  <span className="mt-1 block text-xs text-muted-foreground capitalize">
+                    {level ?? 'All levels'}
+                  </span>
                 </span>
               </AppLink>
             </li>

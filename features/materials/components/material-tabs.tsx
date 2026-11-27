@@ -26,7 +26,10 @@ export default function MaterialTabs({ className }: { className?: string }) {
   return (
     <nav
       aria-label="Material type"
-      className={cn('flex w-fit gap-1 rounded-xl bg-muted p-1', className)}
+      className={cn(
+        'inline-flex w-fit flex-wrap gap-1 rounded-xl border border-border-subtle bg-secondary/75 p-1',
+        className,
+      )}
     >
       {TABS.map(({ label, value }) => {
         const active = current === value;
@@ -36,10 +39,10 @@ export default function MaterialTabs({ className }: { className?: string }) {
             href={hrefFor(value)}
             aria-current={active ? 'page' : undefined}
             className={cn(
-              'flex min-h-11 items-center rounded-lg px-4 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              'flex items-center rounded-lg px-3.5 py-1.5 text-sm font-semibold transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
               active
-                ? 'bg-card font-semibold text-foreground shadow-sm'
-                : 'font-medium text-muted-foreground hover:text-foreground',
+                ? 'bg-card text-foreground shadow-xs'
+                : 'text-muted-foreground hover:text-foreground',
             )}
           >
             {label}

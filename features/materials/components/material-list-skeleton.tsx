@@ -2,81 +2,52 @@ import { Skeleton } from '@/components/ui/skeleton';
 import type { MaterialKind } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 
-const TITLE_WIDTHS = [
-  'w-full',
-  'w-4/5',
-  'w-3/4',
-  'w-2/3',
-  'w-full',
-  'w-3/5',
-  'w-4/5',
-  'w-2/3',
-];
+const TITLE_WIDTHS = ['w-64', 'w-80', 'w-72', 'w-60', 'w-76', 'w-64'];
 
 export default function MaterialListSkeleton({
   kind,
-  wide = false,
 }: {
   kind: MaterialKind;
   wide?: boolean;
 }) {
-  if (kind === 'article') {
-    return (
-      <ul
-        aria-busy
-        className="flex flex-col divide-y divide-border rounded-2xl border border-border bg-card px-5"
-      >
-        <span role="status" className="sr-only">
-          Loading reading
-        </span>
-        {TITLE_WIDTHS.slice(0, 6).map((width, index) => (
-          <li key={index} className="flex items-center gap-3 py-3.5">
-            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-              <Skeleton className={cn('h-4 max-w-md', width)} />
-              <Skeleton className="h-3 w-32" />
-            </div>
-            <Skeleton className="size-4 shrink-0" />
-          </li>
-        ))}
-      </ul>
-    );
-  }
+  const isVideo = kind === 'link';
+  const label =
+    kind === 'article'
+      ? 'Loading reading'
+      : kind === 'guide'
+        ? 'Loading guides'
+        : 'Loading videos';
 
   return (
-    <div
-      aria-busy
-      className={cn(
-        'grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3',
-        wide && 'xl:grid-cols-4',
-      )}
-    >
+    <ul aria-busy className="surface-card flex flex-col overflow-hidden">
       <span role="status" className="sr-only">
-        Loading materials
+        {label}
       </span>
 
       {TITLE_WIDTHS.map((width, index) => (
-        <div
+        <li
           key={index}
-          className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card"
+          className="surface-row flex items-center gap-3.5 py-3 pr-4 pl-4 sm:gap-4 sm:py-3.5 sm:pl-5"
         >
-          {kind === 'link' && (
-            <Skeleton className="aspect-video w-full rounded-none" />
-          )}
+          <Skeleton
+            className={
+              isVideo
+                ? 'h-14 w-24 shrink-0 rounded-lg sm:h-16 sm:w-28'
+                : 'h-11 w-12 shrink-0 rounded-xl'
+            }
+          />
 
-          <div className="flex flex-1 flex-col gap-2 p-5">
-            <div className="flex items-start gap-3">
-              {kind === 'guide' && (
-                <Skeleton className="size-10 shrink-0 rounded-lg" />
-              )}
-              <Skeleton className={cn('h-5', width)} />
-            </div>
-
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-2/3" />
-            <Skeleton className="mt-2 h-3 w-1/3" />
+          <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+            <Skeleton className={cn('h-4 max-w-full', width)} />
+            <Skeleton className="h-3 w-32" />
           </div>
-        </div>
+
+          <div className="flex shrink-0 items-center gap-3">
+            <Skeleton className="hidden h-5 w-24 rounded sm:block" />
+            <Skeleton className="size-8 rounded-lg" />
+          </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
