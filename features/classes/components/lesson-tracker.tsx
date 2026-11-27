@@ -156,8 +156,8 @@ export default function LessonTracker({
       </div>
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="rounded-2xl sm:max-w-lg">
-          <DialogHeader className="gap-1.5 text-left">
+        <DialogContent className="flex max-h-[90svh] flex-col gap-0 overflow-hidden rounded-2xl p-0 sm:max-w-lg">
+          <DialogHeader className="shrink-0 gap-1.5 px-6 pt-6 pb-4 text-left sm:px-7">
             <DialogTitle className="font-serif text-2xl font-medium tracking-tight">
               Lesson done
             </DialogTitle>
@@ -166,82 +166,89 @@ export default function LessonTracker({
             </DialogDescription>
           </DialogHeader>
 
-          {/* A list of days, not a date box. A date box follows the computer's
-              own format, where 10/07 can mean 7 October or 10 July. */}
-          <div className="flex flex-col gap-2">
-            <label
-              htmlFor={dateId}
-              className="text-sm font-medium text-foreground"
-            >
-              Lesson date
-            </label>
-            <Select
-              items={dateOptions}
-              value={lessonDate}
-              onValueChange={(value) => {
-                if (typeof value === 'string') setLessonDate(value);
-              }}
-            >
-              <SelectTrigger
-                id={dateId}
-                className="h-11 w-full rounded-xl text-base md:text-[15px]"
+          <div className="flex min-h-0 flex-1 flex-col gap-5 [scrollbar-gutter:stable_both-edges] [scrollbar-width:thin] overflow-y-auto overscroll-contain px-6 pb-6 sm:px-7">
+            {/* A list of days, not a date box. A date box follows the computer's
+                own format, where 10/07 can mean 7 October or 10 July. */}
+            <div className="flex flex-col gap-2">
+              <label
+                htmlFor={dateId}
+                className="text-sm font-medium text-foreground"
               >
-                <SelectValue placeholder="Choose the day" />
-              </SelectTrigger>
-              <SelectContent>
-                {dateOptions.map(({ value, label }) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                Lesson date
+              </label>
+              <Select
+                items={dateOptions}
+                value={lessonDate}
+                onValueChange={(value) => {
+                  if (typeof value === 'string') setLessonDate(value);
+                }}
+              >
+                <SelectTrigger
+                  id={dateId}
+                  className="h-11 w-full rounded-xl text-base md:text-[15px]"
+                >
+                  <SelectValue placeholder="Choose the day" />
+                </SelectTrigger>
+                <SelectContent>
+                  {dateOptions.map(({ value, label }) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <div className="flex items-baseline justify-between gap-2">
+                <label
+                  htmlFor={noteId}
+                  className="text-sm font-medium text-foreground"
+                >
+                  Note for the student{' '}
+                  <span className="font-normal text-muted-foreground">
+                    optional
+                  </span>
+                </label>
+                <span className="text-xs text-muted-foreground tabular-nums">
+                  {note.length}/{NOTE_LIMIT}
+                </span>
+              </div>
+              <Textarea
+                id={noteId}
+                value={note}
+                onChange={(event) => setNote(event.target.value)}
+                rows={6}
+                maxLength={NOTE_LIMIT}
+                className="field-sizing-fixed max-h-60 min-h-32 resize-y [scrollbar-width:thin] overflow-y-auto rounded-xl text-base leading-relaxed md:text-[15px]"
+                placeholder="Mistakes to fix, new words, what to practise before next time."
+                aria-describedby={`${noteId}-hint`}
+              />
+              <p
+                id={`${noteId}-hint`}
+                className="text-[13px] text-muted-foreground"
+              >
+                Supports Markdown. The student sees this on their Home page.
+              </p>
+            </div>
+
+            {error && (
+              <p
+                role="alert"
+                className="rounded-xl bg-destructive-subtle px-4 py-3 text-sm font-medium text-destructive-subtle-foreground"
+              >
+                {error}
+              </p>
+            )}
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label
-              htmlFor={noteId}
-              className="text-sm font-medium text-foreground"
-            >
-              Note for the student{' '}
-              <span className="font-normal text-muted-foreground">
-                optional
-              </span>
-            </label>
-            <Textarea
-              id={noteId}
-              value={note}
-              onChange={(event) => setNote(event.target.value)}
-              rows={5}
-              maxLength={NOTE_LIMIT}
-              className="text-base md:text-[15px]"
-              placeholder="Mistakes to fix, new words, what to practise before next time."
-              aria-describedby={`${noteId}-hint`}
-            />
-            <p
-              id={`${noteId}-hint`}
-              className="text-[13px] text-muted-foreground"
-            >
-              The student sees this on their Home page.
-            </p>
-          </div>
-
-          {error && (
-            <p
-              role="alert"
-              className="rounded-xl bg-destructive-subtle px-4 py-3 text-sm font-medium text-destructive-subtle-foreground"
-            >
-              {error}
-            </p>
-          )}
-
-          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <div className="flex shrink-0 flex-col-reverse gap-2 border-t border-border-subtle bg-secondary/35 px-6 py-4 sm:flex-row sm:justify-end sm:px-7">
             <Button
               type="button"
               variant="outline"
               onClick={() => handleOpenChange(false)}
               disabled={isPending}
-              className="h-11 rounded-xl px-5 text-[15px] font-semibold"
+              className="h-10 rounded-xl px-4 text-sm font-semibold"
             >
               Cancel
             </Button>
@@ -249,12 +256,12 @@ export default function LessonTracker({
               type="button"
               onClick={handleMark}
               disabled={isPending}
-              className="h-11 gap-2 rounded-xl px-5 text-[15px] font-semibold"
+              className="h-10 gap-2 rounded-xl px-4 text-sm font-semibold shadow-[inset_0_1px_0_0_oklch(1_0_0/0.22),0_1px_2px_0_oklch(0_0_0/0.35)]"
             >
               {isPending ? (
                 <Loader2 className="size-4 animate-spin" aria-hidden />
               ) : (
-                <Check className="size-4" aria-hidden />
+                <Check className="size-4 stroke-[2.25]" aria-hidden />
               )}
               {isPending ? 'Saving' : 'Mark lesson done'}
             </Button>
