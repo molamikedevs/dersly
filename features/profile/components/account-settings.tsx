@@ -13,51 +13,68 @@ function SettingsRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 px-5 py-4">
-      <div className="min-w-0 flex-1 basis-48">
+    <div className="surface-row grid grid-cols-1 gap-4 px-5 py-5 sm:grid-cols-[15rem_minmax(0,1fr)] sm:items-center sm:gap-8 sm:px-7">
+      <div className="min-w-0">
         <p className="text-base font-semibold text-foreground">{title}</p>
         <p className="mt-0.5 text-sm leading-snug text-muted-foreground">
           {description}
         </p>
       </div>
-      <div className="shrink-0">{children}</div>
+      <div className="flex items-center">{children}</div>
     </div>
   );
 }
 
 export default function AccountSettings({
   allowDelete = false,
+  embedded = false,
 }: {
   allowDelete?: boolean;
+  embedded?: boolean;
 }) {
+  const rows = (
+    <>
+      <SettingsRow
+        title="Password"
+        description="The password you sign in with."
+      >
+        <ChangePasswordDialog />
+      </SettingsRow>
+
+      <SettingsRow
+        title="Appearance"
+        description="Only changes how Dersly looks for you."
+      >
+        <ThemeSwitch />
+      </SettingsRow>
+
+      <div className="surface-row [&>div]:px-5 sm:[&>div]:px-7">
+        <SignOutRow />
+      </div>
+    </>
+  );
+
   return (
     <>
-      <section
-        aria-labelledby="settings-heading"
-        className="flex flex-col gap-3"
-      >
-        <h2
-          id="settings-heading"
-          className="text-xl font-bold tracking-tight text-foreground"
+      {embedded ? (
+        rows
+      ) : (
+        <section
+          aria-labelledby="settings-heading"
+          className="flex flex-col gap-3"
         >
-          Settings
-        </h2>
-
-        <div className="flex flex-col divide-y divide-border rounded-2xl border border-border bg-card">
-          <SettingsRow
-            title="Password"
-            description="The password you log in with."
+          <h2
+            id="settings-heading"
+            className="text-xl font-bold tracking-tight text-foreground"
           >
-            <ChangePasswordDialog />
-          </SettingsRow>
+            Settings
+          </h2>
 
-          <SettingsRow title="Theme" description="Light or dark.">
-            <ThemeSwitch />
-          </SettingsRow>
-
-          <SignOutRow />
-        </div>
-      </section>
+          <div className="surface-card flex flex-col overflow-hidden">
+            {rows}
+          </div>
+        </section>
+      )}
 
       {allowDelete && (
         <section
