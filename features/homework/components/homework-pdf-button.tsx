@@ -1,82 +1,36 @@
-import { ArrowLeft, BookOpen } from 'lucide-react';
-import { ReactNode } from 'react';
+'use client';
 
-import { AppLink } from '@/features/app/app-mode';
-import MarkdownContent from './markdown-content';
+import { FileDown } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
 
 type Props = {
   data: HomeWorkRecord;
-  backHref?: string;
-  backLabel?: string;
-  actions?: ReactNode;
 };
 
-export default function HomeworkReader({
-  data,
-  backHref,
-  backLabel,
-  actions,
-}: Props) {
-  const { title, instructions, content, classes } = data;
-  const isTopic = classes?.type === 'conversation';
-  const hasBackLink = Boolean(backHref && backLabel);
+export default function HomeworkPdfButton({ data }: Props) {
+  function handleSavePdf() {
+    const previousTitle = document.title;
+    if (data.title) {
+      document.title = data.title;
+    }
+
+    window.print();
+
+    window.setTimeout(() => {
+      document.title = previousTitle;
+    }, 300);
+  }
 
   return (
-    <article className="mx-auto flex w-full max-w-3xl min-w-0 flex-col gap-6 pb-16">
-      {(hasBackLink || actions) && (
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          {hasBackLink ? (
-            <AppLink
-              href={backHref!}
-              className="inline-flex min-h-10 items-center gap-2 self-start rounded-lg text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-            >
-              <ArrowLeft className="size-4" aria-hidden />
-              {backLabel}
-            </AppLink>
-          ) : (
-            <span />
-          )}
-
-          {actions}
-        </div>
-      )}
-
-      <div className="surface-card flex flex-col overflow-hidden">
-        <header className="flex flex-col gap-3.5 border-b border-border-subtle p-6 sm:p-9">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border-subtle bg-secondary/80 px-3 py-1 text-xs font-medium text-muted-foreground">
-              <BookOpen className="size-3.5 text-primary" aria-hidden />
-              {isTopic ? 'Club topic' : 'Lesson guide'}
-            </span>
-
-            {classes?.name && (
-              <span className="inline-flex items-center rounded-full border border-border-subtle bg-secondary/80 px-3 py-1 text-xs font-medium text-muted-foreground">
-                {classes.name}
-              </span>
-            )}
-          </div>
-
-          <h1 className="font-serif text-3xl leading-[1.15] font-medium tracking-tight text-balance wrap-break-word text-foreground sm:text-4xl">
-            {title}
-          </h1>
-
-          {instructions && (
-            <p className="max-w-prose text-[15px] leading-relaxed text-muted-foreground sm:text-base">
-              {instructions}
-            </p>
-          )}
-        </header>
-
-        <div className="px-6 py-7 sm:px-9 sm:py-9">
-          {content ? (
-            <MarkdownContent content={content} />
-          ) : (
-            <p className="text-sm text-muted-foreground sm:text-base">
-              There is no written guide for this homework yet.
-            </p>
-          )}
-        </div>
-      </div>
-    </article>
+    <Button
+      type="button"
+      variant="outline"
+      onClick={handleSavePdf}
+      className="h-9 shrink-0 touch-manipulation gap-2 rounded-xl border-input-border/80 bg-secondary/75 px-3.5 text-xs font-semibold text-foreground shadow-[inset_0_1px_0_0_oklch(1_0_0/0.04)] transition-colors hover:border-primary/45 hover:bg-accent active:scale-[0.97] sm:text-sm print:hidden"
+    >
+      <FileDown className="size-4 text-primary" aria-hidden />
+      Save PDF
+    </Button>
   );
 }
