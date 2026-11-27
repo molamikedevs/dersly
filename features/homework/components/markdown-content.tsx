@@ -1,26 +1,56 @@
+import { Children, isValidElement, type ReactNode } from 'react';
 import Markdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 import rehypeTableLabels from '@/features/homework/constant/index';
 
+export function headingSlug(text: string) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
+function plainText(node: ReactNode): string {
+  if (typeof node === 'string' || typeof node === 'number') return String(node);
+  if (Array.isArray(node)) return node.map(plainText).join('');
+  if (isValidElement<{ children?: ReactNode }>(node)) {
+    return plainText(node.props.children);
+  }
+  return '';
+}
+
 const components: Components = {
-  h1: ({ children }) => (
-    <h2 className="mt-10 font-serif text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
-      {children}
-    </h2>
-  ),
-  h2: ({ children }) => (
-    <h2 className="mt-10 border-b border-border-subtle pb-2.5 font-serif text-xl font-medium tracking-tight text-foreground sm:text-2xl">
-      {children}
-    </h2>
-  ),
+  h1: ({ children }) => {
+    const id = headingSlug(plainText(children));
+    return (
+      <h2
+        id={id || undefined}
+        className="mt-12 scroll-mt-24 font-serif text-2xl font-medium tracking-tight text-foreground sm:text-3xl"
+      >
+        {children}
+      </h2>
+    );
+  },
+  h2: ({ children }) => {
+    const id = headingSlug(plainText(children));
+    return (
+      <h2
+        id={id || undefined}
+        className="mt-12 scroll-mt-24 font-serif text-2xl font-medium tracking-tight text-foreground sm:text-[26px]"
+      >
+        {children}
+      </h2>
+    );
+  },
   h3: ({ children }) => (
-    <h3 className="mt-7 text-base font-semibold tracking-tight text-foreground sm:text-lg">
+    <h3 className="mt-8 text-base font-semibold tracking-tight text-foreground sm:text-lg">
       {children}
     </h3>
   ),
   p: ({ children }) => (
-    <p className="mt-4 text-[15px] leading-[1.8] text-foreground/90 sm:text-base">
+    <p className="mt-4 max-w-prose text-[15px] leading-[1.8] text-foreground/90 sm:text-base">
       {children}
     </p>
   ),
@@ -53,8 +83,18 @@ const components: Components = {
     </ul>
   ),
   ol: ({ children }) => (
-    <ol className="mt-4 list-decimal space-y-2.5 pl-6 marker:font-semibold marker:text-primary">
-      {children}
+    <ol className="mt-5 divide-y divide-border-subtle border-y border-border-subtle">
+      {Children.map(children, (child, index) => {
+        if (!isValidElement<{ children?: ReactNode }>(child)) return child;
+        return (
+          <li className="flex items-baseline gap-4 py-4 text-[15px] leading-relaxed text-foreground/95 sm:text-base">
+            <span className="w-5 shrink-0 text-xs font-semibold text-muted-foreground tabular-nums">
+              {index + 1}
+            </span>
+            <div className="min-w-0 flex-1">{child.props.children}</div>
+          </li>
+        );
+      })}
     </ol>
   ),
   li: ({ children }) => (
@@ -63,32 +103,34 @@ const components: Components = {
     </li>
   ),
   blockquote: ({ children }) => (
-    <blockquote className="mt-6 rounded-xl border border-primary/20 border-l-4 border-l-primary bg-secondary/65 px-5 py-4 text-foreground/95 [&_p]:mt-0 [&_p]:text-[15px] [&_p]:leading-relaxed [&_p+p]:mt-2.5">
+    <blockquote className="mt-8 rounded-2xl border border-warning/20 bg-warning-subtle/85 px-6 py-5 text-warning-subtle-foreground [&_p]:mt-0 [&_p]:max-w-none [&_p]:text-[15px] [&_p]:leading-relaxed [&_p]:text-warning-subtle-foreground/90 [&_p+p]:mt-2.5 [&_strong]:text-warning-subtle-foreground">
       {children}
     </blockquote>
   ),
   table: ({ children }) => (
-    <div className="mt-6 sm:overflow-x-auto sm:rounded-xl sm:border sm:border-border-subtle sm:bg-background/40">
-      <table className="block w-full text-left text-sm sm:table sm:min-w-[32rem] sm:border-collapse sm:text-[15px]">
+    <div className="mt-5 border-t border-border-subtle">
+      <table className="block w-full text-left text-[15px] sm:table sm:border-collapse">
         {children}
       </table>
     </div>
   ),
   thead: ({ children }) => (
-    <thead className="hidden border-b border-border-subtle bg-secondary/75 sm:table-header-group">
+    <thead className="sr-only sm:not-sr-only sm:border-b sm:border-border-subtle">
       {children}
     </thead>
   ),
   tbody: ({ children }) => (
-    <tbody className="flex flex-col gap-3 sm:table-row-group">{children}</tbody>
+    <tbody className="block divide-y divide-border-subtle sm:table-row-group">
+      {children}
+    </tbody>
   ),
   tr: ({ children }) => (
-    <tr className="flex flex-col gap-2.5 rounded-xl border border-border-subtle bg-secondary/50 p-4 sm:table-row sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0">
+    <tr className="flex flex-col gap-1.5 border-b border-border-subtle py-4 sm:table-row sm:py-0">
       {children}
     </tr>
   ),
   th: ({ children }) => (
-    <th className="px-4 py-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+    <th className="py-2.5 pr-6 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
       {children}
     </th>
   ),
@@ -96,14 +138,14 @@ const components: Components = {
     <td
       data-label={(props as { 'data-label'?: string })['data-label']}
       style={style}
-      className="block leading-relaxed text-foreground/90 before:mb-0.5 before:block before:text-[11px] before:font-semibold before:tracking-[0.12em] before:text-muted-foreground before:uppercase before:content-[attr(data-label)] first:font-semibold first:text-foreground first:before:hidden sm:table-cell sm:border-t sm:border-border-subtle sm:px-4 sm:py-3 sm:align-top sm:before:hidden sm:first:font-medium"
+      className="block leading-relaxed text-foreground/90 before:mb-0.5 before:block before:text-[11px] before:font-semibold before:tracking-[0.12em] before:text-muted-foreground before:uppercase before:content-[attr(data-label)] first:font-serif first:text-base first:font-medium first:text-foreground first:before:hidden sm:table-cell sm:border-b sm:border-border-subtle sm:py-4 sm:pr-6 sm:align-top sm:before:hidden sm:first:w-[36%] sm:first:text-[17px]"
     >
       {children}
     </td>
   ),
-  hr: () => <hr className="my-9 border-border-subtle" />,
+  hr: () => <hr className="my-10 border-border-subtle" />,
   pre: ({ children }) => (
-    <pre className="mt-5 overflow-x-auto rounded-xl border border-border-subtle bg-secondary/80 px-4 py-3.5 font-sans text-sm leading-relaxed wrap-break-word whitespace-pre-wrap text-foreground/95 sm:text-[15px] [&_code]:border-0 [&_code]:bg-transparent [&_code]:p-0 [&_code]:font-sans [&_code]:text-[1em]">
+    <pre className="mt-5 overflow-x-auto rounded-xl border border-border-subtle bg-secondary/75 px-4 py-3.5 font-sans text-sm leading-relaxed wrap-break-word whitespace-pre-wrap text-foreground/95 sm:text-[15px] [&_code]:border-0 [&_code]:bg-transparent [&_code]:p-0 [&_code]:font-sans [&_code]:text-[1em]">
       {children}
     </pre>
   ),
