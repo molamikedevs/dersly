@@ -10,6 +10,8 @@ import HomeWorkSection from '@/features/homework/components/homework-section';
 import { getClassHomework } from '@/features/homework/queries';
 import MistakesSection from '@/features/mistakes/components/mistakes-section';
 import { getStudentMistakes } from '@/features/mistakes/queries';
+import QuizzesSection from '@/features/quizzes/components/quizzes-section';
+import { getClassQuizzes } from '@/features/quizzes/queries';
 import { getClassStudents } from '@/features/students/queries';
 import VocabularySection from '@/features/vocabulary/components/vocabulary-section';
 import { getStudentWords } from '@/features/vocabulary/queries';
@@ -34,16 +36,16 @@ export default async function Page({
   const { classId } = await params;
   const { page } = await searchParams;
 
-  const [classResult, homeworkResult, studentResult] = await Promise.all([
-    getClass(classId),
-    // This page has no homework pager, so it always shows the latest.
-    // ?page= belongs to the student list below.
-    getClassHomework(classId, { page: 1, pageSize: 10 }),
-    getClassStudents(classId, {
-      page: Number(page) || 1,
-      pageSize: STUDENTS_PER_PAGE,
-    }),
-  ]);
+  const [classResult, homeworkResult, studentResult, quizzesResult] =
+    await Promise.all([
+      getClass(classId),
+      getClassHomework(classId, { page: 1, pageSize: 10 }),
+      getClassStudents(classId, {
+        page: Number(page) || 1,
+        pageSize: STUDENTS_PER_PAGE,
+      }),
+      getClassQuizzes(classId),
+    ]);
 
   if (!classResult.success || !classResult.data) notFound();
 
@@ -52,16 +54,13 @@ export default async function Page({
   const students = studentResult.data?.students ?? [];
   const totalStudents = studentResult.data?.total ?? 0;
   const hasMoreStudents = studentResult.data?.isNext ?? false;
+  const quizzes = quizzesResult.data ?? [];
   const isOneToOne = data.type === 'one_to_one';
 
-  // A one-to-one class has one enrolment, which vocabulary and mistakes
-  // belong to
   const progress = isOneToOne
     ? ((await getLessonProgress(classId)).data ?? null)
     : null;
 
-  // Vocabulary and mistakes are for one-to-one students only, once they
-  // have joined
   const enrollmentId = progress?.enrollmentId ?? null;
   const [words, mistakes] = enrollmentId
     ? await Promise.all([
@@ -88,8 +87,6 @@ export default async function Page({
         <ClassHeader data={data} hasJoined={Boolean(enrollmentId)} />
       </div>
 
-      {/* A one-to-one student's work, one part at a time, paired with a
-          persistent package Lesson log sidebar. */}
       {enrollmentId && progress ? (
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_18.5rem] lg:items-start lg:gap-10">
           <Tabs defaultValue="homework" className="min-w-0 gap-6">
@@ -104,6 +101,10 @@ export default async function Page({
               <TabsTrigger value="mistakes" className={tabTriggerClass}>
                 Mistakes
                 {openMistakes > 0 && <Count>{openMistakes}</Count>}
+              </TabsTrigger>
+              <TabsTrigger value="quizzes" className={tabTriggerClass}>
+                Quizzes
+                {quizzes.length > 0 && <Count>{quizzes.length}</Count>}
               </TabsTrigger>
             </TabsList>
 
@@ -124,6 +125,10 @@ export default async function Page({
                 enrollmentId={enrollmentId}
                 mistakes={mistakes}
               />
+            </TabsContent>
+
+            <TabsContent value="quizzes">
+              <QuizzesSection classId={classId} quizzes={quizzes} />
             </TabsContent>
           </Tabs>
 
@@ -151,7 +156,6 @@ export default async function Page({
   );
 }
 
-// What still needs the student, next to the tab name
 function Count({ children }: { children: number }) {
   return (
     <span className="ml-1.5 inline-flex items-center rounded-full bg-background/80 px-2 py-0.5 text-xs font-medium text-muted-foreground tabular-nums">

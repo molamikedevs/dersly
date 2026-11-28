@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 
 import HomeSkeleton from '@/components/common/home-skeleton';
 import { getMyMistakes } from '@/features/mistakes/queries';
+import { getMyActiveQuiz } from '@/features/quizzes/queries';
 import HomeError from '@/features/students/components/home-error';
 import StudentHomeView from '@/features/students/components/student-home';
 import { getStudentHome } from '@/features/students/queries';
@@ -20,10 +21,11 @@ export default function Home() {
 }
 
 async function HomeContent() {
-  const [{ data }, mistakes, vocabulary] = await Promise.all([
+  const [{ data }, mistakes, vocabulary, quiz] = await Promise.all([
     getStudentHome(),
     getMyMistakes(),
     getMyVocabulary(),
+    getMyActiveQuiz(),
   ]);
 
   if (!data) return <HomeError />;
@@ -34,6 +36,7 @@ async function HomeContent() {
       now={new Date()}
       mistakes={mistakes.data}
       vocabulary={vocabulary.data}
+      quiz={quiz.data}
     />
   );
 }

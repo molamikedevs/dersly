@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen } from 'lucide-react';
+import { ArrowRight, BookOpen, ClipboardCheck } from 'lucide-react';
 
 import { AppLink } from '@/features/app/app-mode';
 import PromptCard from '@/features/level-test/components/prompt-card';
@@ -17,18 +17,20 @@ import { formatDate } from '@/lib/utils';
 // database rows, the demo passes it invented ones.
 //
 // Ordered by what the student does: the next lesson, the week at a glance,
-// homework, this week's words, then practice. Lesson notes, materials and
-// reading come after, as things to look back at.
+// quiz, homework, this week's words, then practice. Lesson notes, materials
+// and reading come after, as things to look back at.
 export default function StudentHomeView({
   data,
   now,
   mistakes,
   vocabulary,
+  quiz,
 }: {
   data: StudentHome;
   now: Date;
   mistakes?: StudentMistakes;
   vocabulary?: StudentVocabulary;
+  quiz?: QuizSummary | null;
 }) {
   const {
     firstName,
@@ -51,6 +53,8 @@ export default function StudentHomeView({
   const homeworkHref = current?.hasGuide
     ? `/homework/${current.id}`
     : '/homework';
+
+  const quizDone = Boolean(quiz?.latestAttempt?.submittedAt);
 
   return (
     <div className="flex w-full max-w-6xl min-w-0 flex-col gap-7 pb-10 sm:gap-9">
@@ -81,6 +85,45 @@ export default function StudentHomeView({
                 screen it moves to the side column. */}
             <WeekChecklist {...week} className="lg:hidden" />
           </div>
+
+          {quiz && (
+            <section
+              id="quiz"
+              aria-label="Monthly quiz"
+              className="scroll-mt-24"
+            >
+              <AppLink
+                href={quizDone ? `/quiz/${quiz.id}/result` : `/quiz/${quiz.id}`}
+                className="surface-card group flex min-h-15 touch-manipulation items-center justify-between gap-4 border-primary/30 px-5 py-3.5 transition-all duration-150 hover:border-primary/55 hover:bg-accent/35 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+              >
+                <span className="flex min-w-0 items-center gap-3.5">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary">
+                    <ClipboardCheck className="size-4" aria-hidden />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-[11px] font-semibold tracking-wide text-primary uppercase tabular-nums">
+                      {quizDone
+                        ? `Quiz complete · ${quiz.latestAttempt!.score} / 100`
+                        : `Monthly quiz · ${quiz.questionCount} ${quiz.questionCount === 1 ? 'question' : 'questions'}`}
+                    </span>
+                    <span className="block truncate text-[15px] font-semibold text-foreground transition-colors group-hover:text-primary">
+                      {quiz.title}
+                    </span>
+                  </span>
+                </span>
+
+                <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-primary">
+                  <span className="hidden sm:inline">
+                    {quizDone ? 'View result' : 'Start quiz'}
+                  </span>
+                  <ArrowRight
+                    className="size-4 transition-transform duration-150 ease-out group-hover:translate-x-0.5"
+                    aria-hidden
+                  />
+                </span>
+              </AppLink>
+            </section>
+          )}
 
           {current && (
             <section id="homework" className="scroll-mt-24">
