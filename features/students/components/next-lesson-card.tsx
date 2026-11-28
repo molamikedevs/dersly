@@ -46,16 +46,16 @@ export default function NextLessonCard({
             {started ? 'Your lesson has started' : 'Next lesson'}
           </h2>
 
-          <p className="font-serif text-4xl leading-[1.06] font-medium tracking-tight text-balance text-foreground sm:text-5xl">
+          <p className="font-serif text-4xl leading-[1.06] font-medium tracking-tight text-balance text-[#8fd1b5] sm:text-5xl">
             {when ?? 'No lesson time yet'}
           </p>
 
           <div className="mt-1.5 flex flex-wrap items-center gap-2">
-            <span className="min-w-0 text-base font-semibold wrap-break-word text-foreground sm:text-lg">
+            <span className="min-w-0 text-base font-semibold wrap-break-word text-hero-foreground sm:text-lg">
               {className}
             </span>
             {level && (
-              <span className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-2.5 py-0.5 text-xs font-medium text-foreground/90 capitalize">
+              <span className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-2.5 py-0.5 text-xs font-medium text-hero-foreground/90 capitalize">
                 {level}
               </span>
             )}
@@ -88,7 +88,7 @@ export default function NextLessonCard({
             <span
               className={cn(
                 'font-semibold tabular-nums',
-                complete ? 'text-warning' : 'text-foreground/95',
+                complete ? 'text-warning' : 'text-hero-foreground/95',
               )}
             >
               {packageLabel(done)}

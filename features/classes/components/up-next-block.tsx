@@ -42,7 +42,7 @@ export default function UpNextBlock({
                 {started ? 'On now' : 'Next lesson'}
               </p>
 
-              <p className="font-serif text-4xl leading-[1.06] font-medium tracking-tight text-foreground tabular-nums sm:text-5xl">
+              <p className="font-serif text-4xl leading-[1.06] font-medium tracking-tight text-[#8fd1b5] tabular-nums sm:text-5xl">
                 <time dateTime={start.toISOString()}>
                   {isToday
                     ? formatLessonTime(start)
@@ -50,7 +50,7 @@ export default function UpNextBlock({
                 </time>
               </p>
 
-              <p className="mt-1.5 text-lg leading-snug font-semibold wrap-break-word text-foreground">
+              <p className="mt-1.5 text-lg leading-snug font-semibold wrap-break-word text-hero-foreground">
                 {item.name}
               </p>
 
@@ -74,7 +74,7 @@ export default function UpNextBlock({
             ) : (
               <span
                 aria-hidden
-                className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 group-hover:underline"
+                className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-hero-foreground/90 underline-offset-4 group-hover:underline"
               >
                 Open class
                 <ArrowRight className="size-4 transition-transform duration-150 ease-out group-hover:translate-x-0.5" />
@@ -118,7 +118,7 @@ export default function UpNextBlock({
                   {hasHomework ? (
                     <>
                       <CheckCircle2
-                        className="size-3.5 text-primary"
+                        className="size-3.5 text-[#8fd1b5]"
                         aria-hidden
                       />
                       <span className="font-medium">Homework posted</span>
